@@ -1,0 +1,238 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_DroplistSelect" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if ($('#sDroplistTitle').val() == null || $('#sDroplistTitle').val() == '') {
+                    $ele = $('#sDroplistTitle');
+                    errorField($ele, languageUsed + 'Section Title/Description must be provided.');
+                    return false;
+                }
+
+                if (fCreateDroplistArray().length === 0) {
+                    $ele = $('#droplistTable');
+                    errorField($ele, languageUsed + 'Droplist must be provided.');
+                    return false;
+                }
+
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        function initDroplistTable(){
+            var droplistInfo = '{!jsnDroplist}';
+            if(droplistInfo != ''){
+                droplistInfo = JSON.parse('{!jsnDroplist}');
+            } else {
+                droplistInfo = {};
+            }
+
+            if (!$.isEmptyObject(droplistInfo)){
+                for (var key in droplistInfo){
+                    if (droplistInfo.hasOwnProperty(key)){
+                        var sLabel = droplistInfo[key].sLabel;
+                        var sValue = droplistInfo[key].sValue;
+                        addRow(sLabel, sValue);
+
+                    }
+                }
+            } else {
+                addBlankRow();
+            }
+
+            if({!disableAll}){
+                $('#droplistTable tr td input').attr('readonly',true);
+                $('.remove').remove();
+            } else {
+                $('#addRowButton').click(addBlankRow);
+                $('.removeButton').click(removeRow);
+            }
+        }
+
+        function addBlankRow(){
+            var rowString = '<tr>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs selectLabel" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs selectValue" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<a class="removeButton" style="padding-left:10px">' +
+                                        '<img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" />' +
+                                    '</a>' +
+                                '</td>' +
+                            '</tr>';
+            $('#droplistTable tbody').append(rowString);
+            $('.removeButton').unbind();
+            $('.removeButton').click(removeRow);
+        }
+
+        function addRow(sLabel, sValue){
+
+            var row = $('<tr></tr>');
+            var labelField = $('<td><input class="fullWidth tableInputs selectLabel" type="text" value="' + sLabel + '"></input></td>');
+            var valueField = $('<td><input class="fullWidth tableInputs selectValue" type="text" value="' + sValue + '"></input></td>');
+            var buttonField = $('<td><a class="removeButton" style="padding-left:10px"><img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" /></a></td>"');
+
+            row.append(labelField);
+            row.append(valueField);
+            row.append(buttonField);
+
+            $('#droplistTable tbody').append(row);
+        }
+
+        function removeRow(){
+            if($('#droplistTable tbody tr').length -1 > 0){
+                $(this).parent().parent().remove();
+            } else {
+                $(this).parent().parent().find('.selectLabel').val('');
+                $(this).parent().parent().find('.selectValue').val('');
+            }
+        }
+
+        function fCreateDroplistArray() {
+            var droplistInfo = [];
+
+            $('#droplistTable tbody tr').each(function(index){
+                var sLabel = $(this).find('.selectLabel').val();
+                if(sLabel != null && sLabel != undefined && sLabel != '') {
+                    droplistInfo.push({
+                        sLabel: $(this).find('.selectLabel').val(),
+                        sValue: ($(this).find('.selectValue').val() != '0')?$(this).find('.selectValue').val():''
+                    });
+                }
+            });
+            return droplistInfo;
+        }
+
+        $(document).ready(function(){
+
+            initDroplistTable();
+
+            $(".selectValue").keypress(function(event) {
+                if (this.value.length == 0 && event.which == 48 ){
+                    return false;
+                } else {
+                    return /\d/.test(String.fromCharCode(event.keyCode));
+                }
+            });
+
+            var textMax = 500;
+            var textLength;
+            var textRemaining;
+
+            /* *****
+               * Initialize the remaining character count in the summary text boxes
+               * Character limit is set to 150
+             * *****/
+            textLength = $('#sDroplistTitle').val().length;
+            textRemaining = textMax - textLength;
+            $('#charSummaryCount').html(textRemaining + ' characters remaining');
+
+            /* *****
+               * Update the character count as characters are entered
+             * *****/
+            $('#sDroplistTitle').keyup(function() {
+                textLength = $('#sDroplistTitle').val().length;
+                textRemaining = textMax - textLength;
+                $('#charSummaryCount').html(textRemaining + ' characters remaining');
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                var droplistJSON = JSON.stringify(fCreateDroplistArray());
+
+                attributes.push({"name":"sDroplistTitle", "value": $('#sDroplistTitle').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"sDroplistAccessible", "value": $('#sDroplistAccessible').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"jsnDroplist", "value": droplistJSON, "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sDroplistTitle">Section Title/Description</label>
+                        <textarea  id="sDroplistTitle" name="sDroplistTitle" style="width: 600px; height: 150px;" maxlength="500"><apex:outputText value="{!sDroplistTitle}" /></textarea>
+                        <p class="ocmsHelpText">
+                            (<span id="charSummaryCount"></span>)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sDroplistAccessible">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sDroplistAccessible" name="sDroplistAccessible" type="text" value="{!sDroplistAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fullWidth">
+                        <label class="ocmsLabel ocmsRequiredLabel" for="droplistTable">Droplist</label>
+                        <apex:outputText escape="false" rendered="{!disableAll}">
+                            <table id="droplistTable" style="border:1px dashed #cdcdcd;" class="disabled">
+                                <thead>
+                                    <tr>
+                                        <th width="60%">
+                                            Option Label
+                                        </th>
+                                        <th width="40%" colspan="2">
+                                            Option Value
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </apex:outputText>
+                        <apex:outputText escape="false" rendered="{!!disableAll}">
+                            <table id="droplistTable" style="border:1px solid black;" class="">
+                                <thead>
+                                    <tr>
+                                        <th width="60%">
+                                            Option Label
+                                        </th>
+                                        <th width="40%" colspan="2">
+                                            Option Value
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <br/>
+                            <button id="addRowButton" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Add a new row</span></button>
+                        </apex:outputText>
+                        <p class="ocmsHelpText">Option label is required to make it appear as an option in picklist<br/>
+                        Add integer values (in Option Value field), starting from 1. It is associated with content box ordering</p>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

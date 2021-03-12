@@ -1,0 +1,127 @@
+<!-- ocms_mfc_ToolLibrary_Edit.page -->
+<!--
+    This is the OrchestraCMS content editor page for "Tool Library" custom content
+    
+    2015-Apr-20 - Wilder
+        - original
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_ToolLibrary"
+	showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+	
+	<link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+
+	<apex:outputPanel layout="block">
+
+	<script id="ocms_application_Edit">
+		$(document).ready(function() {
+			ce.content_editor('registerSaveFunction', function() {			   
+				return [
+					{type: 'text', name: 'allToolsHeader',		value: $('#allToolsHeader').val()},
+                                                            {type: 'text', name: 'allToolsMessage',            value: CKEDITOR.instances['allToolsMessage'].getData()},
+					{type: 'text', name: 'myToolsHeader',		value: $('#myToolsHeader').val()},
+                                                            {type: 'text', name: 'myToolsMessage',            value: CKEDITOR.instances['myToolsMessage'].getData()},
+                                                            {type: 'text', name: 'removeButtonText',	value: $('#removeButtonText').val()},
+					{type: 'text', name: 'viewGlobalText',		value: $('#viewGlobalText').val()},
+                                                            {type: 'text', name: 'myBookmarksHeader',     value: $('#myBookmarksHeader').val()},
+                                                            {type: 'text', name: 'myBookmarksMessage',  value: CKEDITOR.instances['myBookmarksMessage'].getData()},
+                                                            {type: 'text', name: 'myBookmarksToolTip',     value: $('#myBookmarksToolTip').val()}
+				];
+			});
+                                // CKEDITOR.replace('body');
+                                CKEDITOR.replace('allToolsMessage', $.extend({
+                                    customConfig: '/apex/c__ocms_mfc_CKEConfig',
+                                    readOnly: false
+                                }, {!CKEditorConfig}));
+
+                                // CKEDITOR.replace('body');
+                                CKEDITOR.replace('myToolsMessage', $.extend({
+                                    customConfig: '/apex/c__ocms_mfc_CKEConfig',
+                                    readOnly: false
+                                }, {!CKEditorConfig}));
+
+                                // CKEDITOR.replace('body');
+                                CKEDITOR.replace('myBookmarksMessage', $.extend({
+                                    customConfig: '/apex/c__ocms_mfc_CKEConfig',
+                                    readOnly: false
+                                }, {!CKEditorConfig}));
+		});
+	</script>
+	
+	<table class="ocmsContentEditor ocmsContentEditorNested">
+            <tr>
+                <td>
+                    <p class="intro">
+                    The section is contains the ability to change the labels on the page.  These can be translatable to serve multiple languages. 
+                    </p>
+                    <p class="intro">
+                    The ordering of the tools/apps is determined through the app's priority setting.
+                    </p>
+	   </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ocmsLabel" for="allToolsHeader" title="All tools Header">All Tools Header</label>
+                    <input type='text' id="allToolsHeader" placeholder="all tools" value="{!allToolsHeader}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <label class="ocmsLabel" for="allToolsMessage" title="All tools Message">All Tools Message</label>
+                    <textarea  id="allToolsMessage" name="allToolsMessage">
+                        <apex:outputText value="{!allToolsMessage}" />
+                    </textarea>                
+	   </td>
+            </tr>
+            <tr>
+               <td>
+                    <label class="ocmsLabel" for="myToolsHeader" title="My tools">My Tools Header</label>
+                    <input type='text' id="myToolsHeader" placeholder="my tools" value="{!myToolsHeader}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>                    
+                    <label class="ocmsLabel" for="allToolsMessage" title="All tools Message">My Tools Message</label>
+                    <textarea  id="myToolsMessage" name="myToolsMessage">
+                        <apex:outputText value="{!myToolsMessage}" />
+                    </textarea>                            
+	   </td>
+            </tr>
+	 <tr>
+               <td>
+	       <label class="ocmsLabel" for="viewGlobalText" title="View global">View Global Label</label>
+	       <input type='text' id="viewGlobalText" placeholder="view global text" value="{!viewGlobalText}"/>
+	   </td>
+            </tr>
+            <tr>
+               <td>
+                    <label class="ocmsLabel" for="removeButtonText" title="Remove button">Remove Button Label</label>
+                    <input type='text' id="removeButtonText" placeholder="remove button text" value="{!removeButtonText}"/>
+	   </td>
+            </tr>
+            <tr>
+               <td>
+                    <label class="ocmsLabel" for="myBookmarksToolTip" title="Bookmarks Label">Bookmarks Tool Tip / Hover Text</label>
+                    <input type='text' id="myBookmarksToolTip" placeholder="Add/Remove Bookmark" value="{!myBookmarksToolTip}"/>
+                </td>
+            </tr>            
+            <tr>
+               <td>
+                    <label class="ocmsLabel" for="myBookmarksHeader" title="Bookmarks Label">Bookmarks Header Text</label>
+                    <input type='text' id="myBookmarksHeader" placeholder="My Bookmarks" value="{!myBookmarksHeader}"/>
+                </td>
+            </tr>
+            <tr>
+                <td>                          
+                    <label class="ocmsLabel" for="myBookmarksMessage" title="My Bookmarks Message">My Bookmarks Message</label>
+                    <textarea  id="myBookmarksMessage" name="myBookmarksMessage">
+                        <apex:outputText value="{!myBookmarksMessage}" />
+                    </textarea>                        
+               </td>
+            </tr>
+        </table>
+
+	</apex:outputPanel>
+	
+</apex:page>
+<!-- ocms_mfc_ToolLibrary_Edit.page -->

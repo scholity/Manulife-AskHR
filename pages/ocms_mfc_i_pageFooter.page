@@ -1,0 +1,52 @@
+<!-- ocms_mfc_i_pageFooter -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+            <!-- turn off google indexing of the following content -->
+            <apex:outputText value=" <" escape="false" />!--googleoff: all--<apex:outputText value="> " escape="false" />
+	<footer id="global-footer" class="clear">
+		<div class="inner">
+            <div class="social-media">
+                <p class="title i18n" id="uiLabelFollowC2A">Follow:</p>
+                <ul>
+                    <li><a title="External site: Opens in a new window" href="#" class="i18nTitle" id="uiTitleFacebook"><span class="fa fa-facebook"></span><span class="accessible">Manulife on Facebook: External site: Opens in a new window</span></a></li>
+                    <li><a title="External site: Opens in a new window" href="#" class="i18nTitle" id="uiTitleTwitter"><span class="fa fa-twitter"></span><span class="accessible">Manulife on Twitter: External site: Opens in a new window</span></a></li>
+                    <li><a title="External site: Opens in a new window" href="#" class="i18nTitle" id="uiTitleInstagram"><span class="fa fa-instagram"></span><span class="accessible">Manulife on Instagram: External site: Opens in a new window</span></a></li>
+                    <li><a title="External site: Opens in a new window" href="#" class="i18nTitle" id="uiTitleLinkedIn"><span class="fa fa-linkedin"></span><span class="accessible">Manulife on LinkedIn: External site: Opens in a new window</span></a></li>
+                    <li><a title="External site: Opens in a new window" href="#" class="i18nTitle" id="uiTitleYouTube"><span class="fa fa-youtube"></span><span class="accessible">Manulife on YouTube: External site: Opens in a new window</span></a></li>
+                </ul>
+            </div>
+
+			<nav class="main-footer-nav">
+				<apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                    <strong>Class Styled Menu</strong> ❧ page footer’s corporate menu<br />
+                    - IMPORTANT: add the class name “sitemap-link” to the Sitemap menu item
+                </div></apex:outputText>
+                <cms:Panel panelName="footerMenu" panelController="{!controller}" panelWidth="550px"
+                    panelHeight="30px" panelContentLayouts="ClassStyledMenu" panelLimit="1" />
+			</nav>
+
+            <div class="clear"></div>
+            <div class="sitemap-content">
+                <hr />
+                <div class="inner">
+                    <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                        <strong>Menu Columns</strong> ❧ MFCentral’s site map menu
+                    </div></apex:outputText>
+                    <cms:Panel panelName="siteMap" panelController="{!controller}" panelWidth="550px"
+                        panelHeight="30px" panelContentLayouts="MenuColumns" panelLimit="1" />
+                </div>
+            </div>
+		</div>
+	</footer>
+    
+    <div class="utilityHTML">
+        <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint" style="margin-top: 2em;">
+            <strong>Custom HTML</strong> ❧ <span>(Optional - advanced use only)</span>
+        </div></apex:outputText>
+        <cms:Panel panelName="utilityHTML" panelController="{!controller}" panelWidth="400px" panelHeight="70px"
+            panelContentLayouts="CustomHtml" />
+    </div>
+    <!-- resuume google indexing of the following content -->
+    <apex:outputText value=" <" escape="false" />!--googleon: all--<apex:outputText value="> " escape="false" /> 
+    
+</apex:page>
+<!-- ocms_mfc_i_pageFooter -->

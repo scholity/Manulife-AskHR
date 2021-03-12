@@ -1,0 +1,65 @@
+<apex:component access="global" controller="ASKHR_ArticleFeedbackExt" >
+    <apex:attribute name="articleId" access="global" description="Attribute for Article Id" type="Id" assignto="{!mArticleId}" />
+        <apex:attribute name="articleLanguage" access="global" description="Attribute for Article Language" type="string" assignto="{!mLanguage}" />
+            <div class="slds-form-element slds-container--left slds-container--small">
+
+                <apex:outputpanel id="details">
+                    <div id="feedback-input" class="slds-form-element__control">
+                        <apex:form >
+                            <apex:actionstatus id="save-feedback-status" onstart="showLoading();" onstop="hideLoading();" />
+                            <p class="slds-text-body--medium slds-m-bottom--small" id="feedback-text"></p>
+                            <apex:inputtextarea id="feedback-input" value="{!articleFeedback.Description__c}" html-class="slds-textarea"></apex:inputtextarea> 
+                            <button class="slds-button slds-button--brand slds-button--small slds-m-top--small" type="button" id="submit-feedback-btn" onclick="submitFeedback();">{!$Label.ASKHR_Article_Feedback_Submit_Text}</button>
+                            <div class="slds-spinner--small slds-float--right" id="comment-loading" style="display:none">
+                                <apex:image value="{!URLFOR($Resource.SLDS_0122,'/assets/images/spinners/slds_spinner.gif')}" />
+                            </div>
+                            <apex:actionfunction action="{!save}" name="submitFeedback"
+                                                 rerender="details" status="save-feedback-status"></apex:actionfunction>
+                        </apex:form>
+                    </div>
+                    <div id="feedback-submitted" class="slds-form-element__control" style="display:none">
+                        <p class="slds-text-heading--label slds-truncate slds-m-bottom--small" title="Field 1">{!$Label.ASKHR_Article_Feedback_TQ_Text}</p>
+                    </div>
+                </apex:outputpanel>
+
+            </div>
+    <script>
+
+        j$ = jQuery.noConflict();
+
+        j$(document).ready(function () {
+            // j$('#feedback-input').text('');
+
+             populateTextContainer();
+             j$('#submit-feedback-btn').attr('disabled' , true);
+        });
+
+            function populateTextContainer(){
+                var employeeName = '{!mEmployeeName}';
+                var caseLink = "/employee/500/e?retURL=%2Femployee%2Fapex%2FASKHR_CustomArticleList&RecordType=01250000000E51ZAAS";
+                var feedbackTitleText = ("{!$Label.ASKHR_Article_Feedback_Text}").replace("{user.Name}", employeeName ).replace("{caselink}", caseLink).split(";");
+
+                j$('#feedback-text').append('<p>'+ feedbackTitleText[0] + '</p>');
+
+            }
+
+            function showLoading(){
+                document.getElementById("comment-loading").style.display = 'block';
+                j$('#submit-feedback-btn').attr('disabled' , true);
+            }
+
+            function hideLoading(){
+                document.getElementById("comment-loading").style.display = 'none';
+                document.getElementById("feedback-input").style.display = 'none';
+                document.getElementById("feedback-submitted").style.display = 'block';
+            }
+
+           j$('textarea[id$="feedback-input"]').keyup(function() {
+            if(j$(this).val() != '') {
+                j$('#submit-feedback-btn').attr('disabled' , false);
+            }else{
+                j$('#submit-feedback-btn').attr('disabled' , true);
+            }
+        });
+    </script>
+</apex:component>

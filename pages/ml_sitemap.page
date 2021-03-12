@@ -1,0 +1,511 @@
+<apex:page contentType="text/xml" showHeader="false" sidebar="false" standardStylesheets="false" applyHtmlTag="false" applyBodyTag="false">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<url>
+  <loc>http://www.manulife.com/</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Home</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Blog</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/About</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Our-Customer-Focus</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Our-Global-Reach</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Our-Story</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Leadership-Team</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Donald-Guloien</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Craig-Bromley</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Cindy-Forbes</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Greg-Framke</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Roy-Gori</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Marianne-Harrison</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Scott-Hartz</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Rahim-Hirji</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Stephani-Kingsmill</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Timothy-Ramza</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Stephen-Roder</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Paul-Rooney</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Stephen-Sigurdson</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Kai-Sotorp</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Warren-Thomson</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Corporate-Citizenship</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Public-Accountability-Statement</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Corporate-Governance</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Guiding-Principles</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Board-of-Directors</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Board-of-Committees</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Awards</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Transactions</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Canada</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-United-States</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Investor-Relations</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Shareholder-Services</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Dividends</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Shareholder-Information</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Preferred-Shares</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Reports</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Credit-Ratings</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Stock-Performance</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Events-Presentations</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Analyst-Coverage</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Key-Financial-Statistics</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Securities-Filings</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/HKEx-Securities-Filings</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Email-alerts</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/News</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Careers</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Why-Manulife</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Your-Career-Development</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Rewards-Recognition</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Workplace-Flexibility</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Global-Opportunities</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Career-Paths</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Career-Alerts-FAQ</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Campus</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Student-Programs</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Events-Calendar</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Campus-Ambassadors</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Meet-the-Team</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Alumni</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Contact</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Dividend-Rates</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Privacy-Policy</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Legal</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Accessibility</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Fraud-Prevention-Centre</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Cambodia</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-China</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Hong-Kong</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Indonesia</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Japan</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Malaysia</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Philippines</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Singapore</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Taiwan</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Thailand</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Products-Services-Vietnam</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Student-Connect</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Online-Privacy-Statement</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Statement-of-Protection-of-Personal-Information</loc>
+</url>
+<url>
+  <loc>http://www.manulife.com/Reinsurance</loc>
+</url>
+  <url>
+    <loc>http://www.manuvie.com/</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Home</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Blog</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/About</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Our-Customer-Focus</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Our-Global-Reach</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Our-Story</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Leadership-Team</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Donald-Guloien</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Craig-Bromley</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Cindy-Forbes</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Greg-Framke</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Roy-Gori</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Marianne-Harrison</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Scott-Hartz</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Rahim-Hirji</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Stephani-Kingsmill</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Timothy-Ramza</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Stephen-Roder</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Paul-Rooney</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Stephen-Sigurdson</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Kai-Sotorp</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Warren-Thomson</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Corporate-Citizenship</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Public-Accountability-Statement</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Corporate-Governance</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Guiding-Principles</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Board-of-Directors</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Board-of-Committees</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Awards</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Transactions</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Canada</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-United-States</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Investor-Relations</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Shareholder-Services</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Dividends</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Shareholder-Information</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Preferred-Shares</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Reports</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Credit-Ratings</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Stock-Performance</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Events-Presentations</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Analyst-Coverage</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Key-Financial-Statistics</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Securities-Filings</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/HKEx-Securities-Filings</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Email-alerts</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/News</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Careers</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Why-Manulife</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Your-Career-Development</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Rewards-Recognition</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Workplace-Flexibility</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Global-Opportunities</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Career-Paths</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Career-Alerts-FAQ</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Campus</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Student-Programs</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Events-Calendar</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Campus-Ambassadors</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Meet-the-Team</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Alumni</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Contact</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Dividend-Rates</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Privacy-Policy</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Legal</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Accessibility</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Fraud-Prevention-Centre</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Cambodia</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-China</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Hong-Kong</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Indonesia</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Japan</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Malaysia</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Philippines</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Singapore</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Taiwan</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Thailand</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Products-Services-Vietnam</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Student-Connect</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Online-Privacy-Statement</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Statement-of-Protection-of-Personal-Information</loc>
+  </url>
+  <url>
+    <loc>http://www.manuvie.com/Reinsurance</loc>
+  </url>
+</urlset>
+</apex:page>

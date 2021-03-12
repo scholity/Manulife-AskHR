@@ -1,0 +1,144 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#navigation li.bt2 a,
+#navigation li.bt2 a:hover,
+#navigation li.bt2 a.on{
+width:146px;
+background-position:-90px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+}
+
+</style>
+
+<div id="content">
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+    <table align="center" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr><td colspan="2" height="20px"></td></tr>
+        <tr>
+            <td width="10%" valign="top">
+              <c:POS_About_Left_Panel src="s2" />    
+            </td>
+
+        <td width="90%" valign="top">   <!--Content--->
+            <div id="aboutpossible" align="center" style="height:100%">
+<div style="height:50px"></div>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td align="center"><img alt="POS OFFERS" src="{!URLFOR($Resource.pos_images2, 'image/POS_roadmap.png')}" /></td>
+        </tr>
+        <tr><td style="height:20px"></td></tr>
+        <tr>
+            <td align="center">
+                <div class="x fontbody" align="center" style="width:770px!important;text-align:justify">
+                    By the end of 2017, eight countries are scheduled to adopt the POSsible solution. These countries will adopt the three components of POSsible (described below) via a series of 'releases'. The current roadmap is as illustrated in the chart. 
+                    This may change depending on country readiness to join the program.
+                </div>
+            </td>
+        </tr>
+        <tr><td style="height:20px"></td></tr>
+        <tr>
+            <td>
+                <div align="center">
+                    <img width="" alt="roadmap" src="{!URLFOR($Resource.pos_images2, 'image/timeline_and_roadmap_diagram_3.png')}" />
+                </div>
+            </td>
+        </tr>
+    </table>
+
+<div style="height:20px"></div>
+ <div class="x fontbody" align="center" style="width:770px;text-align:justify">
+ There are three components that make up the end-to-end POSsible solution.  These are Meet &amp; Refine, Propose (and the Product Engine) and Apply (with Auto Underwriting).  
+ </div>
+ <div style="height:20px"></div>
+
+<div id="Components" style="left: 0px; top: 0px">
+<div align="center"><img width="800px" alt="Contents" src="{!URLFOR($Resource.pos_images2, 'image/content.png')}" /></div>
+<div style="height:40px"></div>
+<div style="height:40px"></div>
+<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
+ <tr>
+
+  <td align="center" valign="top">
+  <!--a href="{!$Site.Prefix}/apex/POS_About"-->
+  <!--a href="javascript: window.history.back()"-->
+  <!-- to cater for Firefox back function not working on this page -->
+  <a id="cmdBack" href="#"
+      onmouseover="document.getElementById('r3').src=pic6.src;"
+      onmouseout="document.getElementById('r3').src=pic5.src;">
+
+  <img src="{!URLFOR($Resource.pos_images, 'image/back-button.png')}" alt="" title="About the program" id="r3" /></a>
+  </td>
+ </tr>
+</table>
+<div style="height:20px"></div>
+</div>
+
+</div>
+
+        </td> <!--end of content--->
+
+        </tr>
+    </table>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+  // to cater for Firefox back function not working for this page
+  var a = document.getElementById('cmdBack');
+  var src = "{!$CurrentPage.parameters.src}";
+  
+  if ( src == 'main' ) {
+    a.href = "{!$Site.Prefix}/apex/POS_About";
+  }
+  if ( src == 'menu' ) {
+    a.href = "{!$Site.Prefix}/apex/POS_About_POS";
+  }
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+   pic5 = new Image();
+   pic5.src = '{!URLFOR($Resource.pos_images, 'image/back-button.png')}';
+   pic6 = new Image();
+   pic6.src = '{!URLFOR($Resource.pos_images, 'image/back-button-(hover).png')}';
+
+</script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

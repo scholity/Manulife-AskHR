@@ -1,0 +1,6 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_Article" showHeader="false" sidebar="false" cache="false" title="OrchestraCMS" standardStylesheets="false">
+	<script> 
+		window.editorType = 'socialPost';
+	</script>
+	<apex:include pageName="ocms_mfc_i_TileItem_Edit" />
+</apex:page>

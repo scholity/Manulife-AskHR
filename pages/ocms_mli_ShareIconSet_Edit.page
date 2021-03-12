@@ -1,0 +1,256 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_ShareIconSet" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateMultipleEmailsCommaSeparated(value) {
+            var result = value.split(',');
+            var errors = [];
+            for(var i = 0;i < result.length;i++) {
+                if (result[i] != '') {
+                    if(!validateEmail(result[i])) {
+                        errors[i] = result[i] + ' is not a valid Email Address format.';
+                    }
+                }
+            }
+            errors = errors.filter(function(e){return e});
+            return errors;
+        }
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if ($('#sFBLikeScript').val() == null || $('#sFBLikeScript').val() == '') {
+                    $ele = $('#sFBLikeScript');
+                    errorField($ele, languageUsed + 'Facebook Like Script must be provided.');
+                    return false;
+                }
+                if ($('#sFBShareLabel').val() == null || $('#sFBShareLabel').val() == '') {
+                    $ele = $('#sFBShareLabel');
+                    errorField($ele, languageUsed + 'Facebook Share Label must be provided.');
+                    return false;
+                }
+                if ($('#sTwitterShareLabel').val() == null || $('#sTwitterShareLabel').val() == '') {
+                    $ele = $('#sTwitterShareLabel');
+                    errorField($ele, languageUsed + 'Twitter Share Label must be provided.');
+                    return false;
+                }
+                if ($('#sLinkedInShareLabel').val() == null || $('#sLinkedInShareLabel').val() == '') {
+                    $ele = $('#sLinkedInShareLabel');
+                    errorField($ele, languageUsed + 'LinkedIn Share Label must be provided.');
+                    return false;
+                }
+                if ($('#sPrintLabel').val() == null || $('#sPrintLabel').val() == '') {
+                    $ele = $('#sPrintLabel');
+                    errorField($ele, languageUsed + 'Print Label must be provided.');
+                    return false;
+                }
+                if ($('#sEmailLabel').val() == null || $('#sEmailLabel').val() == '') {
+                    $ele = $('#sEmailLabel');
+                    errorField($ele, languageUsed + 'Email Label must be provided.');
+                    return false;
+                }
+                if ($('#sEmailAddress').val() != null && $('#sEmailAddress').val() != '') {
+                    $ele = $('#sEmailAddress');
+                    var errors = [];
+                    errors = validateMultipleEmailsCommaSeparated($ele.val());
+                    if (errors.length > 0) {
+                        errorField($ele, languageUsed + errors.join('\n'));
+                        return false;
+                    }
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sShareLabel", "value": $('#sShareLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sShareAccessible", "value": $('#sShareAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFBLikeScript", "value": $('#sFBLikeScript').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFBShareLabel", "value": $('#sFBShareLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFBShareAccessible", "value": $('#sFBShareAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTwitterShareLabel", "value": $('#sTwitterShareLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTwitterShareAccessible", "value": $('#sTwitterShareAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLinkedInShareLabel", "value": $('#sLinkedInShareLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLinkedInShareAccessible", "value": $('#sLinkedInShareAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sPrintLabel", "value": $('#sPrintLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sPrintAccessible", "value": $('#sPrintAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sEmailLabel", "value": $('#sEmailLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sEmailAccessible", "value": $('#sEmailAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sEmailAddress", "value": $('#sEmailAddress').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sEmailSubject", "value": $('#sEmailSubject').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sEmailBody", "value": $('#sEmailBody').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <div class="ocmsHint">
+                            <p>
+                                <a onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a>
+                            </p>
+                            <div style="display: none" class="ocmsInstructions">
+                                <p>
+                                    <strong>IMPORTANT: </strong> in order for the Social Media counters to properly display,
+                                    include the <strong>MLI Facebook Open Graph Article</strong> content in the "Head Tag" section of the page template.
+                                </p>
+                                <p>If the "Head Tag" panel is not visible at the top of the page editor,
+                                check to ensure that the page template has been set to "ocms_mli_t_ArticleDetail".</p>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sShareLabel">Share Label</label>
+                        <input class="ocmsTextInputLrg" id="sShareLabel" name="sShareLabel" type="text" value="{!sShareLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sShareAccessible">Share Accessible Text (mobile only)</label>
+                        <input class="ocmsTextInputLrg" id="sShareAccessible" name="sShareAccessible" type="text" value="{!sShareAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sFBLikeScript">Facebook Like Script</label>
+                        <textarea  id="sFBLikeScript" name="sFBLikeScript" rows="15" cols="100"><apex:outputText value="{!sFBLikeScript}" /></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Facebook Share</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sFBShareLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sFBShareLabel" name="sFBShareLabel" type="text" value="{!sFBShareLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFBShareAccessible">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sFBShareAccessible" name="sFBShareAccessible" type="text" value="{!sFBShareAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Twitter Share</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sTwitterShareLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sTwitterShareLabel" name="sTwitterShareLabel" type="text" value="{!sTwitterShareLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTwitterShareAccessible">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sTwitterShareAccessible" name="sTwitterShareAccessible" type="text" value="{!sTwitterShareAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>LinkedIn Share</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sLinkedInShareLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sLinkedInShareLabel" name="sLinkedInShareLabel" type="text" value="{!sLinkedInShareLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLinkedInShareAccessible">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sLinkedInShareAccessible" name="sLinkedInShareAccessible" type="text" value="{!sLinkedInShareAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Print</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sPrintLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sPrintLabel" name="sPrintLabel" type="text" value="{!sPrintLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sPrintAccessible">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sPrintAccessible" name="sPrintAccessible" type="text" value="{!sPrintAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Email</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sEmailLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sEmailLabel" name="sEmailLabel" type="text" value="{!sEmailLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sEmailAccessible">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sEmailAccessible" name="sEmailAccessible" type="text" value="{!sEmailAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sEmailAddress">Email Address</label>
+                        <input class="ocmsTextInputLrg" id="sEmailAddress" name="sEmailAddress" type="text" value="{!sEmailAddress}"></input>
+                        <p class="ocmsHelpText">Add comma separated email addresses without any space.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sEmailSubject">Email Subject</label>
+                        <input class="ocmsTextInputLrg" id="sEmailSubject" name="sEmailSubject" type="text" value="{!sEmailSubject}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sEmailBody">Email Body</label>
+                        <textarea  id="sEmailBody" name="sEmailBody" rows="15" cols="100"><apex:outputText value="{!sEmailBody}" /></textarea>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

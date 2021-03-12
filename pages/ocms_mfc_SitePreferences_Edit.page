@@ -1,0 +1,768 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_SitePreferences" showHeader="false" sidebar="false" cache="false" title="OrchestraCMS" standardStylesheets="false">
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/ocms-reset+support.css')}" />
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}" class="psContentEditorCSS" />
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/selectize.css')}" />
+    <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+
+    <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery/jquery.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/selectize/js/jquery-ui.min.js')}"></script>
+    <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/selectize/js/selectize.min.js')}"></script>
+
+    <apex:outputPanel layout="block">
+        <script type="text/javascript" language="javascript">
+            var $$ = $.noConflict(true),
+                selectize,
+                $select,
+                apps;
+
+            $(document).ready(function() {
+
+            	function initCheckBoxes () {
+            		$('#socialLinksInNewTab').attr('checked', '{!socialLinksInNewTab}' === 'true');
+            	}
+
+                function initSelectize () {
+                    $select = $$('#mandatoryApps').selectize({
+                        plugins: ['remove_button', 'drag_drop'],
+                        delimiter: ',',
+                        create: false
+                    });
+
+                    selectize = $select[0].selectize;
+                }
+
+                $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_AppService', {
+                        action: 'getFullAppListByName',
+                    },
+                    function (textStatus, json, xhr) {
+                        var mandatoryAppIDs = '{!mandatoryAppIDs}'.split(',');
+                        var mandatoryAppNames = '{!mandatoryAppNames}'.split(',');
+                        var appFoundIndex = 0;
+
+                        if (json.success) {
+                            apps = json.apps;
+
+                            for (var i = 0; i < apps.length; i++) {
+                                var appName = apps[i].appName;
+
+                                if (apps[i].duplicateName) {
+                                    appName += ' - (' + apps[i].appCategory + ')';
+                                }
+
+                                selectize.addOption({value: apps[i].appId + ';' + appName, text: appName});
+
+                                appFoundIndex = mandatoryAppIDs.indexOf(apps[i].appId);
+
+                                if (appFoundIndex != -1) {
+                                    selectize.addItem(mandatoryAppIDs[appFoundIndex] + ';' + mandatoryAppNames[appFoundIndex]);
+                                }
+                            }
+                        }
+                    }
+                );
+
+                initSelectize();
+
+                ce.content_editor('registerSaveFunction', function () {
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_SitePreferences', {
+                            action: 'setupSitePreferences',
+                            thisContentId: "{!thisContentId}"
+                        },
+                        function (textStatus, json, xhr) {
+                            debug.log('setupSitePreferences returned:', textStatus, json);
+                        }
+                    );
+
+                    var apps = selectize.getValue().split(',');
+                    var mandatoryAppIDs = '';
+                    var mandatoryAppNames = '';
+
+                    for (var i = 0; i < apps.length; i++) {
+                        var app = apps[i].split(';')
+                        mandatoryAppIDs += app[0] + ',';
+                        mandatoryAppNames += app[1] + ',';
+                    }
+
+                    var attributes = [
+                        {type: 'Text',  name: 'locationTaxonomy',                   value: $('#locationTaxonomy').val()},
+                        {type: 'Text',  name: 'divisionTaxonomy',                   value: $('#divisionTaxonomy').val()},
+                        {type: 'Text',  name: 'employeeTypeContributorTaxonomy',    value: $('#employeeTypeContributorTaxonomy').val()},
+                        {type: 'Text',  name: 'employeeTypePeopleManagerTaxonomy',  value: $('#employeeTypePeopleManagerTaxonomy').val()},
+                        {type: 'Text',  name: 'newsCategoryTaxonomy',               value: $('#newsCategoryTaxonomy').val()},
+                        {type: 'Text',  name: 'appCategoriesTaxonomy',              value: $('#appCategoriesTaxonomy').val()},
+                        {type: 'Text',  name: 'articleCategoriesTaxonomy',          value: $('#articleCategoriesTaxonomy').val()},
+                        {type: 'Text',  name: 'featuredItemTagPath',                value: $('#featuredItemTagPath').val()},
+                        {type: 'Text',  name: 'mandatoryNewsPaths',                 value: $('#mandatoryNewsPaths').val()},
+                        {type: 'Text',  name: 'mandatoryAppIDs',                    value: mandatoryAppIDs.slice(0, -1)},
+                        {type: 'Text',  name: 'mandatoryAppNames',                  value: mandatoryAppNames.slice(0, -1)},
+
+                        {type: 'Text',  name: 'reportButtonEmail',                  value:$('#reportButtonEmail').val()},
+
+                        // Definition of custom urls
+                        {type: 'Text',  name: 'articlePage',                        value: $('#articlePage').val()},
+                        {type: 'Text',  name: 'bannerPage',                         value: $('#bannerPage').val()},
+                        {type: 'Text',  name: 'ceoArticlePage',                     value: $('#ceoArticlePage').val()},
+                        {type: 'Text',  name: 'appLibrary',                         value: $('#appLibrary').val()},
+                        {type: 'Text',  name: 'appDetail',                          value: $('#appDetail').val()},
+                        {type: 'Text',  name: 'categoryDetail',                     value: $('#categoryDetail').val()}, // should have been appCategoryDetail
+                        {type: 'Text',  name: 'eventPage',                          value: $('#eventPage').val()},
+                        {type: 'Text',  name: 'calendarPage',                       value: $('#calendarPage').val()},
+                        {type: 'Text',  name: 'eventFormPage',                      value: $('#eventFormPage').val()},
+                        {type: 'Text',  name: 'ethicsHotlinePage',                  value: $('#ethicsHotlinePage').val()},
+                        {type: 'Text',  name: 'userPrefsPage',                      value: $('#userPrefsPage').val()},
+                        {type: 'Text',  name: 'mfConnectDirectory',                 value: $('#mfConnectDirectory').val()},
+
+                        {type: 'Text', name: 'facebookPage',                        value: $('#facebookPage').val()},
+                        {type: 'Text', name: 'twitterPage',                         value: $('#twitterPage').val()},
+                        {type: 'Text', name: 'instagramPage',                       value: $('#instagramPage').val()},
+                        {type: 'Text', name: 'linkedInPage',                        value: $('#linkedInPage').val()},
+                        {type: 'Text', name: 'youTubePage',                         value: $('#youTubePage').val()},
+
+                        {type: 'Text',  name: 'notificationsCheckInterval',         value: $('#notificationsCheckInterval').val(),  lang: ''},
+                        {type: 'Text',  name: 'notificationsMaxLoad',               value: $('#notificationsMaxLoad').val(),        lang: ''},
+                        {type: 'Text',  name: 'notificationsPerPage',               value: $('#notificationsPerPage').val(),        lang: ''},
+
+                        {type: 'Text',  name: 'uiLabelMenu',                        value: $('#uiLabelMenu').val()},
+                        {type: 'Text',  name: 'uiLabelClose',                       value: $('#uiLabelClose').val()},
+                        {type: 'Text',  name: 'uiLabelGear',                        value: $('#uiLabelGear').val()},
+                        {type: 'Text',  name: 'uiLabelBack',                        value: $('#uiLabelBack').val()},
+                        {type: 'Text',  name: 'uiLabelBackToTop',                   value: $('#uiLabelBackToTop').val()},
+                        {type: 'Text',  name: 'uiLabelBackToHome',                  value: $('#uiLabelBackToHome').val()},
+                        {type: 'Text',  name: 'uiLabelShowMore',                    value: $('#uiLabelShowMore').val()},
+                        {type: 'Text',  name: 'uiLabelSearchPlaceholder',           value: $('#uiLabelSearchPlaceholder').val()},
+                        {type: 'Text',  name: 'uiLabelFollowC2A',                   value: $('#uiLabelFollowC2A').val()},
+
+                        // the vague 'Explore' has now become 'browse employee directory within MFConnect'
+                        {type: 'Text',  name: 'uiTitleEthics',                      value: $('#uiTitleEthics').val()},
+                        {type: 'Text',  name: 'uiTitleExplore',                     value: $('#uiTitleExplore').val()},
+                        {type: 'Text',  name: 'uiTitleNotifications',               value: $('#uiTitleNotifications').val()},
+                        {type: 'Text',  name: 'uiTitleLaunchPad',                   value: $('#uiTitleLaunchPad').val()},
+                        {type: 'Text',  name: 'uiTopIconsGroup',                    value: $('#uiTopIconsGroup').val()},
+                        {type: 'Text',  name: 'uiTitleSearch',                      value: $('#uiTitleSearch').val()},
+
+                        {type: 'Text', name: 'uiTitleFacebook',                     value: $('#uiTitleFacebook').val()},
+                        {type: 'Text', name: 'uiTitleTwitter',                      value: $('#uiTitleTwitter').val()},
+                        {type: 'Text', name: 'uiTitleInstagram',                    value: $('#uiTitleInstagram').val()},
+                        {type: 'Text', name: 'uiTitleLinkedIn',                     value: $('#uiTitleLinkedIn').val()},
+                        {type: 'Text', name: 'uiTitleYouTube',                      value: $('#uiTitleYouTube').val()},
+                        {type: 'Text', name: 'socialLinksInNewTab',                 value: $('#socialLinksInNewTab').is(':checked')},
+
+                        {type: 'Text',  name: 'uiLabelViewNotificationDetails',     value: $('#uiLabelViewNotificationDetails').val()},
+                        {type: 'Text',  name: 'uiLabelBookmark',                    value: $('#uiLabelBookmark').val()},
+                        {type: 'Text',  name: 'uiLabelShare',                       value: $('#uiLabelShare').val()},
+                        {type: 'Text',  name: 'uiLabelArtContactInformation',       value: $('#uiLabelArtContactInformation').val()},
+                        {type: 'Text',  name: 'uiLabelArtPrevious',                 value: $('#uiLabelArtPrevious').val()},
+                        {type: 'Text',  name: 'uiLabelArtNext',                     value: $('#uiLabelArtNext').val()},
+                        {type: 'Text',  name: 'uiLabelArtTopics',                   value: $('#uiLabelArtTopics').val()},
+                        {type: 'Text',  name: 'uiLabelArtRelated',                  value: $('#uiLabelArtRelated').val()},
+                        {type: 'Text',  name: 'uiLabelArtReadMore',                 value: $('#uiLabelArtReadMore').val()},
+
+                        {type: 'Text',  name: 'uiNewsItemLinkText',                 value: $('#uiNewsItemLinkText').val()},
+                        {type: 'Text',  name: 'uiSocialPostLinkText',               value: $('#uiSocialPostLinkText').val()},
+                        {type: 'Text',  name: 'uiLabelLike',                        value: $('#uiLabelLike').val()},
+                        {type: 'Text',  name: 'uiLabelToday',                       value: $('#uiLabelToday').val()},
+                        {type: 'Text',  name: 'uiLabelYesterday',                   value: $('#uiLabelYesterday').val()},
+
+                        {type: 'Text',  name: 'uiLabelSearchPlaceholder',           value: $('#uiLabelSearchPlaceholder').val()},
+                        {type: 'Text',  name: 'uiLabelSearchErrorNoResults',        value: $('#uiLabelSearchErrorNoResults').val()},
+                        {type: 'Text',  name: 'uiLabelSearchErrorNoResultsP2',      value: $('#uiLabelSearchErrorNoResultsP2').val()},
+                        {type: 'Text',  name: 'uiLabelSearchErrorTimeout',          value: $('#uiLabelSearchErrorTimeout').val()},
+                        {type: 'Text',  name: 'uiLabelSearchFacet1',                value: $('#uiLabelSearchFacet1').val()},
+                        {type: 'Text',  name: 'uiLabelSearchFacet2',                value: $('#uiLabelSearchFacet2').val()},
+                        {type: 'Text',  name: 'uiLabelSearchFacet3',                value: $('#uiLabelSearchFacet3').val()},
+                        {type: 'Text',  name: 'uiLabelSearchFacet4',                value: $('#uiLabelSearchFacet4').val()},
+                        {type: 'Text',  name: 'uiLabelSearchFacet5',                value: $('#uiLabelSearchFacet5').val()},
+
+                        {type: 'Text',  name: 'shareEmailSubject',                  value: $('#shareEmailSubject').val()},
+
+                        {type: 'Text',  name: 'ceoCategory1',                       value: $('#ceoCategory1').val()},
+                        {type: 'Text',  name: 'ceoCategory2',                       value: $('#ceoCategory2').val()},
+                        {type: 'Text',  name: 'ceoCategory3',                       value: $('#ceoCategory3').val()},
+                        {type: 'Text',  name: 'ceoCategory4',                       value: $('#ceoCategory4').val()},
+                        {type: 'Text',  name: 'ceoCategory5',                       value: $('#ceoCategory5').val()},
+                        {type: 'Text',  name: 'ceoCategory6',                       value: $('#ceoCategory6').val()},
+                        {type: 'Text',  name: 'ceoCategory1Image',                  value: $('#ceoCategory1Image').val()},
+                        {type: 'Text',  name: 'ceoCategory2Image',                  value: $('#ceoCategory2Image').val()},
+                        {type: 'Text',  name: 'ceoCategory3Image',                  value: $('#ceoCategory3Image').val()},
+                        {type: 'Text',  name: 'ceoCategory4Image',                  value: $('#ceoCategory4Image').val()},
+                        {type: 'Text',  name: 'ceoCategory5Image',                  value: $('#ceoCategory5Image').val()},
+                        {type: 'Text',  name: 'ceoCategory6Image',                  value: $('#ceoCategory6Image').val()},
+                     
+                        {type: 'Text',  name: 'searchGSARequestTimeout',            value: $('#searchGSARequestTimeout').val()},
+                    ];
+
+                    return attributes;
+                });
+
+                if (!{!disableAll}) {
+                    initializeTagPathSelectors();
+                    initializeMultiTagPathSelectors();
+
+                    $('#notificationsCheckInterval').acceptChars('digits');
+                    $('#notificationsMaxLoad, #notificationsPerPage').acceptChars('digits length 3');
+                } else {
+                    initializeMultiTagPathSelectorsDisabled();
+                }
+
+                initCheckBoxes();
+            });
+        </script>
+
+        <ul class="OCMSTabBar"><!-- no space between inline tab li's -->
+            <li class="active" data-tabsheet="general">General</li><li data-tabsheet="uiText">UI Text</li><li data-tabsheet="advanced">Advanced</li>
+        </ul>
+
+        <div class="OCMSTabSheet_c">
+            <div class="OCMSTabSheet active general">
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Primary taxonomy categories</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr>
+                        <td class="noVerticalPadding">
+                            <p class="ocmsInstructionText">
+                                For each of the following “category dimensions”, choose the taxonomy node that represents the
+                                <i>top-level “root node”</i> for the relevant hierarchy of category labels, or the “All” category label
+                                where appropriate.</p>
+                        </td>
+                    </tr>
+                    <tr><td>
+                            <label class="ocmsLabel">Location: “All Locations”</label>
+                            <div class="taxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="locationTaxonomy" id="locationTaxonomy" value="{!locationTaxonomy}"/>
+                            </div>
+                    </td></tr>
+                    <tr><td>
+                            <label class="ocmsLabel">Division: “All Divisions”</label>
+                            <div class="taxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="divisionTaxonomy" id="divisionTaxonomy" value="{!divisionTaxonomy}"/>
+                            </div>
+                    </td></tr>
+                    <tr><td>
+                            <label class="ocmsLabel">Employee Type</label>
+                            <p>
+                                See the two Employee Type tag labels in the “Specific taxonomy labels” section below.
+                            </p>
+                    </td></tr>
+                    <tr><td>
+                            <label class="ocmsLabel">News Category</label>
+                            <div class="taxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="newsCategoryTaxonomy" id="newsCategoryTaxonomy" value="{!newsCategoryTaxonomy}"/>
+                            </div>
+                    </td></tr>
+                    <tr><td>
+                            <label class="ocmsLabel">Article Categories</label>
+                            <div class="taxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="articleCategoriesTaxonomy" id="articleCategoriesTaxonomy" value="{!articleCategoriesTaxonomy}"/>
+                            </div>
+                    </td></tr>
+                    <tr><td>
+                            <label class="ocmsLabel">Tool Categories</label>
+                            <div class="taxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="appCategoriesTaxonomy" id="appCategoriesTaxonomy" value="{!appCategoriesTaxonomy}"/>
+                            </div>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Specific taxonomy labels</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                            <label class="ocmsLabel">Employee Type: “People Manager” tag label</label>
+                            <div class="taxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="employeeTypePeopleManagerTaxonomy" id="employeeTypePeopleManagerTaxonomy" value="{!employeeTypePeopleManagerTaxonomy}"/>
+                            </div>
+                    </td></tr>
+                    <tr><td>
+                            <label class="ocmsLabel">Employee Type: “Individual Contributor” tag label</label>
+                            <div class="taxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="employeeTypeContributorTaxonomy" id="employeeTypeContributorTaxonomy" value="{!employeeTypeContributorTaxonomy}"/>
+                            </div>
+                    </td></tr>
+
+                    <tr><td>
+                        <label class="ocmsLabel">“Featured” taxonomy tag label</label>
+                        <div class="taxSelect">
+                            <input class="ocmsTextInputVeryWide" type="text" name="featuredItemTagPath" id="featuredItemTagPath" value="{!featuredItemTagPath}"/>
+                        </div>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Page mapping</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr>
+                        <td class="noVerticalPadding">
+                            <p class="ocmsInstructionText">
+                                For each of the following page types, choose the site page that will handle that role.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        Article page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="articlePage">Reusable, dynamic article page</label>
+                        <input type="hidden" name="articlePage" id="articlePage" value="{!articlePageAsData}" />
+                        <cms:PageSelector cPassThroughId="articlePage" value="{!articlePageAsData}" dialogId="dlgarticlePage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        Banner Page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="bannerPage">Main banner page</label>
+                        <input type="hidden" name="bannerPage" id="bannerPage" value="{!bannerPageAsData}" />
+                        <cms:PageSelector cPassThroughId="bannerPage" value="{!bannerPageAsData}" dialogId="dlgbannerPage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        CEO Article page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoArticlePage">Reusable, dynamic article page</label>
+                        <input type="hidden" name="ceoArticlePage" id="ceoArticlePage" value="{!ceoArticlePageAsData}" />
+                        <cms:PageSelector cPassThroughId="ceoArticlePage" value="{!ceoArticlePageAsData}" dialogId="dlgceoArticlePage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        App pages
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="appLibrary">Tool Library (Manage Apps page)</label>
+                        <input type="hidden" name="appLibrary" id="appLibrary" value="{!appLibraryAsData}" />
+                        <cms:PageSelector cPassThroughId="appLibrary" value="{!appLibraryAsData}" dialogId="dlgappLibrary" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="appDetail">App detail page</label>
+                        <input type="hidden" name="appDetail" id="appDetail" value="{!appDetailAsData}" />
+                        <cms:PageSelector cPassThroughId="appDetail" value="{!appDetailAsData}" dialogId="dlgAppDetail" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="categoryDetail">App category detail page</label>
+                        <input type="hidden" name="categoryDetail" id="categoryDetail" value="{!categoryDetailAsData}" />
+                        <cms:PageSelector cPassThroughId="categoryDetail" value="{!categoryDetailAsData}" dialogId="dlgCategoryDetail" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        Event page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="eventPage">All-purpose event detail page</label>
+                        <input type="hidden" name="eventPage" id="eventPage" value="{!eventPageAsData}" />
+                        <cms:PageSelector cPassThroughId="eventPage" value="{!eventPageAsData}" dialogId="dlgEventPage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        Calendar page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="calendarPage">All-purpose calendar page</label>
+                        <input type="hidden" name="calendarPage" id="calendarPage" value="{!calendarPageAsData}" />
+                        <cms:PageSelector cPassThroughId="calendarPage" value="{!calendarPageAsData}" dialogId="dlgCategoryPage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        Event Form page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="eventFormPage">All-purpose event form submission page</label>
+                        <input type="hidden" name="eventFormPage" id="eventFormPage" value="{!eventFormPageAsData}" />
+                        <cms:PageSelector cPassThroughId="eventFormPage" value="{!eventFormPageAsData}" dialogId="dlgEventFormPage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        User Preferences page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="userPrefsPage">User Preferences page</label>
+                        <input type="hidden" name="userPrefsPage" id="userPrefsPage" value="{!userPrefsPageAsData}" />
+                        <cms:PageSelector cPassThroughId="userPrefsPage" value="{!userPrefsPageAsData}" dialogId="dlgUserPrefsPage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+                    <tr class="ocmsEditorSubtitle"><td>
+                        Ethics Hotline page
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ethicsHotlinePage">Ethics Hotline page</label>
+                        <input type="hidden" name="ethicsHotlinePage" id="ethicsHotlinePage" value="{!ethicsHotlinePageAsData}" />
+                        <cms:PageSelector cPassThroughId="ethicsHotlinePage" value="{!ethicsHotlinePageAsData}" dialogId="dlgEthicsHotlinePage" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+
+                    <tr class="ocmsEditorSubtitle"><td>
+                        MFConnect Staff Directory
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="mfConnectDirectory">MFConnect staff directory link (external to MFCentral site)</label>
+                        <input type="hidden" name="mfConnectDirectory" id="mfConnectDirectory" value="{!mfConnectDirectoryAsData}" />
+                        <cms:PageSelector cPassThroughId="mfConnectDirectory" value="{!mfConnectDirectoryAsData}" dialogId="dlgMFConnectDirectory" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Social page mapping</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr>
+                        <td class="noVerticalPadding">
+                            <p class="ocmsInstructionText">
+                                For each of the following, write the link users should be directed to upon cliking. Note that links must be prefaced with http:// or https:// to be properly designated as external links
+                            </p>
+                        </td>
+                    </tr>
+
+                    <tr><td>
+                        <label class="ocmsLabel" for="facebookPage">Facebook page link</label>
+                        <input class="ocmsTextInputMed" type="text" name="facebookPage" id="facebookPage" value="{!facebookPage}"/>
+                    </td></tr>
+
+                    <tr><td>
+                        <label class="ocmsLabel" for="twitterPage">Twitter page link</label>
+                        <input class="ocmsTextInputMed" type="text" name="twitterPage" id="twitterPage" value="{!twitterPage}"/>
+                    </td></tr>
+
+                    <tr><td>
+                        <label class="ocmsLabel" for="instagramPage">Instagram page link</label>
+                        <input class="ocmsTextInputMed" type="text" name="instagramPage" id="instagramPage" value="{!instagramPage}"/>
+                    </td></tr>
+
+                    <tr><td>
+                        <label class="ocmsLabel" for="linkedInPage">LinkedIn page link</label>
+                        <input class="ocmsTextInputMed" type="text" name="linkedInPage" id="linkedInPage" value="{!linkedInPage}"/>
+                    </td></tr>
+
+                    <tr><td>
+                        <label class="ocmsLabel" for="youTubePage">YouTube page link</label>
+                        <input class="ocmsTextInputMed" type="text" name="youTubePage" id="youTubePage" value="{!youTubePage}"/>
+                    </td></tr>
+
+                    <tr><td>
+                            <label class="ocmsLabel" for="socialLinksInNewTab">Link behaviour</label>
+                            <input type="checkbox" id="socialLinksInNewTab" name="socialLinksInNewTab" value="socialLinksInNewTab">Open social links in new tab </input>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Mandatory apps</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="mandatoryApps">Mandatory Apps</label>
+                        <input id="mandatoryApps" name="mandatoryApps" type="text" value="" class="ocmsTextInputVeryWide" />
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Mandatory News Categories</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr>
+                        <td class="noVerticalPadding">
+                            <p class="ocmsInstructionText">
+                                Only choose categories that are children of the "News Category" dimension.
+                            </p>
+                        </td>
+                    </tr>
+                    <tr><td>
+                            <label class="ocmsLabel" for="mandatoryApps">Mandatory News Categories</label>
+                            <div class="multiTaxSelect">
+                                <input class="ocmsTextInputVeryWide" type="text" name="mandatoryNewsPaths" id="mandatoryNewsPaths" value='{!mandatoryNewsPaths}'/>
+                            </div>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Report Button</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                <tr><td>
+                    <label class="ocmsLabel" for="reportButtonEmail">Default report button email</label>
+                    <input id="reportButtonEmail" name="reportButtonEmail" type="text" value="{!reportButtonEmail}" class="ocmsTextInputVeryWide" />
+                </td></tr>
+                </table>
+
+            </div>
+
+            <div class="OCMSTabSheet uiText">
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Text for standard navigation links</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelMenu">“MENU” button text</label>
+                        <input type="text" name="uiLabelMenu" id="uiLabelMenu" value="{!uiLabelMenu}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelClose">“CLOSE” button text</label>
+                        <input type="text" name="uiLabelClose" id="uiLabelClose" value="{!uiLabelClose}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelGear">“Gear” button text (enter `&lt;br&gt;` for new line)</label>
+                        <input type="text" name="uiLabelGear" id="uiLabelGear" value="{!uiLabelGear}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelBack">“Back” button text</label>
+                        <input type="text" name="uiLabelBack" id="uiLabelBack" value="{!uiLabelBack}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelShowMore">”Show More” button text</label>
+                        <input type="text" name="uiLabelShowMore" id="uiLabelShowMore" value="{!uiLabelShowMore}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelBackToTop">”Back to Top” text</label>
+                        <input type="text" name="uiLabelBackToTop" id="uiLabelBackToTop" value="{!uiLabelBackToTop}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelBackToHome">”Back to Home” text</label>
+                        <input type="text" name="uiLabelBackToHome" id="uiLabelBackToHome" value="{!uiLabelBackToHome}"/>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Tip text for navigation icons</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleEthics">Ethics hotline tip text</label>
+                        <input class="ocmsTextInputMed" type="text" name="uiTitleEthics" id="uiTitleEthics" value="{!uiTitleEthics}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleExplore">MFConnect staff directory tip text</label>
+                        <input class="ocmsTextInputMed" type="text" name="uiTitleExplore" id="uiTitleExplore" value="{!uiTitleExplore}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleNotifications">Notifications tip text</label>
+                        <input type="text" name="uiTitleNotifications" id="uiTitleNotifications" value="{!uiTitleNotifications}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleLaunchPad">LaunchPad tip text</label>
+                        <input type="text" name="uiTitleLaunchPad" id="uiTitleLaunchPad" value="{!uiTitleLaunchPad}"/>
+                    </td></tr><tr><td>
+                        <label class="ocmsLabel" for="uiTopIconsGroup">Global Navigation Top Icons</label>
+                        <input type="text" name="uiTopIconsGroup" id="uiTopIconsGroup" value="{!uiTopIconsGroup}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleSearch">Search tip text</label>
+                        <input type="text" name="uiTitleSearch" id="uiTitleSearch" value="{!uiTitleSearch}"/>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Tip text for social media icons</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleFacebook">Facebook icon tip text</label>
+                        <input class="ocmsTextInputMed" type="text" name="uiTitleFacebook" id="uiTitleFacebook" value="{!uiTitleFacebook}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleTwitter">Twitter icon tip text</label>
+                        <input class="ocmsTextInputMed" type="text" name="uiTitleTwitter" id="uiTitleTwitter" value="{!uiTitleTwitter}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleInstagram">Instagram icon tip text</label>
+                        <input type="text" name="uiTitleIntstagram" id="uiTitleInstagram" value="{!uiTitleInstagram}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleLinkedIn">LinkedIn icon tip text</label>
+                        <input type="text" name="uiTitleLinkedIn" id="uiTitleLinkedIn" value="{!uiTitleLinkedIn}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiTitleYouTube">YouTube icon tip text</label>
+                        <input type="text" name="uiTitleYouTube" id="uiTitleYouTube" value="{!uiTitleYouTube}"/>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Search text labels</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchPlaceholder">Search placeholder text</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchPlaceholder" id="uiLabelSearchPlaceholder" value="{!uiLabelSearchPlaceholder}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchErrorNoResults">Search No Result p1</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchErrorNoResults" id="uiLabelSearchErrorNoResults" value="{!uiLabelSearchErrorNoResults}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchErrorNoResultsP2">Search No Result p2</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchErrorNoResultsP2" id="uiLabelSearchErrorNoResultsP2" value="{!uiLabelSearchErrorNoResultsP2}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchErrorTimeout">Search Error Timeout</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchErrorTimeout" id="uiLabelSearchErrorTimeout" value="{!uiLabelSearchErrorTimeout}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchFacet1">Search Facet 1</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchFacet1" id="uiLabelSearchFacet1" value="{!uiLabelSearchFacet1}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchFacet2">Search Facet 2</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchFacet2" id="uiLabelSearchFacet2" value="{!uiLabelSearchFacet2}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchFacet3">Search Facet 3</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchFacet3" id="uiLabelSearchFacet3" value="{!uiLabelSearchFacet3}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchFacet4">Search Facet 4</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchFacet4" id="uiLabelSearchFacet4" value="{!uiLabelSearchFacet4}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelSearchFacet5">Search Facet 5</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelSearchFacet5" id="uiLabelSearchFacet5" value="{!uiLabelSearchFacet5}"/>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Other standard text labels</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelViewNotificationDetails">“View Details” link text for notifications</label>
+                        <input type="text" name="uiLabelViewNotificationDetails" id="uiLabelViewNotificationDetails" value="{!uiLabelViewNotificationDetails}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelBookmark">“Bookmark” label text</label>
+                        <input type="text" name="uiLabelBookmark" id="uiLabelBookmark" value="{!uiLabelBookmark}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelShare">“Share” label text</label>
+                        <input type="text" name="uiLabelShare" id="uiLabelShare" value="{!uiLabelShare}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="shareEmailSubject">Share email subject text</label>
+                        <input class="ocmsTextInputLrg" type="text" name="shareEmailSubject" id="shareEmailSubject" value="{!shareEmailSubject}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelFollowC2A">Social site “Follow” call to action</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelFollowC2A" id="uiLabelFollowC2A" value="{!uiLabelFollowC2A}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelToday">“Today“ label text</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelToday" id="uiLabelToday" value="{!uiLabelToday}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelYesterday">“Yesterday“ label text</label>
+                        <input class="ocmsTextInputLrg" type="text" name="uiLabelYesterday" id="uiLabelYesterday" value="{!uiLabelYesterday}"/>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Labels within Article content</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelArtContactInformation">“Contact Information” title text</label>
+                        <input class="ocmsTextInputMed" type="text" name="uiLabelArtContactInformation" id="uiLabelArtContactInformation" value="{!uiLabelArtContactInformation}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelArtPrevious">“Previous” article link text</label>
+                        <input type="text" name="uiLabelArtPrevious" id="uiLabelArtPrevious" value="{!uiLabelArtPrevious}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelArtNext">“Next” article link text</label>
+                        <input type="text" name="uiLabelArtNext" id="uiLabelArtNext" value="{!uiLabelArtNext}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelArtTopics">“Topics” label text</label>
+                        <input type="text" name="uiLabelArtTopics" id="uiLabelArtTopics" value="{!uiLabelArtTopics}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelArtRelated">“Related” label text</label>
+                        <input type="text" name="uiLabelArtRelated" id="uiLabelArtRelated" value="{!uiLabelArtRelated}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelArtReadMore">“Read More” label text</label>
+                        <input type="text" name="uiLabelArtReadMore" id="uiLabelArtReadMore" value="{!uiLabelArtReadMore}"/>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Labels within News tiles</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiNewsItemLinkText">News item link text</label>
+                        <input class="ocmsTextInputMed" type="text" name="uiNewsItemLinkText" id="uiNewsItemLinkText" value="{!uiNewsItemLinkText}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiSocialPostLinkText">Social post link text</label>
+                        <input class="ocmsTextInputMed" type="text" name="uiSocialPostLinkText" id="uiSocialPostLinkText" value="{!uiSocialPostLinkText}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="uiLabelLike">“Likes” label text</label>
+                        <input type="text" name="uiLabelLike" id="uiLabelLike" value="{!uiLabelLike}"/>
+                    </td></tr>
+                </table>
+
+                <h3 class="OCMSExpandyNext ocmsEditorSubtitle">CEO Categories</h3>
+                <table class="ocmsContentEditor ocmsContentEditorNested OCMSExpandyClosed">
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory1">CEO category 1</label>
+                        <input class="ocmsTextInputMed" type="text" name="ceoCategory1" id="ceoCategory1" value="{!ceoCategory1}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory1Image">CEO category 1 image</label>
+                        <input class="ocmsTextInputMed" type="hidden" name="ceoCategory1Image" id="ceoCategory1Image" value="{!ceoCategory1Image}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="ceoCategory1Image" cImage="{!ceoCategory1Image}" type="Image" disabled="{!disableAll}" DialogId="imageDlg1"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory2">CEO category 2</label>
+                        <input class="ocmsTextInputMed" type="text" name="ceoCategory2" id="ceoCategory2" value="{!ceoCategory2}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory2Image">CEO category 2 image</label>
+                        <input class="ocmsTextInputMed" type="hidden" name="ceoCategory2Image" id="ceoCategory2Image" value="{!ceoCategory2Image}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="ceoCategory2Image" cImage="{!ceoCategory2Image}" type="Image" disabled="{!disableAll}" DialogId="imageDlg2"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory3">CEO category 3</label>
+                        <input class="ocmsTextInputMed" type="text" name="ceoCategory3" id="ceoCategory3" value="{!ceoCategory3}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory3Image">CEO category 3 image</label>
+                        <input class="ocmsTextInputMed" type="hidden" name="ceoCategory3Image" id="ceoCategory3Image" value="{!ceoCategory3Image}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="ceoCategory3Image" cImage="{!ceoCategory3Image}" type="Image" disabled="{!disableAll}" DialogId="imageDlg3"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory4">CEO category 4</label>
+                        <input class="ocmsTextInputMed" type="text" name="ceoCategory4" id="ceoCategory4" value="{!ceoCategory4}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory4Image">CEO category 4 image</label>
+                        <input class="ocmsTextInputMed" type="hidden" name="ceoCategory4Image" id="ceoCategory4Image" value="{!ceoCategory4Image}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="ceoCategory4Image" cImage="{!ceoCategory4Image}" type="Image" disabled="{!disableAll}" DialogId="imageDlg4"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory5">CEO category 5</label>
+                        <input class="ocmsTextInputMed" type="text" name="ceoCategory5" id="ceoCategory5" value="{!ceoCategory5}"/>
+                    </td></tr>
+                     <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory5Image">CEO category 5 image</label>
+                        <input class="ocmsTextInputMed" type="hidden" name="ceoCategory5Image" id="ceoCategory5Image" value="{!ceoCategory5Image}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="ceoCategory5Image" cImage="{!ceoCategory5Image}" type="Image" disabled="{!disableAll}" DialogId="imageDlg5"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory6">CEO category 6</label>
+                        <input class="ocmsTextInputMed" type="text" name="ceoCategory6" id="ceoCategory6" value="{!ceoCategory6}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="ceoCategory6Image">CEO category 6 image</label>
+                        <input class="ocmsTextInputMed" type="hidden" name="ceoCategory6Image" id="ceoCategory6Image" value="{!ceoCategory6Image}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="ceoCategory6Image" cImage="{!ceoCategory6Image}" type="Image" disabled="{!disableAll}" DialogId="imageDlg6"/>
+                    </td></tr>
+                </table>
+            </div><!-- OCMSTabSheet.uiText -->
+
+            <div class="OCMSTabSheet advanced">
+                <table class="ocmsContentEditor ocmsContentEditorNested">
+                    <tr class="ocmsEditorSubtitle">
+                        <td>Notification Settings</td>
+                    </tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="notificationsCheckInterval">Time between checking for new notifications</label>
+                        <input type="text" name="notificationsCheckInterval" id="notificationsCheckInterval" value="{!notificationsCheckInterval}"/>seconds
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="notificationsPerPage">Minimum number of notifications shown “per page”</label>
+                        <input type="text" class="ocmsTextInputSml" name="notificationsPerPage" id="notificationsPerPage" value="{!notificationsPerPage}"/>
+                    </td></tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="notificationsMaxLoad">Maximum number of notifications to load from server</label>
+                        <input type="text" class="ocmsTextInputSml" name="notificationsMaxLoad" id="notificationsMaxLoad" value="{!notificationsMaxLoad}"/>
+                    </td></tr>
+                    <tr class="ocmsEditorSubtitle">
+                        <td>GSA Search Settings</td>
+                    </tr>
+                    <tr><td>
+                        <label class="ocmsLabel" for="searchGSARequestTimeout">Search (GSA) request timeout</label>
+                        <input type="text" name="searchGSARequestTimeout" id="searchGSARequestTimeout" value="{!searchGSARequestTimeout}"/>seconds
+                    </td></tr>
+                </table>
+            </div><!-- OCMSTabSheet.advanced -->
+        </div><!-- .OCMSTabSheet_c -->
+
+
+    </apex:outputPanel>
+
+    <script src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+    <script src="{!URLFOR($Resource.ocms_mfc_pageSupport, 'js/tagPathSelector.js')}"></script>
+    <script src="{!URLFOR($Resource.ocms_mfc_pageSupport, 'js/multiTagPathSelector.js')}"></script>
+
+</apex:page>

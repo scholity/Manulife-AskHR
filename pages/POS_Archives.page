@@ -1,0 +1,160 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" controller="POSArchives" >
+  <apex:stylesheet value="{!URLFOR($Resource.pos_css, 'colorbox.css')}"/>
+  <apex:stylesheet value="{!URLFOR($Resource.pos_css, 'jquery.capty.css')}"/>
+  <apex:stylesheet value="{!URLFOR($Resource.pos_css, 'archives.css')}"/>
+
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'freewall.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery.colorbox.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'imgLiquid-min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery.capty.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">.imgLiquid img {visibility:hidden}</style>   
+
+<script type="text/javascript">
+ $(document).ready(function(){
+    document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    $('.fixed').capty({
+      animation: 'fixed'
+    });  
+    $('.free').colorbox();    
+    $(".imgLiquidFill").imgLiquid({
+        fill: false
+    });
+ }); // end of ready
+
+            $(function() {
+                var wall = new Freewall("#freewall");
+                wall.reset({
+                    selector: '.brick',
+                    animate: true,
+                    cellW: 160,
+                    cellH: 160,
+//                  draggable:true,
+                    gutterX:10,
+                    gutterY:10,
+                    onResize: function() {
+                    wall.fitZone();
+                    }
+                });
+                wall.addCustomEvent('onBlockLoad', function(setting){
+                    console.log(setting);
+                });             
+                
+                wall.fitWidth();
+            });
+            // for scroll bar appear;
+//          $(window).trigger("resize");
+</script>
+
+<style type="text/css">
+
+#navigation li.bt5 a,
+#navigation li.bt5 a:hover,
+#navigation li.bt5 a.on{
+width:144px;
+background-position:-526px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+}
+
+</style>
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table width="100%"><tr><td style="height:10px"></td></tr></table>
+ <!--div style="height:20px;width:100%"></div-->
+ 
+ <div id="containerfree" align="center" class="x">
+     <div id="dvArchive" align="center" class="free-wall" style="width:930px!important;">
+     </div>
+ </div>
+
+<br class="clear" />
+<br class="clear" />
+
+<div id="scontent" align="center" ></div>
+
+<br class="clear" />
+<br class="clear" />
+
+<script language="javascript" type="text/javascript">
+
+window.onload = new function() { GenerateTable(); };
+
+function GenerateTable() {
+    //Build an array containing archive records.
+    var arc = new Array();
+
+     <apex:repeat value="{!ArchiveData}" var="a">
+        arc.push(['{!a.Name}','{!a.ThumbnailImage}','{!a.ArticleImage}']);
+     </apex:repeat>
+ 
+    var dvTable = document.getElementById("dvArchive");
+
+    //Add the images
+    for (var i = 0; i < arc.length; i++) {
+        var div = document.createElement("div");
+        div.className = "imageHolder";
+
+        //image link        
+        var a = document.createElement("a");
+        a.title = arc[i][0];
+        a.className = "free";
+        a.align = "center";
+        //a.style = "display:inline-block!important;";
+        a.href = "{!$Site.Prefix}/servlet/servlet.FileDownload?file=" + arc[i][2];
+        
+        //thumbnail
+        var img = document.createElement("img");
+        img.alt = "";
+        img.style.width = '170px';
+        img.style.height = '175px';
+        img.src = "{!$Site.Prefix}/servlet/servlet.FileDownload?file=" + arc[i][1];
+        
+        var divInner = document.createElement("div");
+        divInner.className = "caption";
+        divInner.align = "center";
+        divInner.innerHTML = arc[i][0];
+        
+        a.appendChild(img);
+        a.appendChild(divInner);
+
+        div.appendChild(a);
+        dvTable.appendChild(div);
+    }
+    
+}
+</script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

@@ -1,0 +1,20 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" contentType="text/javascript">
+
+(function _loadCKETemplates() {
+    CKEDITOR.addTemplates('MLI-Generic', {
+        templates: [
+            {
+                title: 'Archive Main - Category',
+                description: 'A list item with image icon, label and a link.',
+                html: '<li class="archiveCategory ckeContentBorder"><span class="image-icon"><img src="#" alt="" /></span><span class="text">"Place label here and link it."</span></li>'
+            },
+            {
+                title: 'Archive Main &amp; Secondary - File',
+                description: 'A list item with image icon, label, wrapped with a link.',
+                html: '<li class="archiveFile ckeContentBorder"><span><img src="#" alt="" /></span><span class="text">"Place label here and link it."</span></li>'
+            }
+        ]
+    });
+})();
+
+</apex:page>

@@ -1,0 +1,30 @@
+<template>
+    <template if:true={voteData}>
+        
+        <div class="slds-box slds-box_small">
+            <!--<div class="slds-p-bottom_x-small">Was this article helpful?</div>-->
+            <lightning-button-icon 
+                icon-name="utility:like" 
+                variant={likeVariant} 
+                alternative-text="Like"
+                title="Like" 
+                disabled={buttonDisabled}
+                onclick={likeArticle}>
+            </lightning-button-icon>
+            &nbsp;
+            {voteData.likeCount}
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <lightning-button-icon 
+                icon-name="utility:dislike" 
+                variant={dislikeVariant} 
+                alternative-text="Dislike" 
+                title="Dislike" 
+                disabled={buttonDisabled}
+                onclick={dislikeArticle}>
+            </lightning-button-icon>
+            &nbsp;
+            {voteData.dislikeCount}
+        </div>
+        
+    </template>
+</template>

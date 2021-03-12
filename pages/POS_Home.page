@@ -1,0 +1,71 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+
+  <apex:composition template="POS_Template">
+
+    <apex:define name="body">
+
+        <style type="text/css">
+        
+        #navigation li.bt1 a,
+        #navigation li.bt1 a:hover,
+        #navigation li.bt1 a.on{
+        width:90px;
+        background-position:-0px -90px;
+        background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+        }
+
+        .whiteborder{
+        border: 5px solid white;
+        width:289px!important;
+        line-height:150%;
+        text-align:center;
+        color:white;
+        font-family:Calibri;font-size:14px;
+        letter-spacing:1px;
+        }
+     </style>
+    
+      <div class="homepage" style="height:100%" align="center">
+        <div style="height:50px;"></div>
+        <div align="left" style="color:white;font-size:28px;padding-bottom:10px;width:289px;font-family:Calibri">
+    WELCOME TO
+        </div>
+        <div align="center"><img alt="Logo POS" src="{!URLFOR($Resource.pos_images, 'image/POS_logo.png')}" /></div>
+        <div style="height:20px"></div>
+        <div style="width:289px;line-height:150%;text-align:justify;color:white;font-family:Calibri;font-size:14px;letter-spacing:1px" align="center">
+          <div>
+    The internal site for POSsible provides relevant information on the program, 
+    including the features and functionality of the solution.
+    
+    For countries in Asia that will be deploying POSsible,
+    we have dedicated pages within the site via the "How to roll it out" tab 
+    on this page.
+          </div>
+          <div style="height:10px"></div>
+    
+          <div style="text-decoration:none!important">
+    Please contact the <a style="text-decoration:none!important; color: lightblue;" href=""><strong>eBusiness (POSsibleComms@manulife.com)</strong></a> team for access. 
+          </div>
+
+<div style="height:15px"></div>
+<div class="whiteborder" style="" align="center">
+<span style="text-align:center;font-size:24px">
+<div style="height:10px"></div>
+<strong>Latest Developments</strong>
+</span>
+<div class="free-wall" style="height:10px"></div>
+Find out more on latest developments by reading our newsletters in the <a id="file" style="color: lightblue;" href="{!$Site.Prefix}/apex/POS_Archives"><strong>Archives</strong></a> page.
+<div style="height:10px"></div>
+
+</div>
+    
+          <div style="height:30px"></div>
+        </div>
+    
+      </div>
+    
+    </apex:define>
+    
+  </apex:composition>
+
+</apex:page>

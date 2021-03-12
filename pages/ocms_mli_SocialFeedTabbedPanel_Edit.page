@@ -1,0 +1,312 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_SocialFeedTabbedPanel" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+        <link rel="stylesheet" type="text/css"
+            href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ocms-reset+support-v2-edit-content.css')}" />
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+        <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+
+            try {
+                var $ele;
+                if ($('#sFeedAreaTabName').val() == null || $('#sFeedAreaTabName').val() == 'None') {
+                    $ele = $('#sFeedAreaTabName');
+                    errorField($ele, languageUsed + 'Feed Area Tab Name must be provided.');
+                    return false;
+                }
+                if ($('#sFeedAreaTabId').val() == null || $('#sFeedAreaTabId').val() == 'None') {
+                    $ele = $('#sFeedAreaTabId');
+                    errorField($ele, languageUsed + 'Feed Area Tab Sequence must be provided.');
+                    return false;
+                }
+                if ($('#sFeedAreaError').val() == null || $('#sFeedAreaError').val() == '') {
+                    $ele = $('#sFeedAreaError');
+                    errorField($ele, languageUsed + 'Error Message must be provided.');
+                    return false;
+                }
+                if ($('#sFeedAreaTabName').val() != null && $('#sFeedAreaTabName').val() == 'Twitter') {
+                    if ($('#sTwitterApi').val() == null || $('#sTwitterApi').val() == '') {
+                        $ele = $('#sTwitterApi');
+                        errorField($ele, languageUsed + 'Twitter API must be provided.');
+                        return false;
+                    }
+                    if ($('#sBearerToken').val() == null || $('#sBearerToken').val() == '') {
+                        $ele = $('#sBearerToken');
+                        errorField($ele, languageUsed + 'Twitter Bearer Token must be provided.');
+                        return false;
+                    }
+                }
+                if ($('#sFeedAreaTabName').val() != null && $('#sFeedAreaTabName').val() == 'Facebook') {
+                    if ($('#sFacebookApi').val() == null || $('#sFacebookApi').val() == '') {
+                        $ele = $('#sFacebookApi');
+                        errorField($ele, languageUsed + 'Facebook API must be provided.');
+                        return false;
+                    }
+                    if ($('#sAppId').val() == null || $('#sAppId').val() == '') {
+                        $ele = $('#sAppId');
+                        errorField($ele, languageUsed + 'Facebook App Id must be provided.');
+                        return false;
+                    }
+                    if ($('#sAppSecret').val() == null || $('#sAppSecret').val() == '') {
+                        $ele = $('#sAppSecret');
+                        errorField($ele, languageUsed + 'Facebook App Secret must be provided.');
+                        return false;
+                    }
+                    if ($('#sFBFollowScript').val() == null || $('#sFBFollowScript').val() == '') {
+                        $ele = $('#sFBFollowScript');
+                        errorField($ele, languageUsed + 'Facebook Like Script must be provided.');
+                        return false;
+                    }
+                }
+                if ($('#sFeedAreaTabName').val() != null && $('#sFeedAreaTabName').val() == 'Instagram') {
+                    if ($('#sInstagramApi').val() == null || $('#sInstagramApi').val() == '') {
+                        $ele = $('#sInstagramApi');
+                        errorField($ele, languageUsed + 'Instagram API must be provided.');
+                        return false;
+                    }
+                    if ($('#sAccessToken').val() == null || $('#sAccessToken').val() == '') {
+                        $ele = $('#sAccessToken');
+                        errorField($ele, languageUsed + 'Instagram Access Token must be provided.');
+                        return false;
+                    }
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+            var textMax = 1000;
+            var textLength;
+            var textRemaining;
+
+            /* *****
+               * Initialize the remaining character count in the summary text boxes
+               * Character limit is set to 1000
+             * *****/
+            textLength = $('#sFeedAreaError').val().length;
+            textRemaining = textMax - textLength;
+            $('#charSummaryCount').html(textRemaining + ' characters remaining');
+
+            /* *****
+               * Update the character count as characters are entered
+             * *****/
+            $('#sFeedAreaError').keyup(function() {
+                textLength = $('#sFeedAreaError').val().length;
+                textRemaining = textMax - textLength;
+                $('#charSummaryCount').html(textRemaining + ' characters remaining');
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sFeedAreaTabName", "value": $('#sFeedAreaTabName').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaTabId", "value": $('#sFeedAreaTabId').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaTitle", "value": $('#sFeedAreaTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTwitterApi", "value": $('#sTwitterApi').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sBearerToken", "value": $('#sBearerToken').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFacebookApi", "value": $('#sFacebookApi').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAppId", "value": $('#sAppId').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAppSecret", "value": $('#sAppSecret').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFBFollowScript", "value": $('#sFBFollowScript').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sInstagramApi", "value": $('#sInstagramApi').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAccessToken", "value": $('#sAccessToken').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTweetToText", "value": $('#sTweetToText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaFollowLinkText", "value": $('#sFeedAreaFollowLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaError", "value": $('#sFeedAreaError').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLoadingText", "value": $('#sLoadingText').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form id='idContentEditor' class='ocmsContentEditor' action="javascript:false">
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td><label class="ocmsLabel ocmsRequiredLabel" for="sFeedAreaTabName" title="">Feed Area Tab Name</label>
+                        <select name="sFeedAreaTabName" id="sFeedAreaTabName">
+                            <option value="None">Please select social media.</option>
+                            <option value="Twitter">Twitter</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Instagram">Instagram</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel ocmsRequiredLabel" for="sFeedAreaTabId" title="">Feed Area Tab Sequence</label>
+                        <select name="sFeedAreaTabId" id="sFeedAreaTabId">
+                            <option value="None">Please select tabId.</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                        <p class="ocmsHelpText">The selection should match the sequence of social feed tabbed menu.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaTitle">Feed Area Title</label>
+                        <input class="ocmsTextInputLrg" id="sFeedAreaTitle" name="sFeedAreaTitle" type="text" value="{!sFeedAreaTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTwitterApi">Twitter API
+                        <a class="ocmsHint"
+                           onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <input class="ocmsTextInputLrg" id="sTwitterApi" name="sTwitterApi" type="text" value="{!sTwitterApi}"></input>
+                        <div class='ocmsInstructions' style='display: none'>
+                            <p>https://api.twitter.com/1.1/statuses/user_timeline.json?screen_name=manulife&amp;exclude_replies=true&amp;include_rts=false</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sBearerToken">Bearer Token(for Twitter)
+                        <a class="ocmsHint"
+                           onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <input class="ocmsTextInputLrg" id="sBearerToken" name="sBearerToken" type="text" value="{!sBearerToken}"></input>
+                        <div class='ocmsInstructions' style='display: none'>
+                            <p>AAAAAAAAAAAAAAAAAAAAAC%2B5gAAAAAAApULN15YFZgl2JF9LAEJhYmS%2FURI%3DqTb08rYeIfXrvC1QeWZgM24QutijBEZq3WZoxjHftRaWnLabx0</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFacebookApi">Facebook API
+                        <a class="ocmsHint"
+                           onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <input class="ocmsTextInputLrg" id="sFacebookApi" name="sFacebookApi" type="text" value="{!sFacebookApi}"></input>
+                        <div class='ocmsInstructions' style='display: none'>
+                            <p>https://graph.facebook.com/v2.3/Manulife/posts?access_token=</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAppId">App Id(for Facebook)
+                        <a class="ocmsHint"
+                           onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <input class="ocmsTextInputLrg" id="sAppId" name="sAppId" type="text" value="{!sAppId}"></input>
+                        <div class='ocmsInstructions' style='display: none'>
+                            <p>1457201694595287</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAppSecret">App Secret(for Facebook)
+                        <a class="ocmsHint"
+                           onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <input class="ocmsTextInputLrg" id="sAppSecret" name="sAppSecret" type="text" value="{!sAppSecret}"></input>
+                        <div class='ocmsInstructions' style='display: none'>
+                            <p>7fe42ef5aeda235fc648ac79f5082101</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFBFollowScript">Facebook Like Script
+                        <a
+                            class="ocmsHint"
+                            onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <textarea  id="sFBFollowScript" name="sFBFollowScript" style="width: 100%; height: 5em;"><apex:outputText value="{!sFBFollowScript}" /></textarea>
+                        <p class="ocmsHelpText">Please follow document to add the appropriate script for Facebook like button.</p>
+
+                          <div class='ocmsInstructions' style='display: none'>
+                            <code>&lt;div id="fb-root"&gt;&lt;/div&gt;
+&lt;script&gt;(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&amp;version=v2.5";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));
+&lt;/script&gt;
+                            </code>
+                        </div>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sInstagramApi">Instagram API
+                        <a class="ocmsHint"
+                           onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <input class="ocmsTextInputLrg" id="sInstagramApi" name="sInstagramApi" type="text" value="{!sInstagramApi}"></input>
+                        <div class='ocmsInstructions' style='display: none'>
+                            <p>https://api.instagram.com/v1/users/748266724/media/recent?access_token=</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccessToken">Access Token(for Instagram)
+                        <a class="ocmsHint"
+                           onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a></label>
+                        <input class="ocmsTextInputLrg" id="sAccessToken" name="sAccessToken" type="text" value="{!sAccessToken}"></input>
+                        <div class='ocmsInstructions' style='display: none'>
+                            <p>748266724.fb55e48.ca2ee6d00920441aa8aa3234fd007ee5</p>
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTweetToText">Tweet To Text (for Twitter only)</label>
+                        <input class="ocmsTextInputLrg" id="sTweetToText" name="sTweetToText" type="text" value="{!sTweetToText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaFollowLinkText">Feed Area Follow Link Text</label>
+                        <input class="ocmsTextInputLrg" id="sFeedAreaFollowLinkText" name="sFeedAreaFollowLinkText" type="text" value="{!sFeedAreaFollowLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sFeedAreaError">Error Message (if no feeds are returned)</label>
+                        <textarea  id="sFeedAreaError" name="sFeedAreaError" style="width: 100%; height: 5em;" maxlength="1000"><apex:outputText value="{!sFeedAreaError}" /></textarea>
+                        <p class="ocmsHelpText">
+                            (<span id="charSummaryCount"></span>)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLoadingText">Loading Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sLoadingText" name="sLoadingText" type="text" value="{!sLoadingText}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+            </table>
+            <script>
+                // Initialize picklist values here - populate picklist with values from their last save
+                var sFeedAreaTabName =  "{!sFeedAreaTabName}";
+                $('select#sFeedAreaTabName').val(sFeedAreaTabName);
+
+                var sFeedAreaTabId =  "{!sFeedAreaTabId}";
+                $('select#sFeedAreaTabId').val(sFeedAreaTabId);
+            </script>
+        </form>
+    </apex:outputPanel>
+</apex:page>

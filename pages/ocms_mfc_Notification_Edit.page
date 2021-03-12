@@ -1,0 +1,97 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_Notification" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+    <script type="text/javascript" language="javascript">	
+		$(document).ready(function() {
+
+	  		function validateSave() {
+			   var sMessage = 'The following fields must be filled in before the notification can be saved:';
+			   var missingFields = '';
+			   var success = true;
+				   
+			   if (!$('#title').val()) {
+			       missingFields += '\n• Title ';
+			       success = false;
+				}
+				  
+			    if (!$('#message').val()) {
+			       	missingFields += '\n• Message';
+				    success = false;
+			    }
+				   
+				if (!$('#image').val()) {
+			   		missingFields += '\n• Image';
+			       	success = false;
+				}
+				
+				if (!success){
+					alert(sMessage + missingFields);
+		    	}
+		    	
+				return success; 
+	      	}
+
+	       	ce.content_editor('registerSaveFunction', function() {
+	            var attributes = new Array();    
+	            if (validateSave()) {
+		          	attributes.push({"name":"title", "value": $('#title').val(), "type": "Text", "simple": true});
+		            attributes.push({"name":"message", "value":$('#message').val(), "type":"Text"})
+		            attributes.push({"name":"image", "value":$('#image').val()});;
+		            attributes.push({"name":"link", "value":$('#link').val(), "type":"Text", "simple": true});
+					attributes.push({"name":"altText","value":$('#altText').val(), "type": "Text", "simple": true});
+				}
+				
+	            return attributes;
+	       	});
+
+	       	limitText();
+	       	$("#message").keyup(limitText).keydown(limitText);
+
+	       	function limitText(){
+	       		$("#messageLimitText").html((300 - $("#message").val().length) + ' characters remaining');
+	       	}
+		});       
+    </script>
+    <apex:outputPanel >
+        <form>
+			<table class="ocmsContentEditor ocmsContentEditorNested"> 
+	            <tr>
+	                <td>
+	                    <label class="ocmsLabel" for="title">Title</label>
+                        <textarea  id="title" name="title" cols="65"><apex:outputText value="{!title}" /></textarea>                                
+	                </td>
+	            </tr>
+	        	<tr>
+	            	<td>
+	                    <label class="ocmsLabel" for="message">Message</label>
+	                    <textarea name="message" id="message" rows="5" cols="65" maxlength="300"><apex:outputText value="{!message}" /></textarea>
+	                    <p class="ocmsHelpText">
+	                    	<span id="messageLimitText"></span>
+	                    </p>
+	                </td>
+	        	</tr>
+	     	    <tr>
+					<td>
+						<label class="ocmsLabel" for="image">Image</label>
+						<input id="image" name="image" type="hidden" value="{!image}"></input>
+						<cms:ImageSelector cPassThroughId="image" type="image" cImage="{!image}" dialogId="ImageDlg" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+						<p class='ocmsHelpText'>Notification background images should be 255 px wide by 150 px tall.</p>
+					</td>
+			 	</tr>
+	            <tr>
+	                <td>
+	                    <label class="ocmsLabel" for="altText">Image Alt Text</label>
+                        <textarea  id="altText" name="altText" cols="65" rows="2"><apex:outputText value="{!altText}" /></textarea>                               
+	                </td>
+	            </tr>
+	     		<tr>
+					<td>
+						<label class="ocmsLabel" for="link">Link</label>
+						<cms:PageSelector cPassThroughId="link" value="{!link}"  dialogId="SmallBlockTarget" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+						<input type="hidden" id="link" name="link" value="{!link}" />
+					</td>
+				</tr>
+	        </table>
+        </form>
+	</apex:outputPanel>
+</apex:page>

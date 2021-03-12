@@ -1,0 +1,560 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_MissionControl" showHeader="false"
+           sidebar="false" cache="false" title="OrchestraCMS" standardStylesheets="false">
+    *
+    <apex:outputPanel layout="block">
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/ocms-reset+support.css')}" type="text/css"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/selectize.css')}" type="text/css"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}" class="psContentEditorCSS" type="text/css"/>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery/jquery.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/selectize/js/jquery-ui.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/selectize/js/selectize.min.js')}"></script>
+
+        <script type="text/javascript" language="javascript">
+            var $$ = $.noConflict(true);
+            var $select;
+            var relatedSeparator = '~!~!';
+
+            $$(document).ready(function () {
+                CKEDITOR.replace('Body', $.extend({
+                    customConfig: '/apex/c__ocms_mfc_CKEConfig',
+                    readOnly: false
+                }, {!CKEditorConfig}));
+
+                //Setup the radio buttons
+                function loadRadioButtons(radioName, value) {
+                    $('input[name=' + radioName + '][value=' + value + ']').attr('checked', 'checked');
+                }
+
+                function loadDropDownbox(dropdownName, value) {
+                    $('#' + dropdownName).val(value);
+                }
+
+                function survey(selector, callback) {
+                    var input = $(selector);
+                    var oldvalue = input.val();
+                    setInterval(function () {
+                        if (input.val() != oldvalue) {
+                            oldvalue = input.val();
+                            savePageId();
+                        }
+                    }, 100);
+                }
+
+                let textMax = 120;
+                let textLength;
+                let textRemaining;
+
+                /* *****
+                 * Initialize the remaining character count in the summary text boxes
+                 * Character limit is set to 150
+                 * *****/
+                textLength = $('#Excerpt').val().length;
+                textRemaining = textMax - textLength;
+                if (textRemaining < 0) {
+                    $('#charCount').addClass('over');
+                } else {
+                    $('#charCount').addClass('under');
+                }
+                $('#charCount').html(textRemaining);
+
+                /* *****
+                 * Update the character count as characters are entered
+                 * *****/
+                $('#Excerpt').keyup(function () {
+                    textLength = $('#Excerpt').val().length;
+                    textRemaining = textMax - textLength;
+                    if (textRemaining < 0) {
+                        $('#charCount').addClass('over');
+                        $('#charCount').removeClass('under');
+                    } else {
+                        $('#charCount').addClass('under');
+                        $('#charCount').removeClass('over');
+                    }
+                    $('#charCount').html(textRemaining);
+                });
+
+                //template specific configuration
+                if (editorType === 'article') {
+                    $('#templageName').text("Mission Control Article");
+                    $('.articleOnly').css("display", "table-row");
+
+                    var prefillStoryType = '{!StoryType}' ? '{!StoryType}' : 'blank';
+                    var prefillTileType = '{!TileType}' ? '{!TileType}' : 'blank';
+                    var prefillSeries = '{!Series}' ? '{!Series}' : 'blank';
+
+                    loadDropDownbox('StoryType', prefillStoryType);
+                    loadDropDownbox('TileType', prefillTileType);
+                    loadDropDownbox('Series', prefillSeries);
+
+                    $('#Feature').attr('checked', '{!Feature}' === 'true' || '{!Feature}' === 'checked');
+                }
+                if (editorType === 'page') {
+                    $('#templageName').text("Mission Control Page");
+                    $('.pageOnly').css("display", "table-row");
+
+                    loadDropDownbox('PageType', '{!PageType}');
+                }
+
+                //On load set editor based on layout
+                $('.articleContainer').show();
+
+                $('#digitalCustomerLeader').attr('checked', '{!digitalCustomerLeader}' === 'true' || '{!digitalCustomerLeader}' === 'checked');
+                $('#expenseEfficiency').attr('checked', '{!expenseEfficiency}' === 'true' || '{!expenseEfficiency}' === 'checked');
+                $('#accelerateGrowth').attr('checked', '{!accelerateGrowth}' === 'true' || '{!accelerateGrowth}' === 'checked');
+                $('#portfolioOptimization').attr('checked', '{!portfolioOptimization}' === 'true' || '{!portfolioOptimization}' === 'checked');
+                $('#obsessAboutCustomers').attr('checked', '{!obsessAboutCustomers}' === 'true' || '{!obsessAboutCustomers}' === 'checked');
+                $('#highPerformingTeam').attr('checked', '{!highPerformingTeam}' === 'true' || '{!highPerformingTeam}' === 'checked');
+                $('#getItDoneTogether').attr('checked', '{!getItDoneTogether}' === 'true' || '{!getItDoneTogether}' === 'checked');
+                $('#doTheRightThing').attr('checked', '{!doTheRightThing}' === 'true' || '{!doTheRightThing}' === 'checked');
+                $('#thinkBig').attr('checked', '{!thinkBig}' === 'true' || '{!thinkBig}' === 'checked');
+                $('#ownIt').attr('checked', '{!ownIt}' === 'true' || '{!ownIt}' === 'checked');
+                $('#shareYourHumanity').attr('checked', '{!shareYourHumanity}' === 'true' || '{!shareYourHumanity}' === 'checked');
+
+                window.parent.frameElement.contentWindow.$.ocmsValidator.validator['IMAGEDIMENSIONEQ'] = function (theData, options) {
+                    var bIsValid = true;
+                    var sourceImage = new Image();
+
+                    // Only perform this if we have a value for the image
+                    if (theData.value) {
+                        sourceImage.src = theData.value;
+
+                        if (sourceImage.height != options.height || sourceImage.width != options.width) {
+
+                            debug.log('Image height.', sourceImage.height);
+                            debug.log('Image width.', sourceImage.width);
+                            debug.log('Desired height.', options.height);
+                            debug.log('Desired width.', options.width);
+
+                            bIsValid = false;
+                        }
+                    }
+                    return bIsValid;
+                };
+
+                window.parent.frameElement.contentWindow.$.ocmsValidator.validator['RATIOVALIDATOR'] = function (theData, options) {
+                    var bIsValid = true;
+                    var sourceImage = new Image();
+
+                    // Only perform this if we have a value for the image
+                    if (theData.value) {
+                        sourceImage.src = theData.value;
+
+                        var a = sourceImage.height;
+                        var b = sourceImage.width;
+
+                        var remainder = 0;
+
+                        while (b != 0) {
+                            remainder = a % b;
+                            a = b;
+                            b = remainder;
+                        }
+
+                        var ratiox = sourceImage.height / a;
+
+                        a = sourceImage.height;
+                        b = sourceImage.width;
+
+                        remainder = 0;
+                        while (b != 0) {
+                            remainder = a % b;
+                            a = b;
+                            b = remainder;
+                        }
+
+                        var ratioy = sourceImage.width / a;
+
+                        if (ratiox != options.ratiox || ratioy != options.ratioy) {
+                            bIsValid = false;
+                        }
+                    }
+
+                    return bIsValid;
+                };
+
+                // Validation rules for all
+
+                // Article validation rules
+                //if (editorType === 'article') {
+                ce.content_editor('registerValidationRule', 'Title', 'REQUIRED', ' • Title is a required field.');
+                ce.content_editor('registerValidationRule', 'Body', 'REQUIRED', ' • Body is a required field.');
+                ce.content_editor('registerValidationRule', 'ArticleDate', 'REQUIRED', ' • Date is a required field.');
+
+                //}
+
+                function checkBoxText(boxName) {
+                    if ($('#' + boxName).is(':checked'))
+                        return boxName + ";";
+                    else
+                        return "";
+                }
+
+                function formTagsText() {
+                    let str = '';
+
+                    if ($('#portfolioOptimization').is(':checked'))
+                        str += 'portfolio optimization;';
+                    if ($('#expenseEfficiency').is(':checked'))
+                        str += 'expense efficiency;';
+                    if ($('#accelerateGrowth').is(':checked'))
+                        str += 'accelerate growth;';
+                    if ($('#digitalCustomerLeader').is(':checked'))
+                        str += 'digital customer leader;';
+                    if ($('#highPerformingTeam').is(':checked'))
+                        str += 'high performing team;';
+                    if ($('#obsessAboutCustomers').is(':checked'))
+                        str += 'obsess about customers;';
+                    if ($('#doTheRightThing').is(':checked'))
+                        str += 'do the right thing;';
+                    if ($('#thinkBig').is(':checked'))
+                        str += 'think big;';
+                    if ($('#getItDoneTogether').is(':checked'))
+                        str += 'get it done together;';
+                    if ($('#ownIt').is(':checked'))
+                        str += 'own it;';
+                    if ($('#shareYourHumanity').is(':checked'))
+                        str += 'share your humanity;';
+
+                    if (str.charAt(str.length - 1) === ";") {
+                        str = str.slice(0, -1);
+                    }
+                    return str;
+                }
+
+                ce.content_editor('registerSaveFunction', function () {
+                    //Common items saved for all editors.
+                    var returnArray = [
+                        {type: 'text', name: 'Title', value: $('#Title').val()}
+                    ];
+
+                    returnArray.push({type: 'text', name: 'ArticleDate', value: $('#pastPublishingFixInput').val()});
+                    returnArray.push({type: 'text', name: 'Byline', value: $('#Byline').val()});
+                    returnArray.push({type: 'text', name: 'Body', value: CKEDITOR.instances['Body'].getData()});
+                    returnArray.push({type: 'text', name: 'Image', value: $('#Image').val()});
+                    returnArray.push({type: 'text', name: 'Tags', value: formTagsText()});
+                    returnArray.push({type: 'text', name: 'ExternalLinkText', value: $('#ExternalLinkText').val()});
+                    returnArray.push({type: 'text', name: 'ExternalLink', value: $('#ExternalLink').val()});
+                    returnArray.push({type: 'text', name: 'Region', value: $('#Region').val()});
+                    returnArray.push({type: 'text', name: 'Video', value: $('#Video').val()});
+
+                    //Attachments
+                    returnArray.push({type: 'text', name: 'Attachment1', value: $('#Attachment1').val()});
+                    returnArray.push({type: 'text', name: 'Attachment2', value: $('#Attachment2').val()});
+                    returnArray.push({type: 'text', name: 'Attachment3', value: $('#Attachment3').val()});
+                    returnArray.push({type: 'text', name: 'Attachment4', value: $('#Attachment4').val()});
+                    returnArray.push({type: 'text', name: 'Attachment5', value: $('#Attachment5').val()});
+
+                    //Tags
+                    returnArray.push({type: 'text', name: 'digitalCustomerLeader', value: $('#digitalCustomerLeader').attr('checked')});
+                    returnArray.push({type: 'text', name: 'customer', value: $('#customer').attr('checked')});
+                    returnArray.push({type: 'text', name: 'expenseEfficiency', value: $('#expenseEfficiency').attr('checked')});
+                    returnArray.push({type: 'text', name: 'accelerateGrowth', value: $('#accelerateGrowth').attr('checked')});
+                    returnArray.push({type: 'text', name: 'portfolioOptimization', value: $('#portfolioOptimization').attr('checked')});
+                    returnArray.push({type: 'text', name: 'highPerformingTeam', value: $('#highPerformingTeam').attr('checked')});
+                    returnArray.push({type: 'text', name: 'getItDoneTogether', value: $('#getItDoneTogether').attr('checked')});
+                    returnArray.push({type: 'text', name: 'doTheRightThing', value: $('#doTheRightThing').attr('checked')});
+                    returnArray.push({type: 'text', name: 'thinkBig', value: $('#thinkBig').attr('checked')});
+                    returnArray.push({type: 'text', name: 'ownIt', value: $('#ownIt').attr('checked')});
+                    returnArray.push({type: 'text', name: 'shareYourHumanity', value: $('#shareYourHumanity').attr('checked')});
+                    returnArray.push({type: 'text', name: 'obsessAboutCustomers', value: $('#obsessAboutCustomers').attr('checked')});
+
+                    // Article
+                    if (editorType === 'article') {
+                        returnArray.push({type: 'text', name: 'TileType', value: $('#TileType').val()});
+                        returnArray.push({type: 'text', name: 'StoryType', value: $('#StoryType').val()});
+                        returnArray.push({type: 'text', name: 'Series', value: $('#Series').val()});
+                        returnArray.push({type: 'text', name: 'Feature', value: $('#Feature').attr('checked')});
+                        returnArray.push({type: 'text', name: 'Excerpt', value: $('#Excerpt').val()});
+                    }
+                    // Page
+                    if (editorType === 'page') {
+                        returnArray.push({type: 'text', name: 'PageType', value: $('#PageType').val()});
+                        returnArray.push({type: 'text', name: 'PageWeight', value: $('#PageWeight').val()});
+                    }
+                    return returnArray;
+                });
+            });
+        </script>
+        <style>
+            textarea {
+                display: block;
+                margin-top: 5px;
+                width: 290px;
+                height: 100px;
+            }
+
+            .defaultEmail {
+                display: none;
+            }
+
+            #charCount.over {
+                color: red;
+            }
+
+            #charCount.under {
+                color: #788E1E;
+            }
+        </style>
+
+        <style class="CKE_fix_for_small_content_templates_picker">
+            td.cke_dialog_contents_body {
+                height: auto;
+            }
+            div.cke_dialog_ui_vbox.cke_dialog_page_contents[name="selectTpl"] .cke_tpl_list {
+                height: 340px;
+            }
+        </style>
+
+        <div class="tileContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle" id="templateName">Content</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="Title">Title</label>
+                        <input class="ocmsTextInputLrg" id="Title" name="Title" type="text" value="{!Title}"/>
+                    </td>
+                </tr>
+                <tr class="pageOnly" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel" for="PageWeight">Page Weight</label>
+                        <input class="ocmsTextInputLrg" id="PageWeight" name="PageWeight" type="text"
+                               value="{!PageWeight}"/>
+                    </td>
+                </tr>
+                <tr class="pastPublishingContainer">
+                    <td>
+                        <label class="ocmsLabel" for="pastPublishingFix">Date</label>
+                        <div id="pastPublishingFix">
+                            <input type="hidden" id="pastPublishingFixInput"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="pastPublishingSubmitContainer">
+                    <td>
+                        <button class="pastPublishingSubmit">Update</button>
+                    </td>
+                </tr>
+                <tr class="articleOnly" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel" for="Feature">Feature</label>
+                        <label><input type="checkbox" id="Feature" name="Feature"/> Feature</label><br/>
+                        <p class="ocmsHelpText">Use this to lock a tile in position 1 on the home page.</p>
+                    </td>
+                </tr>
+                <tr class="articleOnly" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel">Story Type</label>
+                        <select id="StoryType">
+                            <option value="blank">------</option>
+                            <option value="article">article</option>
+                            <option value="quote">quote</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="articleOnly" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel">Tile Type</label>
+                        <select id="TileType">
+                            <option value="blank">------</option>
+                            <option value="article">article</option>
+                            <option value="poster">poster</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="articleOnly" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel">Series</label>
+                        <select id="Series">
+                            <option value="blank">------</option>
+                            <option value="reading">reading list</option>
+                            <option value="disruptor">disruptor</option>
+                            <option value="nowyouknow">now you know</option>
+                            <option value="customer">customer</option>
+                            <option value="link">the link</option>
+                            <option value="leadership">leadership</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr class="pageOnly" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel">Page Type</label>
+                        <select id="PageType">
+                            <option value="blank">------</option>
+                            <option value="Our Mission">Our Mission</option>
+                            <option value="Our Values">Our Values</option>
+                            <option value="5 Key Priorities">5 Key Priorities</option>
+                            <option value="Our Bold Ambition">Our Bold Ambition</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Tags">Tags</label>
+                        <label><input type="checkbox" id="portfolioOptimization" name="portfolioOptimization"/><span> Portfolio Optimization </span></label><br/>
+                        <label><input type="checkbox" id="expenseEfficiency" name="expenseEfficiency"/><span> Expense Efficiency </span></label><br/>
+                        <label><input type="checkbox" id="accelerateGrowth" name="accelerateGrowth"/> Accelerate Growth </label><br/>
+                        <label><input type="checkbox" id="digitalCustomerLeader" name="digitalCustomerLeader"/>Digital, Customer Leader </label><br/>
+                        <label><input type="checkbox" id="highPerformingTeam" name="highPerformingTeam"/><span> High Performing Team </span></label><br/>
+                        <label><input type="checkbox" id="obsessAboutCustomers" name="obsessAboutCustomers"/> Obsess About Customers </label><br/>
+                        <label><input type="checkbox" id="doTheRightThing" name="doTheRightThing"/> Do The Right Thing </label><br/>
+                        <label><input type="checkbox" id="thinkBig" name="thinkBig"/> Think Big </label><br/>
+                        <label><input type="checkbox" id="getItDoneTogether" name="getItDoneTogether"/><span> Get It Done Together </span></label><br/>
+                        <label><input type="checkbox" id="ownIt" name="ownIt"/> Own It </label><br/>
+                        <label><input type="checkbox" id="shareYourHumanity" name="shareYourHumanity"/> Share Your Humanity </label><br/>
+                    </td>
+                </tr>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="Byline">Byline</label>
+                        <input class="ocmsTextInputLrg" id="Byline" name="Byline" type="text" value="{!Byline}"/>
+                    </td>
+                </tr>
+                <tr class="tileSummaryRow articleOnly" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel" for="Excerpt">Excerpt</label>
+                        <textarea id="Excerpt" name="Excerpt" maxlength="120"><apex:outputText value="{!Excerpt}"/></textarea>
+                        <p class="ocmsHelpText"><span id="charCount">120</span> characters remaining.</p>
+                        <p class="ocmsHelpText">For display on homepage feature tiles and in social sharing</p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Body">Body</label>
+                        <textarea id="Body" name="Body">
+                            <apex:outputText value="{!Body}"/>
+                        </textarea>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Image">Article Image</label>
+                        <input type="hidden" name="Image" id="Image" value="{!Image}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="Image"
+                                           cImage="{!Image}" type="Image" disabled="{!disableAll}"
+                                           DialogId="articleImage"/>
+                        <p class="ocmsHelpText">
+                            Recommended image size 255 px x 150 px<br/>
+                            Please maintain a 1.7:1 aspect ratio.
+                        </p>
+                    </td>
+                </tr>
+
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="ExternalLinkText">External Link Text</label>
+                        <input class="ocmsTextInputLrg" id="ExternalLinkText" name="ExternalLinkText" type="text"
+                               value="{!ExternalLinkText}"/>
+                    </td>
+                </tr>
+
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="ExternalLink">External Link URL</label>
+                        <input class="ocmsTextInputLrg" id="ExternalLink" name="ExternalLink" type="text" value="{!ExternalLink}"/>
+                        <p class="ocmsHelpText">Please include 'http://' or "https://" in the URL</p>
+                    </td>
+                </tr>
+
+                <tr class="tileTitleRow" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel" for="Region">Region</label>
+                        <input class="ocmsTextInputLrg" id="Region" name="Region" type="text" value="{!Region}"/>
+                    </td>
+                </tr>
+                <tr class="tileSummaryRow" style="display:none;">
+                    <td>
+                        <label class="ocmsLabel" for="Video">Video</label>
+                        <textarea id="Video" name="Video" maxlength="180"><apex:outputText value="{!Video}"/></textarea>
+                    </td>
+                </tr>
+
+                </tbody>
+            </table>
+        </div>
+        <div class="articleContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Downloads</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Attachment1">Download 1</label>
+                        <input type="hidden" name="Attachment1" id="Attachment1" value="{!Attachment1}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="Attachment1"
+                                           cImage="{!Attachment1}" type="Image" disabled="{!disableAll}"
+                                           DialogId="Attachment1"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Attachment2">Download 2</label>
+                        <input type="hidden" name="Attachment2" id="Attachment2" value="{!Attachment2}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="Attachment2"
+                                           cImage="{!Attachment2}" type="Image" disabled="{!disableAll}"
+                                           DialogId="Attachment2"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Attachment3">Download 3</label>
+                        <input type="hidden" name="Attachment3" id="Attachment3" value="{!Attachment3}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="Attachment3"
+                                           cImage="{!Attachment3}" type="Image" disabled="{!disableAll}"
+                                           DialogId="Attachment3"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Attachment4">Download 4</label>
+                        <input type="hidden" name="Attachment4" id="Attachment4" value="{!Attachment4}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="Attachment4"
+                                           cImage="{!Attachment4}" type="Image" disabled="{!disableAll}"
+                                           DialogId="Attachment4"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="Attachment5">Download 5</label>
+                        <input type="hidden" name="Attachment5" id="Attachment5" value="{!Attachment5}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="Attachment5"
+                                           cImage="{!Attachment5}" type="Image" disabled="{!disableAll}"
+                                           DialogId="Attachment5"/>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <script>
+            $('#pastPublishingFix').datetime_selector({
+                passThruId: '#pastPublishingFixInput',
+                type: 'datetime',
+                value: '{!ArticleDate}'
+            });
+
+            $(function () {
+                $('.pastPublishingContainer input').removeAttr('disabled');
+                $('.dt-clear-cell').hide();
+            });
+
+            $('.pastPublishingSubmit').click(function () {
+                var dtString = $('#pastPublishingFixInput').val();
+                var dtParts = dtString.match(/(\d{4})-(\d{1,2})-(\d{1,2}) (\d{2}):(\d{2}):(\d{2})/);
+                var d = new Date(dtParts[1], dtParts[2] - 1, dtParts[3], dtParts[4], dtParts[5], dtParts[6]);
+                $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_MissionControl', {
+                    action: 'updateOriginPublishStartDate',
+                    contentId: '{!content.Id}',
+                    startDate: JSON.stringify(d)
+                });
+            });
+
+        </script>
+        <!-- End past publishing fix -->
+    </apex:outputPanel>
+
+    <script type="text/javascript"
+            src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+</apex:page>

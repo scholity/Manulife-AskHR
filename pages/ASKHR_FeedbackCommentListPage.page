@@ -1,0 +1,139 @@
+<apex:page standardStylesheets="false" extensions="ASKHR_ArticleFeedbackExt" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0" showHeader="false" sidebar="false" standardController="ASKHR_ArticleFeedback__c" >
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <head>
+            <apex:stylesheet value="{!URLFOR($Resource.SLDS_0122,'assets/styles/salesforce-lightning-design-system-vf.css')}"/>
+            <apex:includescript value="https://code.jquery.com/jquery-1.12.1.min.js" />
+        </head>
+        <apex:remoteObjects >
+        	<apex:remoteObjectModel jsShorthand="articleFeedback" name="ASKHR_ArticleFeedback__c" fields="CreatedDate,Article_Feedback_User_Name__c,Comment__c,Article_Feedback__c">                
+            </apex:remoteObjectModel>          
+        </apex:remoteObjects>
+        <body>
+            <div class="slds">
+                <div class="slds-grid slds-grid--vertical slds-container--small">      
+                    <div class="slds-page-header">
+                        <div class="slds-feed">
+                            <ul id="commentList" class="slds-feed__list">
+                                <!--<li class="slds-comment__overflow">
+    <button class="slds-button slds-button--neutral">3 more comments</button>
+  </li>-->
+                            </ul>
+                            <div class="slds-form-element" style="{!IF(mIsAllowComment,'display:block','display:none')}">
+                                <div class="slds-form-element__control">
+                                    <textarea id="comment-input" class="slds-textarea" placeholder="Write a comment"></textarea>
+                                    <button id="comment-submit-btn" class="slds-button slds-button--brand slds-float--right" type="button" onclick="insertNewComment()">Submit</button>
+                                    <div class="slds-spinner--small slds-float--right slds-m-right--small" id="comment-loading" style="display:none">
+                                        <apex:image value="{!URLFOR($Resource.SLDS_0122,'/assets/images/spinners/slds_spinner.gif')}" />
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="slds-tile slds-m-around--small" style="{!IF(mIsAllowComment,'display:none','display:block')}">
+                                <p>Please assign the feedback to yourself or change the owner to comment</p>                                
+                            </div>
+                        </div>                    
+                    </div>
+                </div>
+            </div>
+        </body>
+        <script>
+            j$ = jQuery.noConflict();
+			var comment = new SObjectModel.articleFeedback();
+			var outputDiv = document.getElementById("commentList");
+        	var hideComment = true;
+            j$('#comment-submit-btn').attr('disabled', true);
+            j$('#comment-input').keyup(function() {
+                if(j$(this).val() != '') {
+                    j$('#comment-submit-btn').attr('disabled' , false);
+                }else{
+                    j$('#comment-submit-btn').attr('disabled' , true);
+                }
+            });
+
+            function insertNewComment(){
+                document.getElementById("comment-loading").style.display="block";
+                j$('#comment-submit-btn').attr('disabled', true);
+
+                var commentDetails = document.getElementById("comment-input").value;
+                var newCommentFields = {
+                        Article_Feedback__c : '{!articleFeedback.Id}',
+                        Article_Feedback_User__c : '{!mEmployeeId}',
+                        Comment__c  : commentDetails,
+                        RecordTypeId : '{!mCommentRecordTypeId}',
+                    Parent_Feedback_User__c : '{!mParentUser}',
+                    	Parent_Owner__c : '{!mParentOwner}'
+                };
+                comment.create(newCommentFields, function(error, results){
+                    document.getElementById("comment-loading").style.display="none";
+                	if(error){
+                    	console.log(error.message);
+                	}else{
+                    	updateOutputDiv();
+                        document.getElementById("comment-input").value = '';
+                        //console.log(JSON.stringify(results));
+                	}
+                });
+            }
+
+			function updateOutputDiv(){
+                var query = {
+                	where: {
+                        Article_Feedback__c: {eq: '{!articleFeedback.Id}'}
+                    }
+                };
+            	comment.retrieve(query,
+                                  function(error, records){
+                                  	if(error){
+                                    	console.log(error.message);
+                                    }else{
+                                        var html='';
+
+                                        for(i = 0; i < records.length; i++){
+
+                                        	if(records.length - 3 > i && hideComment){
+                                               html = '<li class="slds-comment__overflow slds-m-top--small">' +
+                                                  		'<button class="slds-button slds-button--neutral" onClick="toggleMoreComment()">' + (i+1) + ' more comments</button>' +
+                                                	  '</li>';
+                                            }else{
+                                            	html += 	'<li class="slds-feed__item">' +
+                                    			   	'	<div class="slds-media slds-comment slds-hint-parent">' +
+                                        		   	'      <div class="slds-media__body">'+
+                                            		'      <div class="slds-grid slds-grid--align-spread slds-has-flexi-truncate">' +
+                                                	'      		<p class="slds-truncate"><a id="' + records[i].get("Article_Feedback_User_Name__c") + '">' + records[i].get("Article_Feedback_User_Name__c") +  '</a> -'+
+                                                    '      			<span class="slds-text-body--small">' + normalizeDateExtended(records[i].get('CreatedDate')) + '</span>' +
+                                                	'      		</p>' +
+                                            		' 		</div>' +
+                                            		'		<div class="slds-comment__content slds-text-longform">' +
+                                                	'		<p>' + records[i].get("Comment__c") + '</p>' +
+                                            		'		</div>' +
+                                            		'		</div>' +
+                                    				'	</div>' +
+                                					'</li>';
+                                            }
+                                        }
+                                        //console.log(html);
+                                        outputDiv.innerHTML = html;
+
+                                    }
+                                  }
+              );
+            }
+        function normalizeDateExtended(mydate){
+            mydate = new Date(mydate);
+            data = new Date(mydate -  mydate.getTimezoneOffset() * 60000);
+            var d = mydate.getDate();
+            var m = mydate.getMonth()+1;
+            var y = mydate.getFullYear();
+            return '' + (d<=9?'0'+d:d)+'/'+ (m<=9?'0'+m:m) +'/' + y + ' ' + mydate.getHours() + ':' + mydate.getMinutes();
+        }
+
+        function toggleMoreComment(){
+        	hideComment = !hideComment;
+            updateOutputDiv();
+        }
+
+                updateOutputDiv();
+        </script>
+    </html>
+    
+</apex:page>

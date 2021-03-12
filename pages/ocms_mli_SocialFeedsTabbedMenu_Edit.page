@@ -1,0 +1,220 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_SocialFeedsTabbedMenu" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var selectBox = $('<select class="fullWidth tableInputs socialMedia" />');
+        $('<option />', {value: 'Twitter', text: 'Twitter'}).appendTo(selectBox);
+        $('<option />', {value: 'Facebook', text: 'Facebook'}).appendTo(selectBox);
+        $('<option />', {value: 'Instagram', text: 'Instagram'}).appendTo(selectBox);
+        $('<option />', {value: 'LinkedIn', text: 'LinkedIn'}).appendTo(selectBox);
+
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+
+            try {
+                var $ele;
+                if (fCreateSocialMediaArray().length === 0) {
+                    $ele = $('#socialMediaTable');
+                    errorField($ele, languageUsed + 'Social Media Items must be provided.');
+                    return false;
+                }
+
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        function initSocialFeedTable(){
+            var socialFeedsInfo = '{!jsnSocialFeedslist}';
+            if(socialFeedsInfo != ''){
+                socialFeedsInfo = JSON.parse('{!jsnSocialFeedslist}');
+            } else {
+                socialFeedsInfo = {};
+            }
+
+            if (!$.isEmptyObject(socialFeedsInfo)){
+                for (var key in socialFeedsInfo){
+                    if (socialFeedsInfo.hasOwnProperty(key)){
+                        var sSocialMedia = socialFeedsInfo[key].sSocialMedia;
+                        var sAccessibleText = socialFeedsInfo[key].sAccessibleText;
+                        var sTabId = socialFeedsInfo[key].sTabId;
+                        addRow(sSocialMedia, sAccessibleText, sTabId);
+
+                    }
+                }
+            } else {
+                addBlankRow();
+            }
+
+            if({!disableAll}){
+                $('#socialMediaTable tr td input').attr('readonly',true);
+                $('.remove').remove();
+            } else {
+                $('#addRowButton').click(addBlankRow);
+                $('.removeButton').click(removeRow);
+            }
+        }
+
+        function addBlankRow(){
+            if ($('.newSelectBox').length) {
+                $('#socialMediaTable td').removeClass('newSelectBox');
+            }
+            var rowString = '<tr>' +
+                                '<td class="sMediaDropdown newSelectBox">' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs accessibleText" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs tabId" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<a class="removeButton" style="padding-left:10px">' +
+                                        '<img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" />' +
+                                    '</a>' +
+                                '</td>' +
+                            '</tr>';
+            $('#socialMediaTable tbody').append(rowString);
+            $(selectBox).clone().appendTo('.sMediaDropdown.newSelectBox');
+            $('.removeButton').unbind();
+            $('.removeButton').click(removeRow);
+        }
+
+        function addRow(sSocialMedia, sAccessibleText, sTabId){
+
+            var row = $('<tr></tr>');
+            var sMediaField = $('<td></td>');
+            var accessibleTextField = $('<td><input class="fullWidth tableInputs accessibleText" type="text" value="' + sAccessibleText + '"></input></td>');
+            var tabIdField = $('<td><input class="fullWidth tableInputs tabId" type="text" value="' + sTabId + '"></input></td>');
+            var buttonField = $('<td><a class="removeButton" style="padding-left:10px"><img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" /></a></td>"');
+
+            $(selectBox).clone().appendTo(sMediaField).val(sSocialMedia);
+            row.append(sMediaField);
+            row.append(accessibleTextField);
+            row.append(tabIdField);
+            row.append(buttonField);
+
+            $('#socialMediaTable tbody').append(row);
+        }
+
+        function removeRow(){
+            if($('#socialMediaTable tbody tr').length -1 > 0){
+                $(this).parent().parent().remove();
+            } else {
+                $(this).parent().parent().find('.socialMedia').val('');
+                $(this).parent().parent().find('.accessibleText').val('');
+                $(this).parent().parent().find('.tabId').val('');
+            }
+        }
+
+        function fCreateSocialMediaArray() {
+            var socialFeedsInfo = [];
+
+            $('#socialMediaTable tbody tr').each(function(index){
+                var sSocialMedia = $(this).find('.socialMedia').val();
+                var sTabId = $(this).find('.tabId').val();
+                if ((sSocialMedia != null && sTabId != null) && (sSocialMedia != undefined && sTabId != undefined) && sTabId != '') {
+                    socialFeedsInfo.push({
+                        sSocialMedia: $(this).find('.socialMedia').val(),
+                        sAccessibleText: $(this).find('.accessibleText').val(),
+                        sTabId: $(this).find('.tabId').val()
+                    });
+                }
+             });
+             return socialFeedsInfo;
+        }
+
+        $(document).ready(function(){
+
+            initSocialFeedTable();
+
+            $('.tabId').keypress(function(event) {
+                if (this.value.length == 0 && event.which == 48 ){
+                    return false;
+                } else {
+                    return /\d/.test(String.fromCharCode(event.keyCode));
+                }
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                var socialFeedsJSON = JSON.stringify(fCreateSocialMediaArray());
+
+                attributes.push({"name":"jsnSocialFeedslist", "value": socialFeedsJSON, "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td class="fullWidth">
+                        <label class="ocmsLabel ocmsRequiredLabel" for="socialMediaTable">Social Feeds Tabbed Menu</label>
+                        <apex:outputText escape="false" rendered="{!disableAll}">
+                            <table id="socialMediaTable" style="border:1px dashed #cdcdcd;" class="disabled">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">
+                                            Social Media
+                                        </th>
+                                        <th width="40%">
+                                            Accessible Text
+                                        </th>
+                                        <th width="20%" colspan="2">
+                                            Tab Id
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </apex:outputText>
+                        <apex:outputText escape="false" rendered="{!!disableAll}">
+                            <table id="socialMediaTable" style="border:1px solid black;" class="">
+                                <thead>
+                                    <tr>
+                                        <th width="40%">
+                                            Social Media
+                                        </th>
+                                        <th width="40%">
+                                            Accessible Text
+                                        </th>
+                                        <th width="20%" colspan="2">
+                                            Tab Id
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <br/>
+                            <button id="addRowButton" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Add a new row</span></button>
+                        </apex:outputText>
+                        <p class="ocmsHelpText">Select 'Social Media' in order to make it appear as a menu item<br/>
+                        Add integer values (in Tab Id), starting from 1 to 4. It is associated with container showing the recent activity.</p>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

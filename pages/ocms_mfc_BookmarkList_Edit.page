@@ -1,0 +1,85 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_BookmarkContentServiceLayout" showHeader="false" sidebar="false" cache="false" standardStylesheets="false">
+<!-- <style>@import url('{!URLFOR($Resource.ocms_core, 'css/ocms-content-template.css')}');</style> -->
+<apex:outputPanel layout="block">
+	<script type="text/javascript" language="javascript">
+    	//  Implement this function for the Save button in the editor
+		//  Saves the content attributes
+		$(document).ready(function() {
+			// $('input:radio[name=canReorder][value={!AllowBookmarkOrder}]').attr('checked',true);
+
+			ce.content_editor('registerSaveFunction', function() {
+				var attributes = new Array();
+				var canReorder = $('input:radio[name=canReorder]:checked').val();
+				attributes.push({"name":"BookmarkListTitle", "value": $('#BookmarkListTitle').val(), "type":"Text"});
+				attributes.push({"name":"NumberOfBookmarks", "value": $('#NumberOfBookmarks').val(), "type":"Text", "simple":true, "lang": ""});
+				attributes.push({"name":"DefaultLabel", "value": $('#DefaultLabel').val(), "type":"Text", "simple":true});
+				attributes.push({"name":"ShowAllLabel", "value": $('#ShowAllLabel').val(), "type":"Text", "simple":true});
+				// attributes.push({"name":"AllowBookmarkOrder", "value": canReorder, "type":"Text", "simple":true, "lang": ""});
+
+	  			return attributes;
+			});
+		});
+	</script>
+
+	<table class="ocmsContentEditor ocmsContentEditorNested">
+		<tr>
+			<td>
+				<label class="ocmsLabel" for="BookmarkListTitle">Title</label>
+				<apex:outputText escape="false" rendered="{!disableAll}" >
+			        <input type="text" value="{!BookmarkListTitle}" name="" id="BookmarkListTitle" size="60" disabled="disabled" />
+				</apex:outputText>
+				<apex:outputText escape="false" rendered="{!!disableAll}" >
+			        <input type="text" value="{!BookmarkListTitle}" name="" id="BookmarkListTitle" size="60" />
+				</apex:outputText>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label class="ocmsLabel" for="NumberOfBookmarks">Default number of links displayed</label>
+				<apex:outputText escape="false" rendered="{!disableAll}" >
+			        <input type="text" value="{!NumberOfBookmarks}" name="" id="NumberOfBookmarks" class="ocmsLanguageNeutral" size="60" disabled="disabled" />
+				</apex:outputText>
+				<apex:outputText escape="false" rendered="{!!disableAll}" >
+			        <input type="text" value="{!NumberOfBookmarks}" name="" id="NumberOfBookmarks" class="ocmsLanguageNeutral" size="60" />
+				</apex:outputText>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label class="ocmsLabel" for="DefaultLabel">Default value label</label>
+				<apex:outputText escape="false" rendered="{!disableAll}" >
+			        <input type="text" value="{!DefaultLabel}" name="" id="DefaultLabel" size="60" disabled="disabled" />
+				</apex:outputText>
+				<apex:outputText escape="false" rendered="{!!disableAll}" >
+			        <input type="text" value="{!DefaultLabel}" name="" id="DefaultLabel" size="60" />
+				</apex:outputText>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label class="ocmsLabel" for="ShowAllLabel">Show all label</label>
+				<apex:outputText escape="false" rendered="{!disableAll}" >
+			        <input type="text" value="{!ShowAllLabel}" name="" id="ShowAllLabel" size="60" disabled="disabled" />
+				</apex:outputText>
+				<apex:outputText escape="false" rendered="{!!disableAll}" >
+			        <input type="text" value="{!ShowAllLabel}" name="" id="ShowAllLabel" size="60" />
+				</apex:outputText>
+			</td>
+		</tr>
+	</table>
+
+<!-- 	<br/><br/>
+	<span>Enable manual re-ordering?</span><br/>
+	<apex:outputText escape="false" rendered="{!disableAll}" >
+		<input type="radio" name="canReorder" value="yes" /> Yes <br/>
+		<input type="radio" name="canReorder" value="no" /> No
+	</apex:outputText>
+	<apex:outputText escape="false" rendered="{!!disableAll}" >
+		<input type="radio" name="canReorder" value="yes" /> Yes <br/>
+		<input type="radio" name="canReorder" value="no" /> No
+	</apex:outputText> -->
+ </apex:outputPanel>
+</apex:page>

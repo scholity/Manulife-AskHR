@@ -1,0 +1,13 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId" access="global" controller="ASKHR_HRNotes_Controller">
+    <aura:attribute name="recordId" type="Id" /> 
+    <aura:attribute name="Notes" type="String" />
+    <aura:attribute name="showPopup" type="Boolean" default="false" />
+    <aura:attribute name="submitDisabled" type="Boolean" default="true" />
+	
+    <lightning:textarea value="{! v.Notes }" placeholder="Type HR Notes here..." onchange="{!c.commentsChanged}"/>
+            <br />
+            <lightning:button variant="brand" 
+                                          label="Submit HR Note"
+                                          onclick="{!c.submitComment}"
+                              disabled="{! v.submitDisabled }"/>
+</aura:component>

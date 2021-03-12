@@ -1,0 +1,91 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_StockPrice" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function(){
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"strTitle", "value": $('#strTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strIcon", "value": $('#strIcon').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink", "value": $('#strLink').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLinkText", "value": $('#strLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strDelayText", "value": $('#strDelayText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accStock", "value": $('#accStock').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accStockPrice", "value": $('#accStockPrice').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accIncrease", "value": $('#accIncrease').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accDecrease", "value": $('#accDecrease').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strTitle">Title</label>
+                        <input class="ocmsTextInputLrg" id="strTitle" type="text" value="{!strTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strIcon">Icon</label>
+                        <input type="hidden" name="strIcon" id="strIcon" value="{!strIcon}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strIcon" cPassThroughId="strIcon" cImage="{!strIcon}" type="Image" disabled="{!disableAll}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLinkText">Link text</label>
+                        <input class="ocmsTextInputLrg" id="strLinkText" type="text" value="{!strLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink">Link</label>
+                        <input type="hidden" name="strLink" id="strLink" value="{!strLink}" />
+                        <cms:PageSelector cPassThroughId="strLink" value="{!strLink}"  dialogId="strLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strDelayText">Data delayed text</label>
+                        <input class="ocmsTextInputLrg" id="strDelayText" type="text" value="{!strDelayText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accStock">Stock</label>
+                        <input class="ocmsTextInputLrg" id="accStock" type="text" value="{!accStock}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accStockPrice">Stock price</label>
+                        <input class="ocmsTextInputLrg" id="accStockPrice" type="text" value="{!accStockPrice}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accIncrease">Increase</label>
+                        <input class="ocmsTextInputLrg" id="accIncrease" type="text" value="{!accIncrease}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accDecrease">Decrease</label>
+                        <input class="ocmsTextInputLrg" id="accDecrease" type="text" value="{!accDecrease}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

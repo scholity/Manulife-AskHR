@@ -1,0 +1,50 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId" access="global" >
+	<aura:attribute name="isFeedbackVisible" type="Boolean" default="true" />
+	<aura:attribute name="showQuestion" type="Boolean" default="true" />
+	<aura:attribute name="showThankyou" type="Boolean" default="false" />
+	<aura:attribute name="showSubmitComment" type="Boolean" default="false" />
+	<aura:attribute name="submitDisabled" type="Boolean" default="true" />
+    
+    <aura:attribute name="feedbackText" type="Object" />
+	<aura:attribute name="feedbackCommentLabel" type="String" />
+    
+	<aura:attribute name="comments" type="String" />
+    
+    <aura:handler name="init" value="{! this }" action="{! c.init }" />
+    
+    <aura:if isTrue="{!v.isFeedbackVisible}">
+        <!-- Show the initial question -->
+        <aura:if isTrue="{!v.showQuestion}">
+        	<span>{!v.feedbackText[0]}</span>
+            <br /><br />
+        	<lightning:button variant="brand" 
+                                          label="{!v.feedbackText[1]}"
+                                          title="{!v.feedbackText[1]}"
+                                          onclick="{!c.yesClicked}"/>
+            &nbsp;&nbsp;
+        	<lightning:button variant="brand" 
+                                          label="{!v.feedbackText[2]}"
+                                          title="{!v.feedbackText[2]}"
+                                          onclick="{!c.noClicked}"/>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.showThankyou}">
+            <!-- Show Thank you message -->
+            <span>{!$Label.c.ASKHR_Article_Feedback_TQ_Text}</span>
+        </aura:if>
+        
+        <aura:if isTrue="{!v.showSubmitComment}">
+            <!-- Show the textbox to enter comments -->
+            <p class="slds-text-body--medium slds-m-bottom--small">
+                <lightning:formattedRichText  value="{! v.feedbackCommentLabel }" />
+            </p>
+            <lightning:textarea value="{! v.comments }" onchange="{!c.commentsChanged}"/>
+            <br />
+            <lightning:button variant="brand" 
+                                          label="{!$Label.c.ASKHR_Article_Feedback_Submit_Text}"
+                                          title="{!$Label.c.ASKHR_Article_Feedback_Submit_Text}"
+                              			  disabled="{! v.submitDisabled }"
+                                          onclick="{!c.submitComment}"/>
+        </aura:if>
+    </aura:if>
+</aura:component>

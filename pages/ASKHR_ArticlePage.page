@@ -1,0 +1,693 @@
+<apex:page standardcontroller="Knowledge__kav" extensions="ASKHR_ArticlePageExtension" sidebar=" false" action="{!langRedirect}" showheader="true" tabstyle="ASKHR_CustomArticleSearch__tab" standardstylesheets="false" applybodytag="false" doctype="html-5.0">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <head>
+        <apex:stylesheet value="{!URLFOR($Resource.SLDS_0122,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.ASKHR_ArticleAssets, 'css/style.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.ASKHR_ArticleAssets, 'css/style-rate.css')}" />
+        <apex:includescript value="/support/console/33.0/integration.js" />
+        <apex:includescript value="https://code.jquery.com/jquery-1.12.1.min.js" />
+    </head>
+    <apex:remoteobjects >
+        <apex:remoteobjectmodel jsshorthand="rate" name="Vote" fields="Id,ParentId,CreatedById,Type">
+        </apex:remoteobjectmodel>
+    </apex:remoteobjects>
+    <body>
+        <div class="slds">
+            <div class="slds-page-header slds-grid">
+                <h1 class="slds-text-heading--medium slds-m-right--small slds-align-middle slds-wrap " title="{!Knowledge__kav.Title}">
+                    {!Knowledge__kav.Title}
+                </h1>
+                <a class="slds-col--bump-left" href="javascript:openPrintableView();"><span class="configLinks">{!$Label.ASKHR_ArticlePrintableView}</span></a>
+            </div>
+            <knowledge:articlerenderertoolbar articleid="{!$CurrentPage.parameters.id}" canvote="true"  />
+            <br />
+            <div class="slds-tabs--scoped" id="article-tab-container">
+                <ul class="slds-tabs--scoped__nav" role="tablist">
+                    <li class="slds-tabs--default__item slds-text-heading--label slds-active" title="Information" role="presentation">
+                        <span class="slds-tabs--default__link" role="tab" tabindex="0" aria-selected="true" onclick="selectTab(this);" aria-controls="tab-scoped-1" id="tab-scoped-1__item">
+                        </span>
+                    </li>
+                    <li class="slds-tabs--default__item slds-text-heading--label" title="Q & A" role="presentation" style="{!IF($ObjectType.Knowledge__kav.fields.AskHR_Article_Question_and_Answe15__c.Accessible,'display:block;','display:none;')}">
+                        <span class="slds-tabs--default__link" role="tab" tabindex="-1" aria-selected="false" onclick="selectTab(this);" aria-controls="tab-scoped-2" id="tab-scoped-2__item">
+                        </span>
+                    </li>
+                    <li class="slds-tabs--default__item slds-text-heading--label" title="CSR" role="presentation" style="{!IF($ObjectType.Knowledge__kav.fields.AskHR_Article_CSR_Content__c.Accessible,'display:block;','display:none;')}">
+                        <span class="slds-tabs--default__link" role="tab" tabindex="-1" aria-selected="false" onclick="selectTab(this);" aria-controls="tab-scoped-3" id="tab-scoped-3__item">
+                        </span>
+                    </li>
+                    <li class="slds-tabs--default__item slds-text-heading--label" title="Manager" role="presentation" style="{!IF($ObjectType.Knowledge__kav.fields.AskHR_Article_Manager_Content__c.Accessible,'display:block;','display:none;')}">
+                        <span class="slds-tabs--default__link" role="tab" tabindex="-1" aria-selected="false" onclick="selectTab(this);" aria-controls="tab-scoped-4" id="tab-scoped-4__item">
+                        </span>
+                    </li>
+                    <li class="slds-tabs--default__item slds-text-heading--label" id="article-employee-feedback-tab" title="Employee Feedback" style="{!IF(mFeedbackSize > 0, 'display:block;', 'display:none;')}" role="presentation">
+                        <span class="slds-tabs--default__link" role="tab" tabindex="-1" aria-selected="false" onclick="selectTab(this);" aria-controls="tab-scoped-5" id="tab-scoped-5__item">
+                        </span>
+                    </li>
+                </ul>
+                <div id="tab-scoped-1" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item" style="min-height: 300px">
+                    <div class="slds-grid">
+                        <div class="slds-size--1-of-5 slds-p-around--medium" style="font-weight: bold; text-align: right; vertical-align: text-top;">{!$ObjectType.Knowledge__kav.fields.AskHR_Article_Question__c.Label}</div>
+                        <div class="slds-size--4-of-5 slds-p-around--medium">
+                            <div id="article-content-question" style="width:90%;"></div>
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-size--1-of-5 slds-p-around--medium" style="font-weight: bold; text-align: right; vertical-align: text-top;">{!$ObjectType.Knowledge__kav.fields.AskHR_Article_Answer__c.Label}</div>
+                        <div class="slds-size--4-of-5 slds-p-around--medium">
+                            <div id="article-content-answer" style="width:90%;"></div>
+                        </div>
+                    </div>
+                    <div class="slds-grid">
+                        <div class="slds-size--1-of-5 slds-p-around--medium" style="font-weight: bold; text-align: right; vertical-align: text-top;">{!$ObjectType.Knowledge__kav.fields.Links__c.Label}</div>
+                        <div class="slds-size--4-of-5 slds-p-around--medium">
+                            <div id="article-content-links" style="width:90%;"></div>
+                        </div>
+                    </div>
+                    <div class="slds-grid" style="{!IF($ObjectType.Knowledge__kav.fields.Review_Date__c.Accessible,'visibility:visible;','visibility:hidden;')}">
+                        <div class="slds-size--1-of-5 slds-p-around--medium" style="font-weight: bold; text-align: right; vertical-align: text-top;">{!$ObjectType.Knowledge__kav.fields.Review_Date__c.Label}</div>
+                        <div class="slds-size--4-of-5 slds-p-around--medium"><apex:outputfield value="{!Knowledge__kav.Review_Date__c}" /></div>
+                    </div>
+                </div>
+                <div id="tab-scoped-2" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item" style="min-height: 300px">
+                    <div class="slds-grid">
+                        <div class="slds-size--1-of-5 slds-p-around--medium" style="font-weight: bold; text-align: right; vertical-align: text-top;">{!$ObjectType.Knowledge__kav.fields.AskHR_Article_Question_and_Answe15__c.Label}</div>
+                        <div class="slds-size--4-of-5 slds-p-around--medium">
+                            <div id="article-content-qna" style="width:90%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-scoped-3" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-3__item" style="min-height: 300px">
+                    <div class="slds-grid">
+                        <div class="slds-size--1-of-5 slds-p-around--medium" style="font-weight: bold; text-align: right; vertical-align: text-top;">{!$ObjectType.Knowledge__kav.fields.AskHR_Article_CSR_Content__c.Label}</div>
+                        <div class="slds-size--4-of-5 slds-p-around--medium">
+                            <div id="article-content-csrcontent" style="width:90%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-scoped-4" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-4__item" style="min-height: 300px">
+                    <div class="slds-grid">
+                        <div class="slds-size--1-of-5 slds-p-around--medium" style="font-weight: bold; text-align: right; vertical-align: text-top;">{!$ObjectType.Knowledge__kav.fields.AskHR_Article_Manager_Content__c.Label}</div>
+                        <div class="slds-size--4-of-5 slds-p-around--medium">
+                            <div id="article-content-manager" style="width:90%;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="tab-scoped-5" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-5__item" style="min-height: 300px">
+                    <div id="article-qna">
+                        <ul class="slds-list--vertical">
+                            <apex:repeat value="{!ArticleFeedbacks}" var="feedback">
+                                <li class="slds-list__item">
+                                    <div class="slds-p-around--medium">
+                                        <p style="color: rgb(0, 128, 0); font-size: 16px;"><b><apex:outputtext value="{!feedback.Description__c}" escape="false" /></b></p>
+                                        <p><apex:outputtext value="{!feedback.Answer__c}" escape="false" /></p>
+                                    </div>
+                                </li>
+                            </apex:repeat>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div id="single-article-feedback-container" class="feedback_component_single_article" style="{!IF(mFeedbackIsEnable,'display:block;','display:none;')}">
+                <c:ASKHR_ArticleFeedbackComp html-style="display:none" html-class="article_feedback" articleid="{!Knowledge__kav.Id}" articlelanguage="{!Knowledge__kav.Language}"></c:ASKHR_ArticleFeedbackComp>
+            </div>
+            <div>
+                <div id="rate-dialog" aria-hidden="true" role="dialog" class="slds-modal slds-fade-in-close">
+                    <div class="slds-modal__container">
+                        <div id="rate-main" class="slds-show">
+                            <div class="slds-modal__header">
+                                <span class="slds-icon__container slds-p-around--x-small slds-icon-action-share-thanks slds-m-bottom--x-small">
+                                    <img class="slds-icon slds-icon-action-share-thanks icon--medium" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/action/new_custom11_60.png')}" />
+                                    <span class="slds-assistive-text">Rate Article</span>
+                                </span>
+                                <h2 class="slds-text-heading--medium">{!$Label.ASKHR_Rate_Article_Text_1}</h2>
+                                <p class="slds-m-top--x-small">{!$Label.ASKHR_Rate_Article_Text_2}</p>
+                                <span class="star-rating slds-m-top--small">
+                                    <input type="radio" name="rating" value="1" /><i></i>
+                                    <input type="radio" name="rating" value="2" /><i></i>
+                                    <input type="radio" name="rating" value="3" /><i></i>
+                                    <input type="radio" name="rating" value="4" /><i></i>
+                                    <input type="radio" name="rating" value="5" /><i></i>
+                                </span>
+                                <p id="rate-choice" class="slds-m-top--x-small">{!$Label.ASKHR_Rate_Article_Text_6}</p>
+                            </div>
+                            <div class="slds-modal__footer">
+                                <div class="slds-x-small-buttons--horizontal">
+                                    <button class="slds-button slds-button--neutral" onclick="closeRateDialog();">{!$Label.ASKHR_Rate_Article_Text_3}</button>
+                                    <button class="slds-button slds-button--neutral slds-button--brand" onclick="closeRateDialog();showRateDialog(false);">{!$Label.ASKHR_Rate_Article_Text_4}</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="rate-thankyou" class="slds-hide">
+                            <div class="slds-modal__header">
+                                <div id="feedback-submit-successful" class="slds-grid slds-grid--vertical slds-grid--vertical-align-center slds-grid--align-center slds-grow">
+                                    <span class="slds-icon__container--circle slds-icon-standard-solution slds-p-around--large">
+                                        <img class="slds-icon slds-icon--medium" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/action/check_60.png')}" />
+                                        <span class="slds-assistive-text">Thanks</span>
+                                    </span>
+                                    <h2 class="slds-text-heading--medium slds-m-top--large">{!$Label.ASKHR_Article_Feedback_TQ_Text}</h2>
+                                </div>
+                            </div>
+                            <div class="slds-modal__footer">
+                                <div class="slds-x-small-buttons--horizontal">
+                                    <button class="slds-button slds-button--neutral" onclick="closeRateDialog();">{!$Label.ASKHR_Article_Rate_Close_Text}</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="rate-dialog-backdrop" class="slds-backdrop slds-backdrop--close"></div>
+            </div>
+        </div>
+        <div id="temp-article-content-question" style="width:90%;display:none;">
+            <apex:outputfield value="{!Knowledge__kav.AskHR_Article_Question__c}" />
+        </div>
+        <div id="temp-article-content-answer" style="width:90%;display:none;">
+            <apex:outputfield value="{!Knowledge__kav.AskHR_Article_Answer__c}" />
+        </div>
+        <div id="temp-article-content-links" style="width:90%;display:none;">
+            <apex:outputfield value="{!Knowledge__kav.Links__c}" />
+        </div>
+        <div id="temp-article-content-qna" style="display:none;">
+            <apex:outputfield value="{!Knowledge__kav.AskHR_Article_Question_and_Answe15__c}" />
+        </div>
+        <div id="temp-article-content-csrcontent" style="display:none;">
+            <apex:outputfield value="{!Knowledge__kav.AskHR_Article_CSR_Content__c}" />
+        </div>
+        <div id="temp-article-content-manager" style="display:none;">
+            <apex:outputfield value="{!Knowledge__kav.AskHR_Article_Manager_Content__c}" />
+        </div>
+    </body>
+    <script type="text/javascript">
+        j$ = jQuery.noConflict();
+        var rate = new SObjectModel.rate();
+        var rateTimeout;
+        var hasRepositioned = false;
+
+        j$(window).load(function () {
+            populateArticleFeedbackContainer();
+            try{
+                if (sforce.console.isInConsole()) {
+                    initArticleContents(-3,13);
+                }else{
+                    var topOffSet = 91;
+
+                    if(j$('#globalHeaderBar').length){
+                        topOffSet += 36;//as long as have the globalHeaderBar, minus 36px offset
+                    }
+
+                    //check if viewing in MFC Community
+                    if(!j$('.askhr_community_header').length){
+						topOffSet += 39;
+                    }
+
+                    initArticleContents(topOffSet,13);
+
+                    getRating();
+                }
+            }catch(err){
+                if(j$('#globalHeaderBar').length){
+                   	initArticleContents(103,13);
+                }else{
+                    initArticleContents(66,13);
+                }
+
+                getRating();
+                console.log(err);
+            }
+
+            toggleArticleQnAVisibility(false);
+            toggleCSRContentVisibility(false);
+            toggleManagerContentVisibility(false);
+
+            checkForChanges();
+       });
+
+		j$(window).resize(repositionArticleContents);
+
+        var tabContainer = j$("#article-tab-container");
+        var lastPosition = j$("#article-tab-container").offset().top;
+        function checkForChanges()
+        {
+            if (tabContainer.offset().top != lastPosition)
+            {
+                lastPosition = tabContainer.offset().top;
+                repositionArticleContents();
+            }
+
+             setTimeout(checkForChanges, 10);
+        }
+
+        function openPrintableView(){
+            if(j$('.askhr_community_header').length){
+                openPopupFocus('/employee/articles/{!mUserLocale}/Standard_Tab_Layout/{!Knowledge__kav.UrlName}/p', 'PrintableView', 800, 600, 'width=800,height=600,resizable=yes,toolbar=no,status=no,scrollbars=yes,menubar=yes,directories=no,location=no,dependant=no', false, false);
+            }else{
+                openPopupFocus('/articles/{!mUserLocale}/Standard_Tab_Layout/{!Knowledge__kav.UrlName}/p', 'PrintableView', 800, 600, 'width=800,height=600,resizable=yes,toolbar=no,status=no,scrollbars=yes,menubar=yes,directories=no,location=no,dependant=no', false, false);
+            }
+        }
+
+        (function initContentTabsTitle(){
+                var tabTitles = ("{!$Label.ASKHR_ArticleTab_Titles}").split(';');
+
+                j$('#tab-scoped-1__item').text(tabTitles[0]);
+                j$('#tab-scoped-2__item').text(tabTitles[1]);
+                j$('#tab-scoped-3__item').text(tabTitles[2]);
+                j$('#tab-scoped-4__item').text(tabTitles[3]);
+                j$('#tab-scoped-5__item').text(tabTitles[4]);
+        })();
+
+        function populateArticleFeedbackContainer(){
+            var div = document.createElement('div');
+            var feedbackText = ("{!$Label.ASKHR_Single_Article_Feedback_Text}").split(';');
+
+            var p = document.createElement('p');
+            p.setAttribute('class','slds-text-body--small slds-m-top--x-small');
+            var span = document.createElement('span');
+            span.setAttribute('id','feedback_title');
+            span.appendChild(document.createTextNode(feedbackText[0]));
+            p.appendChild(span);
+            div.appendChild(p);
+            div.appendChild(document.createElement('br'));
+
+            //yes button
+            var button = document.createElement('button');
+            button.setAttribute('class','slds-button slds-button--neutral slds-button--small');
+            button.setAttribute('id','feedback_button_yes');
+            button.setAttribute('type','button');
+            button.setAttribute('onclick','popupwindowYes()');
+            button.appendChild(document.createTextNode(feedbackText[1]));
+            div.appendChild(button);
+
+            //no button
+            button = document.createElement('button');
+            button.setAttribute('class','slds-button slds-button--neutral slds-button--small');
+            button.setAttribute('id','feedback_button_no');
+            button.setAttribute('type','button');
+            button.setAttribute('onclick','popupwindow()');
+            button.appendChild(document.createTextNode(feedbackText[2]));
+            div.appendChild(button);
+
+            j$('#single-article-feedback-container').append(div);
+        }
+
+        function popupwindow()
+        {
+
+            document.getElementById("feedback_button_yes").style.display = 'none';
+            document.getElementById("feedback_button_no").style.display = 'none';
+            document.getElementById("feedback_title").innerHTML='';
+            var el = document.getElementsByClassName("article_feedback")[0].style.display;
+
+            if(el == 'none')
+                document.getElementsByClassName("article_feedback")[0].style.display = 'block';
+            else
+                document.getElementsByClassName("article_feedback")[0].style.display = 'none';
+
+            if(rateTimeout != null) clearTimeout(rateTimeout);
+
+        }
+
+        function popupwindowYes()
+        {
+            document.getElementById("feedback_button_yes").style.display = "none";
+            document.getElementById("feedback_button_no").style.display = "none";
+
+            document.getElementById("feedback_title").innerHTML="{!$Label.ASKHR_Article_Feedback_TQ_Text}";
+        }
+
+        function selectTab(elmnt) {
+            // slds-active
+            j$(elmnt).parent("li").siblings(".slds-active").removeClass("slds-active");
+            j$(elmnt).parent("li").addClass("slds-active");
+
+            // tabindex
+            j$(elmnt).parent("li").siblings().children("a").attr("tabindex", -1);
+            j$(elmnt).attr("tabindex", 0);
+
+            // aria-selected
+            j$(elmnt).parent("li").siblings().children("a").attr("aria-selected", false);
+            j$(elmnt).attr("aria-selected", true);
+
+            // hiding previouly selected tab (slds-show/slds-hide)
+            j$(elmnt).closest(".slds-tabs--scoped").children("div[role='tabpanel'].slds-show").addClass("slds-hide");
+            j$(elmnt).closest(".slds-tabs--scoped").children("div[role='tabpanel'].slds-show").removeClass("slds-show");
+            // displaying newly selected tab (slds-show/slds-hide)
+            j$(elmnt).closest(".slds-tabs--scoped").children("div[aria-labelledby='"+elmnt.id+"']").addClass("slds-show");
+            j$(elmnt).closest(".slds-tabs--scoped").children("div[aria-labelledby='"+elmnt.id+"']").removeClass("slds-hide");
+
+            toggleArticleContentVisibility(false);
+            toggleArticleQnAVisibility(false);
+            toggleCSRContentVisibility(false);
+            toggleManagerContentVisibility(false);
+
+            repositionArticleContents();
+
+            if(j$(elmnt).attr('id') == 'tab-scoped-1__item'){
+                toggleArticleContentVisibility(true);
+            }else if(j$(elmnt).attr('id') == 'tab-scoped-2__item'){
+                toggleArticleQnAVisibility(true);
+            }else if(j$(elmnt).attr('id') == 'tab-scoped-3__item'){
+                toggleCSRContentVisibility(true);
+            }else if(j$(elmnt).attr('id') == 'tab-scoped-4__item'){
+               	toggleManagerContentVisibility(true)
+            }
+        }
+
+        (function setTabTitle() {
+          	try{
+           		if (sforce.console.isInConsole()) {
+                    var title = "{!Knowledge__kav.Title}";
+                 	sforce.console.setTabTitle(title);
+          		}
+            }catch(err){}
+        })();
+        //-----------rating---------------
+
+        j$(':radio').hover(function(){
+            var text = "{!$Label.ASKHR_Rate_Article_Text_5}";
+            var rateText = text.split(';');
+             switch(this.value){
+                case '1':
+                    j$('#rate-choice').text(rateText[0]);
+                    break;
+                case '2':
+                    j$('#rate-choice').text(rateText[1]);
+                    break;
+                case '3':
+                    j$('#rate-choice').text(rateText[2]);
+                    break;
+                case '4':
+                    j$('#rate-choice').text(rateText[3]);
+                    break;
+                case '5':
+                    j$('#rate-choice').text(rateText[4]);
+                    break;
+                default:
+                    j$('#rate-choice').text("{!$Label.ASKHR_Rate_Article_Text_6}");
+                    break;
+            }
+        });
+
+        j$(':radio').change(function () {
+            postRating(this.value);
+            j$('#rate-main').addClass('slds-hide');
+            j$('#rate-main').removeClass('slds-show');
+
+            j$('#rate-thankyou').addClass('slds-show');
+            j$('#rate-thankyou').removeClass('slds-hide');
+        })
+
+        function getRating(){
+            var query = {
+                where: {
+                    ParentId: {eq: "{!Knowledge__kav.KnowledgeArticleId}"},
+                    CreatedById: {eq: "{!$User.Id}"}
+                }
+            };
+            rate.retrieve(query,
+                             function(error, records){
+                                 if(error){
+                                     console.log(error.message);
+                                 }else{
+                                     if(records.size() == 0){
+                                        var x = true;
+
+                                        if({!mRatePopupIsRandom}){
+                                            x = Math.floor((Math.random() * 30) + 1) % 2 == 0 ? true : false;
+                                        }
+                                        //randomly show the popup dialog
+                                        //TODO: commented for testing
+                                        if(x){
+                                            showRateDialog(true);
+                                        }
+                                     }
+                                 }
+                             }
+                            );
+        }
+
+        function postRating(type){
+            var newRateFields = {
+                        ParentId : "{!Knowledge__kav.KnowledgeArticleId}",
+                        Type : type
+                };
+                rate.create(newRateFields, function(error, results){
+                    if(error){
+                        console.log(error.message);
+                    }else{
+                        // console.log(JSON.stringify(results));
+                    }
+                });
+        }
+
+        function closeRateDialog(){
+            var html = j$(document.documentElement);
+            html.css('overflow', '');
+            j$('#rate-dialog').removeClass('slds-fade-in-open');
+            j$('#rate-dialog').addClass('slds-fade-in-close');
+
+            j$('#rate-dialog-backdrop').removeClass('slds-backdrop--open');
+            j$('#rate-dialog-backdrop').addClass('slds-backdrop--close');
+        }
+
+        function showRateDialog(isOnLoad){
+                var timeout = {!mRatePopupInterval};
+
+                if(!isOnLoad){
+                    if({!mRatePopupLaterIsEnable} == false){ return; }
+
+                    timeout = {!mRatePopupIntervalLater};
+                }else{
+                    if({!mRatePopupIsEnable} == false){ return; }
+                }
+
+                rateTimeout = setTimeout(function () {
+                    var html = j$(document.documentElement);
+                    html.css('overflow', 'hidden');
+                    j$('#rate-dialog').addClass('slds-fade-in-open');
+                    j$('#rate-dialog').removeClass('slds-fade-in-close');
+
+                    j$('#rate-dialog-backdrop').addClass('slds-backdrop--open');
+                    j$('#rate-dialog-backdrop').removeClass('slds-backdrop--close');
+                }, timeout);
+
+        }
+
+        /*****************************Article Repositioning Section*****************************/
+        /*
+        * To prevent SLDS overwriting the article format, the content is placed outside the slds div
+        * and reposition upon loading, resizing and tab switching
+        */
+        function repositionArticleContents(){
+            var topOffset = 90;
+            var leftOffset = 13;
+            try{
+                if (sforce.console.isInConsole()) {
+                 	topOffset = -3;
+             	}else{
+                     if(j$('#globalHeaderBar').length){
+                        topOffset += 36;//as long as have the globalHeaderBar, minus 36px offset
+                    }
+
+                    if(!j$('.askhr_community_header').length){
+						topOffset += 39;
+                    }
+                }
+            }catch(err){
+                console.log(err);
+            }
+        	if(j$('#tab-scoped-1').hasClass('slds-show')){
+                repositionQuestion(topOffset,leftOffset);
+                repositionAnswer(topOffset, leftOffset);
+                repositionLinks(topOffset, leftOffset);
+            }else if(j$('#tab-scoped-2').hasClass('slds-show')){
+            	repositionQnA(topOffset, leftOffset);
+            }else if(j$('#tab-scoped-3').hasClass('slds-show')){
+            	 repositionCSR(topOffset, leftOffset);
+            }else if(j$('#tab-scoped-4').hasClass('slds-show')){
+            	 repositionManager(topOffset, leftOffset);
+            }
+        }
+
+        function initArticleContents(topOffset,leftOffset){
+            repositionQuestion(topOffset,leftOffset);
+            repositionAnswer(topOffset, leftOffset);
+            repositionLinks(topOffset, leftOffset);
+        }
+
+        function repositionQuestion(topOffset,leftOffset){
+            var containerWidth = 0.8 * j$('#tab-scoped-1').width();
+            var tmpWidth = j$('#temp-article-content-question').width();
+                tmpWidth = containerWidth - 20;
+
+            j$('#article-content-question').css({
+            	height: j$('#temp-article-content-question').height(),
+                width: tmpWidth
+            });
+
+             var position = j$('#article-content-question').offset();
+    		var ptop = position.top - topOffset;
+    		var pleft = position.left - leftOffset;
+            j$('#temp-article-content-question').css({
+                		display: 'block',
+                        position: 'absolute',
+                        top: ptop,
+                        left: pleft,
+                 		width: tmpWidth
+                    });
+        }
+
+        function repositionAnswer(topOffset, leftOffset){
+            var containerWidth = 0.8 * j$('#tab-scoped-1').width();
+            var tmpWidth = containerWidth-20;
+
+            j$('#article-content-answer').css({
+            	height: j$('#temp-article-content-answer').height(),
+                width: tmpWidth
+            });
+
+             var position = j$('#article-content-answer').offset();
+            var ptop = position.top - topOffset;//-8
+    		var pleft = position.left - leftOffset;
+             j$('#temp-article-content-answer').css({
+                		display: 'block',
+                        position: 'absolute',
+                        top: ptop,
+                        left: pleft,
+                 		width: tmpWidth
+                    });
+        }
+
+        function repositionLinks(topOffset, leftOffset){
+            var containerWidth = 0.8 * j$('#tab-scoped-1').width();
+            var tmpWidth = j$('#temp-article-content-links').width();
+            tmpWidth = containerWidth-20;
+
+            j$('#article-content-links').css({
+            	height: j$('#temp-article-content-links').height(),
+                width: tmpWidth
+            });
+
+             var position = j$('#article-content-links').offset();
+    		var ptop = position.top - topOffset;
+    		var pleft = position.left - leftOffset;
+
+             j$('#temp-article-content-links').css({
+                		display: 'block',
+                        position: 'absolute',
+                        top: ptop,
+                        left: pleft,
+                 		width: tmpWidth
+
+                    });
+        }
+
+        function toggleArticleContentVisibility(show){
+           if(show){
+               j$('#temp-article-content-question').show();
+               j$('#temp-article-content-answer').show();
+               j$('#temp-article-content-links').show();
+            }else{
+            	j$('#temp-article-content-question').hide();
+            	j$('#temp-article-content-answer').hide();
+            	j$('#temp-article-content-links').hide();
+            }
+        }
+
+        function repositionQnA(topOffset, leftOffset){
+            var containerWidth = 0.8 * j$('#tab-scoped-2').width();
+
+            var tmpWidth = j$('#temp-article-content-qna').width();
+            tmpWidth = containerWidth-20;
+
+            j$('#article-content-qna').css({
+            	height: j$('#temp-article-content-qna').height(),
+                width: tmpWidth
+            });
+
+            var position = j$('#article-content-qna').offset();
+    		var ptop = position.top - topOffset;
+    		var pleft = position.left - leftOffset;
+             j$('#temp-article-content-qna').css({
+                		display: 'block',
+                        position: 'absolute',
+                        top: ptop,
+                        left: pleft,
+                 		width: tmpWidth
+
+                    });
+        }
+
+        function toggleArticleQnAVisibility(show){
+        	if(show){
+            	j$('#temp-article-content-qna').show();
+            }else{
+            	j$('#temp-article-content-qna').hide();
+            }
+        }
+
+        function repositionCSR(topOffset, leftOffset){
+            var containerWidth = 0.8 * j$('#tab-scoped-3').width();
+
+            var tmpWidth = j$('#temp-article-content-csrcontent').width();
+            tmpWidth = containerWidth-20;
+
+            j$('#article-content-csrcontent').css({
+            	height: j$('#temp-article-content-csrcontent').height(),
+                width: tmpWidth
+            });
+
+            var position = j$('#article-content-csrcontent').offset();
+    		var ptop = position.top - topOffset;
+    		var pleft = position.left - leftOffset;
+             j$('#temp-article-content-csrcontent').css({
+                		display: 'block',
+                        position: 'absolute',
+                        top: ptop,
+                        left: pleft,
+                 		width: tmpWidth
+
+                    });
+        }
+
+        function toggleCSRContentVisibility(show){
+        	if(show){
+            	j$('#temp-article-content-csrcontent').show();
+            }else{
+            	j$('#temp-article-content-csrcontent').hide();
+            }
+        }
+
+        function repositionManager(topOffset, leftOffset){
+            var containerWidth = 0.8 * j$('#tab-scoped-4').width();
+
+            var tmpWidth = j$('#temp-article-content-manager').width();
+            tmpWidth = containerWidth-20;
+
+            j$('#article-content-manager').css({
+            	height: j$('#temp-article-content-manager').height(),
+                width: tmpWidth
+            });
+
+            var position = j$('#article-content-manager').offset();
+    		var ptop = position.top - topOffset;
+    		var pleft = position.left - leftOffset;
+             j$('#temp-article-content-manager').css({
+                		display: 'block',
+                        position: 'absolute',
+                        top: ptop,
+                        left: pleft,
+                 		width: tmpWidth
+
+                    });
+        }
+
+        function toggleManagerContentVisibility(show){
+        	if(show){
+            	j$('#temp-article-content-manager').show();
+            }else{
+            	j$('#temp-article-content-manager').hide();
+            }
+        }
+    </script>
+</html>
+</apex:page>

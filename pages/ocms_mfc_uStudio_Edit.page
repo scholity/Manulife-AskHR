@@ -1,0 +1,88 @@
+<!--
+ - Created by rhyanmitchell on 2017-02-07.
+ -->
+
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_uStudio"
+           showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+
+    <link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+          rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+
+    <script id="ocms_application_Edit">
+        $(document).ready(init);
+
+        function init() {
+            ce.content_editor('registerSaveFunction', getAttributes);
+
+            $('#body').val('{!JSENCODE(body)}');
+
+            CKEDITOR.replace('body', $.extend({
+                readOnly: false
+            }, {!CKEditorConfig}));
+
+        }
+
+        /**
+         * Returns an array of OrchestraCMS attributes based on the current UI values.
+         */
+        function getAttributes() {
+            var attributes = [];
+            var useChunking = false;
+            var bodyChunks;
+            var body;
+
+            if (useChunking) {
+                // Process the body into 30kb chunks to split across several attribute (if necessary)
+                bodyChunks = chunkString(CKEDITOR.instances.embed.getData());
+                attributes.push({
+                    name: 'bodyChunkCount',
+                    value: bodyChunks.length.toString(),
+                    type: 'Integer',
+                    simple: true
+                });
+
+                bodyChunks.forEach(function(chunk, i) {
+                    attributes.push({
+                        name: 'body_' + i,
+                        value: chunk,
+                        type: 'Rich Text'
+                    });
+                });
+            } else {
+                attributes.push({
+                    name: 'body',
+                    value: CKEDITOR.instances.body.getData(),
+                    type: 'Rich Text'
+                });
+            }
+
+            return attributes;
+        }
+
+        /**
+         * Breaks a string into a set of 30kb chunks that can be stored in several Salesforce Long Text fields.
+         */
+        function chunkString(str) {
+            var CHUNK_SIZE = 32768;
+            var chunkList = [];
+            var cursor = 0;
+
+            while(cursor < str.length) {
+                chunkList.push(str.substr(cursor, CHUNK_SIZE));
+                cursor += CHUNK_SIZE;
+            }
+
+            return chunkList;
+        }
+
+    </script>
+
+    <table class="ocmsContentEditor ocmsContentEditorNested">
+        <tr>
+            <td>
+                <label class="ocmsLabel" for="body">uStudio Embed HTML</label>
+                <textarea id="body"></textarea>
+            </td>
+        </tr>
+    </table>
+</apex:page>

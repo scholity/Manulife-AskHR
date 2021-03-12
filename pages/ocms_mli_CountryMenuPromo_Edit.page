@@ -1,0 +1,78 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_CountryMenuPromo" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function(){
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"strContentId", "value": $('#strContentId').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strSummary", "value": $('#strSummary').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLinkText", "value": $('#strLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accText", "value": $('#accText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLinkTitle", "value": $('#strLinkTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink", "value": $('#strLink').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strImage", "value": $('#strImage').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strContentId">Content ID</label>
+                        <input class="ocmsTextInputLrg" id="strContentId" name="strContentId" type="text" value="{!strContentId}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strSummary">Summary</label>
+                        <textarea id="strSummary" name="strSummary" style="width: 295px; height: 100px;">{!strSummary}</textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLinkText">Link text</label>
+                        <input class="ocmsTextInputLrg" id="strLinkText" name="strLinkText" type="text" value="{!strLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLinkTitle">Link title</label>
+                        <input class="ocmsTextInputLrg" id="strLinkTitle" name="strLinkTitle" type="text" value="{!strLinkTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink">Link destination</label>
+                        <input type="hidden" name="strLink" id="strLink" value="{!strLink}" />
+                        <cms:PageSelector cPassThroughId="strLink" value="{!strLink}"  dialogId="strLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strImage">Promo image</label>
+                        <input type="hidden" name="strImage" id="strImage" value="{!strImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strImage" cPassThroughId="strImage" cImage="{!strImage}" type="Image" disabled="{!disableAll}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accText">Link action</label>
+                        <input class="ocmsTextInputLrg" id="accText" name="accText" type="text" value="{!accText}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

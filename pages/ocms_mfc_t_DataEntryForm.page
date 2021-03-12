@@ -1,0 +1,142 @@
+<!-- ocms_mfc_t_DataEntryForm -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mfc_FavIcon, 'img/favicon.ico')}" type="image/x-icon"/>
+            <!-- this is K2’s customized jQuery UI CSS, some of which is overridden by K2’s style.css, hence this must appear first -->
+            <link rel="stylesheet"
+                  href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/jquery-ui.min.css')}"
+                  type="text/css"/>
+            <apex:include pageName="ocms_mfc_i_headSpace"/>
+
+            <style>
+                /* say no to some OrchestraCMS extra markup wrt date picking */
+                .date-label {
+                    display: none;
+                }
+            </style>
+        </apex:define><!-- header -->
+
+        <apex:define name="body">
+            <div class="pg pgDataEntryForm">
+
+                <apex:include pageName="ocms_mfc_i_headerAndSideNav"/>
+
+                <div class="global-layer-wrap main-global-layer">
+
+                    <div class="global-align-center">
+                        <div class="global-drawer-slider">
+
+                            <apex:include pageName="ocms_mfc_i_globalNavTools"/>
+
+                            <div class="content-layer main-layer sticky-footer-fix">
+
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>TextBlock</strong> ❧ critical alerts section
+                                    </div>
+
+                                </apex:outputText>
+                                <div class='critical-alerts'>
+                                    <cms:Panel panelName="criticalAlerts" panelController="{!controller}"
+                                               panelWidth="550px" panelHeight="30px"/>
+                                </div>
+
+                                <main class="content-wrap main-article">
+                                    <!-- K2 had non-semantic article element here -->
+                                    <apex:include pageName="ocms_mfc_i_breadcrumb"/>
+
+                                    <div class="preamble">
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint">
+                                                <strong>Text Block, Image</strong> <span>(optional)</span><br/>
+                                                ❧ a brief introduction that precedes the form may be added here
+                                            </div>
+                                        </apex:outputText>
+                                        <cms:Panel panelName="preamble" panelController="{!controller}"
+                                                   panelWidth="350px"
+                                                   panelHeight="60px"
+                                                   panelContentLayouts="TextBlock, CustomHtml, Image, MFCTextBlock"/>
+                                    </div>
+
+                                    <div class="article-content pgDataEntryForm">
+                                        <div class="inner">
+                                            <h2>
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                    <div class="ocmsHint">
+                                                        <strong>PlainText</strong> ❧ Form title
+                                                    </div>
+                                                </apex:outputText>
+                                                <cms:Panel panelName="formTitle" panelController="{!controller}"
+                                                           panelWidth="325px"
+                                                           panelHeight="22px" panelContentLayouts="PlainText"
+                                                           panelLimit="1"/>
+                                            </h2
+                                            ><!-- h2 -->
+
+                                            <div class="instructions">
+                                                <div class="inst-tab">
+                                                    <h4 class="subhead">
+                                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                            <div class="ocmsHint">
+                                                                <strong>PlainText</strong> ❧ Instructions title
+                                                                (typically “Instructions”)
+                                                            </div>
+                                                        </apex:outputText>
+                                                        <cms:Panel panelName="instructionsTitle"
+                                                                   panelController="{!controller}" panelWidth="350px"
+                                                                   panelHeight="22px" panelContentLayouts="PlainText"
+                                                                   panelLimit="1"/>
+                                                    </h4
+                                                    ><!-- h4 --><span class="mobile"></span>
+                                                </div>
+
+                                                <div class="inst-content">
+                                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                        <div class="ocmsHint">
+                                                            <strong>Text Block</strong> ❧ instructions
+                                                        </div>
+                                                    </apex:outputText>
+                                                    <cms:Panel panelName="instructions" panelController="{!controller}"
+                                                               panelWidth="350px"
+                                                               panelHeight="22px" panelContentLayouts="TextBlock"
+                                                               panelLimit="1"/>
+                                                </div>
+                                            </div><!-- .instructions -->
+
+                                            <div class="form-wrapper">
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                    <div class="ocmsHint">
+                                                        <strong>Form, Classifier</strong> ❧ add the form content item
+                                                        here<br/>
+                                                        - for some data entry forms you may also need to add a
+                                                        Classifier content item to indicate what type of data entry form
+                                                        this is (some forms require special handling)
+                                                    </div>
+                                                </apex:outputText>
+                                                <cms:Panel panelName="theForm" panelController="{!controller}"
+                                                           panelWidth="375px"
+                                                           panelHeight="32px" panelContentLayouts="Form, Classifier"
+                                                           panelLimit="2"/>
+                                            </div>
+
+                                            <div class="clear"></div>
+                                        </div><!-- .inner -->
+                                    </div>
+                                </main>
+
+                                <apex:include pageName="ocms_mfc_i_pageFooter"/>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .global-layer-wrap.main-global-layer -->
+                <a id="back-to-top">
+                    <span class="i18n" id="uiLabelBackToTop">Back to top</span>
+                </a>
+            </div><!-- .pg.pgDataEntryForm -->
+
+            <!--script type="text/javascript">_satellite.pageBottom();</script-->
+        </apex:define><!-- body -->
+    </apex:composition>
+</apex:page>
+<!-- ocms_mfc_t_DataEntryForm -->

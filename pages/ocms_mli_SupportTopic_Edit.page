@@ -1,0 +1,29 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_SupportTopic" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script type="text/javascript" language="javascript">
+
+        $(document).ready(function(){
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+                
+                attributes.push({"name":"supportTopic", "value": $('#supportTopic').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+        
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="supportTopic">Support topic</label>
+                        <p>NOTE: This content type is for analytics purposes only, it is used to identify a page as a support page and relay its topic to Adobe analytics. It does not display on the page.</p>
+                        <input class="ocmsTextInputLrg" id="supportTopic" type="text" value="{!supportTopic}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

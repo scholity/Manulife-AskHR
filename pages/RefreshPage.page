@@ -1,0 +1,5 @@
+<apex:page standardController="Case">
+    <script> 
+        window.top.location='/console';
+    </script>
+</apex:page>

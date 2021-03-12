@@ -1,0 +1,80 @@
+<!-- ocms_mfc_i_headSpace -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no,width=device-width" />
+
+    <!-- ••• CSS ••• -->
+    <apex:outputText rendered="{!api.page_mode != 'production'}"><!-- Edit, Preview -->
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/ocms-reset+support.css')}" type="text/css" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/style.css')}" type="text/css" />
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/mfc.css')}" type="text/css" />
+    </apex:outputText><apex:outputText rendered="{!api.page_mode == 'edit'}"><!-- Edit only -->
+       <!-- <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_PageSupport, 'css/edit.css')}" type="text/css"/> -->
+    </apex:outputText><apex:outputText rendered="{!api.page_mode == 'production'}"><!-- Production -->
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'prod/mfc-prod.css')}" type="text/css" />
+    </apex:outputText>
+
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" />
+
+    <!-- ••• JavaScript ••• -->
+    <!-- Part I -->
+    <script id="mfcSitePreferences">
+        var MFC = MFC || {};
+        MFC.sitePreferences = {!sitePreferences};
+    </script>
+
+    <!-- Fix an issue that OCMS Sept. 2019 Update is not able to edit page/content -->
+    <!-- Unable to create a new version of CeoFeature Message article in OCMS.
+    (Actual issue is unable to access the Edit Content option on the menu of the content on the page).-->
+    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+        <style>
+            #back-to-top {
+                bottom: 0 !important;
+            }
+        </style>
+    </apex:outputText>
+
+    <!-- Part II -->
+    <apex:outputText rendered="{!api.page_mode != 'production'}"><!-- Edit, Preview -->
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery/jquery.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/orchestra/jquery-ui-1114.custom.min.js')}"></script>
+    
+        <apex:outputText rendered="{!api.page_mode != 'edit'}">
+            <script type="text/javascript" src="{!URLFOR($Resource.cms__jqueryui, 'js/ocms.production.js')}"></script>
+        </apex:outputText>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/lazyload/lazyload.min.js')}"></script>
+        <!--<script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_Bookmark, 'js/extMain.js')}"></script>-->
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/html5shiv/html5shiv.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.cms__OrchestraCMSPublic, 'multilingual/languageMap.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.cms__jqueryui, 'js/jquery-ui-i18n.min.js')}"></script>
+        <!-- newer jQuery loads now -->
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery-colorbox/jquery.colorbox.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery-iosslider/jquery.iosslider.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery-masonry/jquery.masonry.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery-ellipsis/jquery.ellipsis.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/moment-with-locales/moment-with-locales.js')}"></script> 
+
+        <!-- likely only needed for pgDataEntryForm page template -->
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery-ui-datepicker/js/jquery-ui.min.js')}"></script>
+
+        <!-- mfc_script restores $ to OrchestraCMS’s jQuery 1.5.1, leaving $$ as the newer version loaded above -->
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'js/mfc_script.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'js/mfc.js')}"></script>
+    </apex:outputText><apex:outputText rendered="{!api.page_mode == 'production'}"><!-- Production -->
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'prod/lib/mfclib-prod.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.cms__jqueryui, 'js/ocms.production.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery-ui-datepicker/js/jquery-ui.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/lazyload/lazyload.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_Bookmark, 'js/extMain.js')}"></script>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.cms__OrchestraCMSPublic, 'multilingual/languageMap.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'prod/js/mfc-prod.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+    </apex:outputText>
+
+    <script>$(document).data('cms', CMS);</script>
+    <apex:outputText escape="false" value="{!AnalyticsScriptTag}" />
+</apex:page>
+<!-- ocms_mfc_i_headSpace -->

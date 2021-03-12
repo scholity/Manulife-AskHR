@@ -1,0 +1,36 @@
+<!-- ocms_mfc_AppWidget_Edit.page -->
+<!--
+    This is the OrchestraCMS content editor page for "App Widget" custom content
+    
+    2015-Apr-07 Wilder
+        - original
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_App"
+	showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+	
+	<link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+
+	<apex:outputPanel layout="block">
+
+	<script id="ocms_application_Edit">
+		$(document).ready(function() {
+			ce.content_editor('registerSaveFunction', function() {			   
+				return [
+					{type: 'text', name: 'appWidgetTitle', value: $('#appWidgetTitle').val()}
+				];
+			});
+		});
+	</script>
+
+	<table class="ocmsContentEditor ocmsContentEditorNested">
+            <tr><td>
+            	<label class="ocmsLabel" for="appWidgetTitle" title="Widget title">Title</label>
+                <input type='text' id="appWidgetTitle" placeholder="widget title" value="{!appWidgetTitle}"/>
+			</td></tr>
+	</table>
+
+	</apex:outputPanel>
+	
+</apex:page>
+<!-- ocms_mfc_AppWidget_Edit.page -->

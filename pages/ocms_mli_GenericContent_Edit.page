@@ -1,0 +1,200 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_GenericContent" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if (CKEDITOR.instances.sGenericContentBody.getData() == null || CKEDITOR.instances.sGenericContentBody.getData() == '') {
+                    $ele = $('#sGenericContentBody');
+                    errorField($ele, languageUsed + 'Content Body must be provided.');
+                    return false;
+                }
+                if ($('#sGenericContentImage').val() != null && $('#sGenericContentImage').val() != '') {
+                    if ($('#sGenericContentImageMobile').val() == null || $('#sGenericContentImageMobile').val() == '') {
+                        $ele = $('#sGenericContentImageMobile');
+                        errorField($ele, languageUsed + 'Content Image(for mobile) must be provided as Content Image is added.');
+                        return false;
+                    }
+                }
+                if ($('#sLink').val() != null && $('#sLink').val() != '') {
+                    if ($('#sLinkTitle').val() == null || $('#sLinkTitle').val() == '') {
+                        $ele = $('#sLinkTitle');
+                        errorField($ele, languageUsed + 'Footer Link Label must be provided as Footer Link is added.');
+                        return false;
+                    }
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            CKEDITOR.replace('sGenericContentBody', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            var textMax = 1000;
+            var textLength;
+            var textRemaining;
+
+            /* *****
+               * Initialize the remaining character count in the summary text boxes
+               * Character limit is set to 1000
+             * *****/
+            textLength = $('#sGenericContentHeading').val().length;
+            textRemaining = textMax - textLength;
+            $('#charSummaryCount').html(textRemaining + ' characters remaining');
+
+            /* *****
+               * Update the character count as characters are entered
+             * *****/
+            $('#sGenericContentHeading').keyup(function() {
+                textLength = $('#sGenericContentHeading').val().length;
+                textRemaining = textMax - textLength;
+                $('#charSummaryCount').html(textRemaining + ' characters remaining');
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sGenericContentIcon", "value": $('#sGenericContentIcon').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sGenericContentTitle", "value": $('#sGenericContentTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sGenericContentHeading", "value": $('#sGenericContentHeading').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sGenericContentBody", "value": CKEDITOR.instances.sGenericContentBody.getData(), "type": "Text", "simple": false});
+                attributes.push({"name":"sGenericContentImagePosition", "value": $('#sGenericContentImagePosition').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sGenericContentImage", "value": $('#sGenericContentImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sGenericContentImageMobile", "value": $('#sGenericContentImageMobile').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sGenericContentImageAlt", "value": $('#sGenericContentImageAlt').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLink", "value": $('#sLink').val(), "type": "cms.Link", "simple": false});
+                attributes.push({"name":"sLinkTitle", "value": $('#sLinkTitle').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <strong>Widget Header</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sGenericContentIcon">Header Icon</label>
+                        <input type="hidden" name="sGenericContentIcon" id="sGenericContentIcon" value="{!sGenericContentIcon}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sGenericContentIcon" cPassThroughId="sGenericContentIcon" cImage="{!sGenericContentIcon}" type="Image" disabled="{!disableAll}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sGenericContentTitle">Header Title</label>
+                        <input class="ocmsTextInputLrg" id="sGenericContentTitle" name="sGenericContentTitle" type="text" value="{!sGenericContentTitle}"></input>
+                        <div class="ocmsInstructions">
+                                <p>If blank then the entire header section including the icon and horizontal underline line will not be rendered.</p>
+                            </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Widget Content</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sGenericContentHeading">Content Heading</label>
+                        <textarea  id="sGenericContentHeading" name="sGenericContentHeading" style="width: 600px; height: 150px;" maxlength="1000"><apex:outputText value="{!sGenericContentHeading}" /></textarea>
+                        <p class="ocmsHelpText">
+                            (<span id="charSummaryCount"></span>)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sGenericContentBody">Content Body</label>
+                        <textarea  id="sGenericContentBody" name="sGenericContentBody">
+                            <apex:outputText value="{!sGenericContentBody}" />
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel" for="sGenericContentImagePosition">Image Position Selector</label>
+                        <select name="sGenericContentImagePosition" id="sGenericContentImagePosition">
+                            <option value="right">Position image on right</option>
+                            <option value="left">Position image on left</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sGenericContentImage">Content Image(for desktop and tablet)</label>
+                        <input type="hidden" name="sGenericContentImage" id="sGenericContentImage" value="{!sGenericContentImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sGenericContentImage" cPassThroughId="sGenericContentImage" cImage="{!sGenericContentImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W403 X H167 to W494 X H293 pixel (72ppi)<br/>
+                        Retina: W806 X H334 to W988 X H586 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sGenericContentImageMobile">Content Image(for mobile)</label>
+                        <input type="hidden" name="sGenericContentImageMobile" id="sGenericContentImageMobile" value="{!sGenericContentImageMobile}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sGenericContentImageMobile" cPassThroughId="sGenericContentImageMobile" cImage="{!sGenericContentImageMobile}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W201 X H146 to W494 X H167 pixel (72ppi)<br/>
+                        Retina: W402 X H292 to W988 X H334 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sGenericContentImageAlt">Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sGenericContentImageAlt" name="sGenericContentImageAlt" type="text" value="{!sGenericContentImageAlt}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Widget Footer</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLink">Footer Link</label>
+                        <input type="hidden" name="sLink" id="sLink" value="{!sLink}" />
+                        <cms:PageSelector cPassThroughId="sLink" value="{!sLink}"  dialogId="sLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLinkTitle">Footer Link Label</label>
+                        <input class="ocmsTextInputLrg" id="sLinkTitle" name="sLinkTitle" type="text" value="{!sLinkTitle}"></input>
+                    </td>
+                </tr>
+            </table>
+            <script>
+                // Initialize picklist values here - populate picklist with values from their last save
+                var sGenericContentImagePosition =  "{!sGenericContentImagePosition}";
+                $('select#sGenericContentImagePosition').val(sGenericContentImagePosition);
+            </script>
+        </form>
+    </apex:outputPanel>
+</apex:page>

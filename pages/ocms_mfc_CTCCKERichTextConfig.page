@@ -1,0 +1,25 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" contentType="text/javascript">
+
+/**
+ *
+ *	The content editor page will reference this like so, for a textarea with the id of 'richText'
+ * 		CKEDITOR.replace('richText', {
+ *   	   customConfig: '/apex/c__ocms_mfc_CTCCKERichTextConfig',
+ *      });
+ *
+ */
+
+CKEDITOR.editorConfig = function(config) {
+	
+	CKEDITOR.config.forcePasteAsPlainText = true;
+	CKEDITOR.config.enterMode = CKEDITOR.ENTER_BR;
+    CKEDITOR.config.toolbar = 'Custom';
+
+    CKEDITOR.config.toolbar_Custom =
+    [
+		{ name: 'clipboard',	items : [ 'Cut','Copy','Paste','-','Undo','Redo' ] },
+		{ name: 'editing',		items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] }
+    ];
+};
+
+</apex:page>

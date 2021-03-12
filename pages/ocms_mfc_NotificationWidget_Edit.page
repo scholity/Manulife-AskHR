@@ -1,0 +1,36 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_NotificationWidget" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+    <script type="text/javascript" language="javascript">	
+		$(document).ready(function() {
+	       ce.content_editor('registerSaveFunction', function() {
+			var attributes = new Array();    
+			attributes.push({"name":"heading", "value": $('#heading').val(), "type": "Text", "simple": true});
+			attributes.push({"name":"countText", "value":$('#countText').val(), "type":"Text", "simple": true})
+				
+			return attributes;
+	       });
+        });       
+    </script>
+    <apex:outputPanel >
+        <form>
+			<table class="ocmsContentEditor ocmsContentEditorNested"> 
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="heading">Header</label>
+						<textarea class="ocmsTextInputLrg" id="heading" name="heading" ><apex:outputText value="{!heading}" /></textarea>                                
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel ocmsRequiredLabel" for="countText">Unread Count</label>
+						<textarea class="ocmsTextInputLrg" id="countText" name="countText">
+							<apex:outputText value="{!countText}" />
+						 </textarea>
+						 <p class="ocmsHelpText">Place [count] to appear where you want the unread notification count.<br />Example: You have [count] PENDING</p>
+					</td>
+			 	</tr>
+	        </table>
+        </form>
+	</apex:outputPanel>
+</apex:page>

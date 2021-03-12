@@ -1,0 +1,8 @@
+<template>
+    <!-- Loop thru each Alert -->
+    <template for:each={listKnowledgeAlertArticles.data} for:item="knowledgeAlertArticle">
+        <div key={knowledgeAlertArticle.Id} class="slds-text-align_center">
+            <p class="slds-text-color_error"><lightning-formatted-rich-text value={knowledgeAlertArticle.General_Purpose_Content__c}></lightning-formatted-rich-text></p>
+        </div>
+    </template>
+</template>

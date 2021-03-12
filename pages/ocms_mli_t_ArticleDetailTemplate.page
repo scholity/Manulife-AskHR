@@ -1,0 +1,1088 @@
+<!--
+OrchestraCMS Page Template
+##########################
+
+Author: Daniel Sokolowski
+-->
+<apex:page controller="cms.CoreController" extensions="ocms_mli_Utility" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+            <!-- using `link` tag over SF's 'Site Favourite Icon' is the more modern approach and allows it to be neatly version tracked
+            TODO: determine how to track and if needed to track `/staticresoruce/ocms_mli_favicon.resource` -->
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'ocms_mli_favicon.ico')}" />
+
+            <!-- 2016-03-30 - [Stephen Scholtz] Added language support for Bing search engine -->
+            <meta http-equiv="content-language" content="{!IF(api.lang=='en_US','en',api.lang)}" />
+            <!-- 2016-04-01 - [Stephen Scholtz] Added webmaster verification codes -->
+            <!--//Google --> 
+            <meta name="google-site-verification" content="oFtYOjV6JxFX4grH7CiyrHx1aiP85EA_nleIkOtnrpw" /> 
+            <meta name="google-site-verification" content="dSCJDxZf7NKbL9kyAHYDrgVuPN6sAuiOLOIEBjP2Icc" /> 
+            <!--//Bing  --> 
+            <meta name="msvalidate.01" content="3EA8933C17C570A0E92E9C9D173BDCA7" />
+
+            <!--
+            Edit mode css/js
+            ================-->
+            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                <!-- Edit Mode CSS -->
+                <!-- <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/hw-mli.css')}" /> -->
+                <!-- <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/defaultEditMode1.css')}" />
+                <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/defaultEditMode2.css')}" />
+                <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/defaultEditMode.css')}" />-->
+                <!-- <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli.css')}" /> -->
+                <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ocms-reset+support-v2-edit-template.css')}" />
+                <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-template.css')}" />
+                <!--  <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />-->
+            </apex:outputText>
+
+
+
+            <!--
+            Preview <head> files
+            =======================-->
+            <apex:outputText rendered="{!api.page_mode == 'prev'}">
+                <!--
+                Preview OCMS Scripts (due to 'Disable OrcestraCMS Scripts')
+                -----------------------------------------------------------
+
+                Due to jquery and jquery ui vulnerabilities we are leveraging OCMS Winter 2015 scripts by manually including them,
+                see: https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-5312
+
+                See `PreviewTempalte.page` and search for `Disable_OrchestraCMS_Scripts__c` merge field which is evaluated
+                and different markup rendered if script are disabled.
+                -->
+
+                <!-- `PreviewTempalte.page` excerpts for version 7.85.11 pasted below as references
+
+                ...
+                $(document).ready(function(e) {
+
+                   $('#topControls').parent().addClass('OCMS-Preview');
+
+                  <apex:outputText escape="false" rendered="{!!pageRecord.Page_Layout__r.Disable_OrchestraCMS_Scripts__c}">
+                            $('.ocms-dynamicload').ocmsDynamicLoad({
+                                sname : '{!site_name}',
+                                page_mode: 'prev',
+                                token : '{!api.csrf_token}'
+                            });
+
+                            $.orchestracmsSecureUrlLoad.doLoadS3SecureUrl();
+                  </apex:outputText>
+                 });
+                ...
+                if({!pageRecord.Page_Layout__r.Disable_OrchestraCMS_Scripts__c}) {
+                    var ocmsJQuery = $.noConflict(true);
+                }
+                -->
+
+                <script>
+                // project code expects `$` and `jQuery` to be OrechstraCMS jQuery
+                var $ = ocmsJQuery;
+                var jQuery = ocmsJQuery;
+                $(document).ready(function(e) {
+                    "use strict";
+                    $('.ocms-dynamicload').ocmsDynamicLoad({
+                        sname : '{!api.site_name}', // `{\!site_name}` is not `global` in the `cms.CoreController`
+                        page_mode: 'prev',
+                        token : '{!api.csrf_token}'
+                    });
+                });
+                //# sourceURL=ocms_mli_t_StandartPageTemlate.page#inlinedScript1
+                </script>
+
+
+
+                <!--
+                Project Template References
+                --------------------------->
+                <!-- Preview Mode CSS -->
+                <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/hw-mli.css')}" />
+                <link rel="stylesheet" type="text/css" media="print" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/print.css')}" /> <!-- from HW mockups -->
+                <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli.css')}" />
+
+
+                <!--[if (lt IE 9)&!(IEMobile)]>
+                    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/html5shiv.js')}"></script>
+                    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/json2.js')}"></script>
+                    <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/oldie.css')}" type="text/css" media="screen, projection" />
+                    <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/oldie2.css')}" type="text/css" media="screen, projection" />
+                <![endif]-->
+
+                <!--[if lt IE 9]>
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/es5-shim.js')}"></script>
+                <![endif]-->
+
+
+                <!-- TeamplateHeadTag.min.js -->
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_analytics, 'js/analytics.js')}"></script>
+                <!-- <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_PageSupport, 'lib/moment-with-locales/moment-with-locales.js')}"></script> -->
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ocms-extensions-custom.js')}"></script>
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli.js')}"></script>
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/hw-mli.js')}"></script>
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-preview.js')}"></script>
+
+
+                <!-- Adobe Analytics -->
+                <apex:outputText escape="false" value="{!AnalyticsScriptTag}" />
+            </apex:outputText>
+
+
+
+            <!--
+            Production <head> files
+            =======================-->
+            <apex:outputText rendered="{!api.page_mode == 'production'}">
+                <!--
+                Production OCMS Scripts (due to 'Disable OrcestraCMS Scripts')
+                --------------------------------------------------------------
+
+                Due to jquery and jquery ui vulnerabilities we are leveraging OCMS Winter 2015 scripts by manually including them,
+                see: https://web.nvd.nist.gov/view/vuln/detail?vulnId=CVE-2010-5312
+
+                See `ProductionTemplate.page` for list of required scripts which than you can download in your browser
+                to create/update the `ocms_mli_pageSupport.resource/orchestra-cms/*`; don't forget to update your grunt or
+                other minification build script to these files and in proper order.
+                -->
+
+                <!-- `ProductionTemplate.page` excerpt for version 7.173 pasted below as references
+                <apex:outputText escape="false" rendered="{!disable_scripts != true}">
+                  <link rel="stylesheet" href="{!URLFOR($Resource.jqueryui, '/js/rendering/jqueryui-all.css')}" type="text/css" charset="utf-8" />
+                  <apex:includeScript value="{!URLFOR($Resource.jqueryui, '/js/rendering/jquery.min.js')}"/>
+                  <apex:includeScript value="{!URLFOR($Resource.jqueryui, '/js/rendering/jquery-ui.min.js')}" />
+
+                  <apex:includeScript value="{!URLFOR($Resource.jqueryui, '/js/ocms.production.js')}" />
+                  <apex:includeScript value="{!URLFOR($Resource.OrchestraCMSPublic, '/recaptcha_ajax.js')}" />
+                  <apex:includeScript value="{!URLFOR($Resource.OrchestraCMSUtil,'/IEScripts.js')}" />
+                  <apex:includeScript value="{!URLFOR($Resource.jqueryui, '/js/rendering/jquery-ui-i18n.min.js')}" />
+
+                  <script type="text/javascript">
+                    $(document).data('cms', CMS);
+                    $(document).data("btn_close_inactive", "{!URLFOR($Resource.jqueryui, '/css/images/Icons/btnCloseInactive.png')}");
+                    $(document).data("btn_close_active", "{!URLFOR($Resource.jqueryui, '/css/images/Icons/btnCloseActive.png')}");
+                    $(document).ready(function(){
+                        $('body').addClass('OCMS-Production');
+                    });
+                  </script>
+                </apex:outputText>
+                -->
+
+                <!--
+                OCMS scripts references, but we are not including all and are concatenating and minifying them for
+                performance reasons, see `gruntfile-mli.js` `OCMSHeadTag` settings -->
+                <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/OCMSHeadTag.min.js')}"></script>
+
+
+                <!--
+                Project Template References
+                ----------------------------->
+
+                <!-- Production CSS -->
+                <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/mli.min.css')}" />
+                <link rel="stylesheet" type="text/css" media="print" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/print.css')}" />
+                <!--[if (lt IE 9)&!(IEMobile)]>
+                    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/html5shiv.js')}"></script>
+                    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/json2.js')}"></script>
+                    <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/oldie.css')}" type="text/css" media="screen, projection" />
+                    <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/oldie2.css')}" type="text/css" media="screen, projection" />
+                <![endif]-->
+                <!--[if lt IE 9]>
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/es5-shim.js')}"></script>
+                <![endif]-->
+
+
+                <!--
+                Based '[Manulife.com] Performance Optimisation Experiments'
+                (https://docs.google.com/document/d/1WAObSmIHSTdNIDegVYhzAQUJeDnifZbbGtWtppbAkBE/edit) the optimal scenario
+                was to minify the template JS/CSS at top and leave OCMS scripting enabled
+                 -->
+                <!-- see `concat` grunt task in 'gruntfile-mli.js' which is how we create the below  -->
+                <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/TeamplateHeadTag.min.js')}"></script>
+
+
+                <!-- Adobe Analytics -->
+                <apex:outputText escape="false" value="{!AnalyticsScriptTag}" />
+            </apex:outputText>
+
+
+            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                <div class="ocmsHint">
+                    <strong>Head Tag</strong> - Used to output within the `&lt;head&gt;` template tag, currently only leveraged
+                    by the `MLI Facebook Open Graph Article` content template which requires <i>Page Template</i> caching to be disabled.
+
+
+                </div>
+            </apex:outputText>
+            <cms:Panel panelname="headTag" panelController="{!controller}" panelContentLayouts="MLIFacebookOpenGraphArticle" panelLimit="1" />
+
+            <script type="text/javascript">
+
+                function setFrench(){
+                    OCMS.setCookie('apex__ocmsLang', 'fr');
+                    if (window.location.search.indexOf("ocmsLang=")>-1) {
+
+                        if (window.location.search.indexOf("?ocmsLang=")==0 && window.location.search.indexOf("&")>-1) {
+                            window.location.assign(window.location.href.replace(/ocmsLang=[a-zA-Z_]+[&]?/g,""));
+                        } else {
+                            window.location.assign(window.location.href.replace(/[&?]?ocmsLang=[a-zA-Z_]+/g,"") );
+                        }
+                    } else {
+                        location.reload(true);
+                    }
+                }
+
+                //mmcg 2017-08-21 - make manuvie.com show French content rather than english contentt
+                // PT# 150216883 
+                console.log('starting regex');
+                var manuvie = window.location.hostname, exprManuvie = /manuvie.com/; //force.com
+                var ocmsLang = window.location.search, exprOcmsLang = /ocmsLang/;
+                var params = window.location.search, exprParams = /\?/;
+                var hash = window.location.hash, exprHash = /#/;
+
+                if (exprManuvie.test(manuvie)) { //are we on the french site? 
+                    console.log('On the French site');
+                    if (!exprOcmsLang.test(ocmsLang) ) { //if ocmsLang param is absent 
+                        console.log('OCMS param is absent');
+                        var cookie = (OCMS.getCookie('apex__ocmsLang') == undefined) ? "" : OCMS.getCookie('apex__ocmsLang');
+                        if (cookie != 'fr') {
+                            setFrench();
+                        }
+                    }
+                }  else{
+                    OCMS.setCookie('apex__ocmsLang', 'en_US');
+                }
+            </script>
+        </apex:define>
+        <apex:define name="body">
+            <div class="pageWrapper">
+
+                <!-- Header -->
+                <h1 class="accessible">
+                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                        <div class="ocmsHint" style="">
+                            <strong>Accessibility</strong> - Name of Page - Text
+                        </div>
+                    </apex:outputText>
+                    <cms:Panel panelname="accessibleName" panelController="{!controller}"   panelLimit="1" panelContentLayouts="PlainText"/>
+                </h1>
+
+                <!--
+                2016-04-22 - [Stephen Scholtz] Moved out of <header> so that skip link will be above the new masthead.
+                           - not great semantics, but necessary to be "before" the new masthead
+                -->
+                <!-- turn off google indexing of the following content -->
+                <apex:outputText value=" <" escape="false" />!--googleoff: all--<apex:outputText value="> " escape="false" />                        
+                <!-- IE9 Compatibility fix -->
+                <apex:outputText rendered="{!api.page_mode != 'edit'}">
+                    <a class="skiplink" href="#mainContent">
+                        <cms:Panel panelname="skipToMainContent" panelController="{!controller}" panelLimit="1" panelContentLayouts="PlainText"/>
+                    </a>
+                </apex:outputText>
+
+                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                    <div class="skiplink">
+                        <div class="ocmsHint">
+                            <strong>Accessibility</strong> - Skip to Main Content - Text
+                        </div>
+                        <cms:Panel panelname="skipToMainContent" panelController="{!controller}" panelLimit="1" panelContentLayouts="PlainText"/>
+                    </div>
+                </apex:outputText>
+                <!-- IE9 Compatibility fix -->
+
+                <!--
+                2016-04-20 - [Stephen Scholtz] New code for a masthead that was added to the ML.com site
+                             design after executive feedback
+                           - viewable only in desktop
+                           - not great semantics, but new mast head can't live inside the <header> because
+                             of the Heath Wallace JS framework, it ends up applying unwanted JS behaviours
+                             to the new masthead code which we don't want.
+                -->
+                <div class="masthead">
+                    <div class="mastheadDesktopUtility" data-hw-module="module/ShowHide" data-hw-options="selectors: {button: '#js-mastheadDesktopCountry', contentArea: '#js-mastheadDesktopCountries .mastheadDropdownMenu'}, classes: {isOpen: 'is-active'}">
+                      <div class="mastheadDesktopInner clearfix" data-hw-module="ml/mastheadDesktop">
+                        <div class="mastheadDesktopLeft">
+                          <ul>
+                            <li class="mastheadDesktopItem mastheadDesktopLoc">
+                              <!-- CUSTOM HTML BLOCK -->
+                              <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                  <div class="ocmsHint" style="">
+                                      <strong>Site Location</strong> - CustomHTML
+                                  </div>
+                              </apex:outputText>
+                              <cms:Panel panelName="mastheadDesktopSite" panelController="{!controller}" panelWidth="120px" panelContentLayouts="CustomHtml"/>
+                              <!-- <span class="icon icon-globe"></span>
+                              Manulife Global -->
+                              <!-- /CUSTOM HTML BLOCK -->
+                            </li>
+                            <li class="mastheadDesktopItem mastheadDesktopCountry" id="js-mastheadDesktopCountry">
+                              <!-- CUSTOM HTML BLOCK -->
+                              <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                  <div class="ocmsHint" style="">
+                                      <strong>Other Sites Link</strong> - CustomHTML
+                                  </div>
+                              </apex:outputText>
+                              <cms:Panel panelName="mastheadDesktopOtherCountries" panelController="{!controller}" panelWidth="120px" panelContentLayouts="CustomHtml"/>
+                              <!-- 
+                              <a href="#">Other Countries <span class="icon icon-angle-down"></span> <span class="accessible">List: Click to open</span></a>
+                              -->
+                              <!-- /CUSTOM HTML BLOCK -->
+                            </li>
+                          </ul>
+                        </div>
+                    
+                      <!-- AREA TO HIT WITH COUNTRY MENU -->
+                      <div class="mastheadDesktopCountries" id="js-mastheadDesktopCountries"></div>
+                      <!-- /AREA TO HIT WITH COUNTRY MENU -->
+                    
+                        <div class="mastheadDesktopRight">
+                          <ul>
+                            <li class="mastheadDesktopItem mastheadDesktopContact">
+                              <!-- CUSTOM HTML BLOCK, REUSE CONTACT -->
+                              <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                  <div class="ocmsHint" style="">
+                                      <strong>Contact Us Link</strong> - CustomHTML
+                                  </div>
+                              </apex:outputText>
+                              <cms:Panel panelName="mastheadDesktopContact" panelController="{!controller}" panelWidth="120px" panelContentLayouts="CustomHtml"/> 
+                              <!--  
+                              <div class="mastheadUtilitiesItem mastheadContact" style="
+                    "> <a href="#" class="accessibleLink" style="
+                    ">Contact</a></div>
+                              -->
+                              <!-- /CUSTOM HTML BLOCK -->
+                            </li>
+                            
+                            <!-- LANG SELECTOR -->
+                            <li class="mastheadDesktopItem mastheadDesktopLang" id="mastheadDesktopLanguageSelector">
+                            </li>
+                            <!-- /LANG SELECTOR -->
+                          </ul>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+           
+                <header data-hw-module="module/Navigation" class="masthead">
+
+                    <div class="mastheadTop">
+                        <div class="mastheadTopInner">
+                            <span class="logo accessibleLink">
+
+                                <!-- Manulife Logo -->
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint" style="">
+                                        <strong>Logo</strong> - Image
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelname="logo" panelController="{!controller}"   panelLimit="1" panelContentLayouts="Image"/>
+
+                            </span>
+                            <span class="logoHancock accessibleLink">
+
+                                <!-- Hancock logo -->
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint" style="">
+                                        <strong>Logo</strong> - Image
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelname="logoHancock" panelController="{!controller}"   panelLimit="1" panelContentLayouts="Image"/>
+
+                            </span>
+                        </div>
+                    </div>
+
+                    <button type="button" class="mastheadTrigger">
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <!-- Responsive Menu Button Label -->
+                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                            <div class="ocmsHint" style="">
+                                <strong>Responsive Menu Label</strong> - Plain Text
+                            </div>
+                        </apex:outputText>
+                        <cms:Panel panelName="ResponsiveMenuLabel" panelController="{!controller}"   panelLimit="1" panelContentLayouts="PlainText"/>
+
+                    </button>
+                    <div class="mastheadPanel">
+
+                        <!-- Standard markup for preview and production -->
+                        <apex:outputText rendered="{!api.page_mode != 'edit'}">
+
+                            <div class="mastheadPanelInner">
+                                <!-- Main navigation menu -->
+                                <cms:Panel panelname="mainNavigation" panelController="{!controller}"   />
+
+                                <div class="ocms-utility" id="mainNavigationMegaMenuPromo">
+                                    <!-- Mega Menu Promo Items -->
+                                    <cms:Panel panelName="mainNavigationMegaMenuPromo" panelController="{!controller}"   />
+                                </div>
+
+                                <div class="mastheadUtilities">
+
+                                    <!-- Utility menu -->
+                                    <cms:Panel panelname="mainNavigationUtilities" panelController="{!controller}"   />
+
+                                    <div class="ocms-utility" id="mainNavCountryPromo">
+                                        <!-- Country Menu Promo Items -->
+                                        <cms:Panel panelName="cntryMenuPromo" panelController="{!controller}"   />
+                                    </div>
+                                </div>
+                            </div>
+
+                        </apex:outputText>
+                        <!-- Non-standard markup for edit mode only -->
+                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+
+                            <div class="mastheadPanelInner">
+
+                                <div class="col">
+
+                                    <!-- Main navigation menu -->
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint" style="">
+                                            <strong>Main Navigation Menu</strong> - Mega Menu
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="mainNavigation" panelController="{!controller}"   />
+
+                                    <div class="ocms-utility" id="mainNavigationMegaMenuPromo">
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint" style="min-">
+                                                <strong>Mega Menu Promo Items</strong> - Mega Menu Promo
+                                            </div>
+                                        </apex:outputText>
+                                        <cms:Panel panelName="mainNavigationMegaMenuPromo" panelController="{!controller}"   />
+                                    </div>
+
+                                </div>
+                                <div class="col" style="padding-left:20px">
+
+                                    <div class="mastheadUtilities">
+
+                                        <!-- Utility menu -->
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint" style="min-">
+                                                <strong>Utilities</strong> - Any
+                                            </div>
+                                        </apex:outputText>
+                                        <cms:Panel panelname="mainNavigationUtilities" panelController="{!controller}"   />
+
+                                        <div class="ocms-utility" id="mainNavCountryPromo">
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint" style="min-">
+                                                    <strong>Country Menu Promo Items</strong> - Country Menu Promo
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="cntryMenuPromo" panelController="{!controller}"   />
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                        </apex:outputText>
+                    </div>
+                </header>
+
+                <!-- resume googl indexing of content -->
+                <apex:outputText value=" <" escape="false" />!--googleon: all--<apex:outputText value="> " escape="false" />
+
+                <!-- Body -->
+                <main id="main" role="main" class="pageContainer">
+
+                <!-- "Top of main content" accessible text -->
+                <!-- turn off google indexing of the following content -->
+                <apex:outputText value=" <" escape="false" />!--googleoff: all--<apex:outputText value="> " escape="false" />                        
+                <!-- IE9 fix -->
+                <apex:outputText rendered="{!api.page_mode != 'edit'}">
+                    <a id="mainContent" tabindex="-1" class="skiplink">
+                        <cms:Panel panelname="topOfMainContent" panelController="{!controller}" panelLimit="1" panelContentLayouts="PlainText"/>
+                    </a>
+                </apex:outputText>
+
+                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                    <div class="skiplink">
+                        <div class="ocmsHint">
+                            <strong>Accessibility</strong> - Top of main content - Text
+                        </div>
+                        <cms:Panel panelname="topOfMainContent" panelController="{!controller}" panelLimit="1" panelContentLayouts="PlainText"/>
+                    </div>
+                </apex:outputText>
+                <!-- IE9 fix -->
+                <!--resume google indexing of content -->
+                <apex:outputText value=" <" escape="false" />!--googleon: all--<apex:outputText value="> " escape="false" />        
+
+                <!-- BreadCrumb Area -->
+                <div class="socialNavArea">
+                    <div class="mainContent">
+                        <div class="grid5">
+                            <div class="col1">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>Breadcrumb Area</strong> - Breadcrumb
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelname="breadcrumb" panelController="{!controller}" />
+                            </div>
+                            <div class="col2">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>Follow Us Area</strong> - Follow Us
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelname="followUs" panelController="{!controller}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!---->
+                <div class="grid">
+                <apex:outputPanel layout="block" styleClass="ocmsHint" rendered="{!api.page_mode == 'edit'}">
+                            <strong>Hero</strong> - Hero Carousel
+                </apex:outputPanel>
+                        <!-- see `Panel.component` for available options -->
+                <cms:Panel panelname="heroCarousel" panelController="{!controller}"
+                    panelInfo="<strong>FIXME: TEST-FINDME</strong>"></cms:Panel>
+                </div>
+
+                <!---->
+                <div class="mainContent">
+                    <!-- 100% -->
+                    <div class="grid grid1">
+                        <div class="gridWidth">
+                            <div class="row">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 1</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section1" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- 66% / 33% -->
+                    <div class="grid grid2">
+                        <div class="gridWidth">
+                            <div class="row" data-hw-module="widget/core/EqualHeights"
+                                data-hw-options="selector: '.widgetContent', minBreakpoint: 'desktop'">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 2</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section2" panelController="{!controller}" />
+                                </div>
+                                <div class="col col2">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 3</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section3" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 50% / 50% -->
+                    <div class="grid grid5">
+                        <div class="gridWidth">
+                            <div class="row" data-hw-module="widget/core/EqualHeights"
+                                data-hw-options="selector: '.widgetContent', minBreakpoint: 'desktop'">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 4</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section4" panelController="{!controller}" />
+                                </div>
+                                <div class="col col2">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 5</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section5" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 100% -->
+                    <div class="grid grid1">
+                        <div class="gridWidth">
+                            <div class="row">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 6</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section6" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 33% / 66% -->
+                    <div class="grid grid3">
+                        <div class="gridWidth">
+                            <div class="row" data-hw-module="widget/core/EqualHeights"
+                                data-hw-options="selector: '.widgetContent', minBreakpoint: 'desktop'">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 7</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section7" panelController="{!controller}" />
+                                </div>
+                                <div class="col col2">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 8</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section8" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 50% / 50% -->
+                    <div class="grid grid5">
+                        <div class="gridWidth">
+                            <div class="row" data-hw-module="widget/core/EqualHeights"
+                                data-hw-options="selector: '.widgetContent', minBreakpoint: 'desktop'">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 9</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section9" panelController="{!controller}" />
+                                </div>
+                                <div class="col col2">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 10</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section10" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <!-- 100% -->
+                    <div class="grid grid1">
+                        <div class="gridWidth">
+                            <div class="row">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 11</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section11" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 66% / 33% -->
+                    <div class="grid grid2">
+                        <div class="gridWidth">
+                            <div class="row" data-hw-module="widget/core/EqualHeights"
+                                data-hw-options="selector: '.widgetContent', minBreakpoint: 'desktop'">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 12</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section12" panelController="{!controller}" />
+                                </div>
+                                <div class="col col2">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 13</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section13" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 50% / 50% -->
+                    <div class="grid grid5">
+                        <div class="gridWidth">
+                            <div class="row" data-hw-module="widget/core/EqualHeights"
+                                data-hw-options="selector: '.widgetContent', minBreakpoint: 'desktop'">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 14</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section14" panelController="{!controller}" />
+                                </div>
+                                <div class="col col2">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 15</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section15" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- 100% -->
+                    <div class="grid grid1">
+                        <div class="gridWidth">
+                            <div class="row">
+                                <div class="col col1">
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Section 16</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="section16" panelController="{!controller}" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- .mainContent END -->
+
+                <div class="backToTopStandalone" data-hw-module="module/BackToTop"></div>
+                </main>
+
+                <!-- Footer -->
+                <!-- turn off google indexing of the following content -->
+                <apex:outputText value=" <" escape="false" />!--googleoff: all--<apex:outputText value="> " escape="false" />                        
+                <footer >
+                    <div class="sitemap">
+                        <div class="toggler" role="navigation" aria-label="Footer" data-hw-module="module/ShowHide" data-hw-options="selectors: {button: '.toggleButton'}, classes: {isOpen: 'is-open'}" >
+
+                            <!-- IE9 compatibility issue, see commit #731c9fb -->
+                            <apex:outputText rendered="{!api.page_mode != 'edit'}">
+                                <h2 class="sitemapTitle">
+                                    <a href="#" class="toggleButton">
+                                        <span class="wrapper">
+                                            <span class="title">
+                                                <!-- Site Map Title -->
+                                                <cms:Panel panelname="mliSiteMapTitle" panelController="{!controller}"   panelLimit="1" panelContentLayouts="PlainText" />
+                                            </span>
+                                            <span class="icon icon-angle-down"></span>
+                                            <span class="icon icon-angle-up"></span>
+                                        </span>
+                                    </a>
+                                </h2>
+                            </apex:outputText>
+
+                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                <h2 class="sitemapTitle">
+                                    <!-- Site Map Title -->
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint" style="">
+                                            <strong>Site Map Title</strong> - Text
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="mliSiteMapTitle" panelController="{!controller}"   panelLimit="1" panelContentLayouts="PlainText" />
+                                </h2>
+                            </apex:outputText>
+                            <!-- IE9 compatibility issue -->
+
+                            <div class="contentArea">
+                                <!-- Site Map -->
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint" style="">
+                                        <strong>Site Map</strong>
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelname="mliSiteMapMenu" panelController="{!controller}"   />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="pageFooter">
+                        <div class="row wrapper">
+                            <div class="socialMedia">
+                                <p class="title">
+                                    <!-- Social feed text title -->
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint" style="">
+                                            <strong>Social Feed Title</strong> - Text
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="socialFeedTitle" panelController="{!controller}"   panelLimit="1" panelContentLayouts="PlainText" />
+                                </p>
+                                <ul>
+                                    <!-- Social feed items -->
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint" style="">
+                                            <strong>Social Feed Items</strong>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelname="socialFeedItems" panelController="{!controller}"   />
+                                </ul>
+                            </div>
+                            <div class="footerLinks">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint" style="">
+                                        <strong>Footer Menu</strong>
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelName="footerMenu" panelController="{!controller}"   />
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint" style="">
+                                        <strong>Copyright</strong>
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelName="copyright" panelController="{!controller}"   />
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+                <!-- resume google indexing of content -->
+                <apex:outputText value=" <" escape="false" />!--googleon: all--<apex:outputText value="> " escape="false" />                        
+            </div>
+            <!-- end `.pageWrapper` -->
+
+            <!--
+            Preview end of <body> files
+            ===========================-->
+            <!-- <apex:outputText rendered="{!api.page_mode == 'prev'}">
+                 OCMSHeadTag.min.js
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli.js')}"></script>
+                <script type="text/javascript" src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/hw-mli.js')}"></script>
+            </apex:outputText> -->
+
+            <!--
+            Production end of <body> files
+            ===============================-->
+            <!-- <apex:outputText rendered="{!api.page_mode == 'production'}">-->
+                <!-- Production Mode Javascript -->
+                <!-- see `concat` grunt task '142@gruntfile-mli.js' which is how we create the below based on preview mode -->
+               <!--  <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/jsEndOfBodyTag.min.js')}"></script>
+            </apex:outputText> -->
+
+            <!-- tells Analytics to fire off since we parsing end of page -->
+            <apex:outputText rendered="{!api.page_mode == 'production' || api.page_mode == 'prev'}">
+                <script type="text/javascript">_satellite.pageBottom();</script>
+                <script>
+                $( document ).ocmsDynamicLoadFinished(function() {
+                    _satellite.track('PageLoad')
+                });
+                </script>
+            </apex:outputText>
+
+
+            <!--
+            2016-03-15 - [Stephen Scholtz] Added client-side code to deal with helping search engines find the french versions of
+                         english pages.
+                       - Site is not setup to help search engines discover translated pages, as all site URLs are exactly the same,
+                         whether in eng or fr.
+                       - Language serving is instead handled via user preference (browser cookie, browser language preference) which
+                         is the only way that Orchestra can handle serving of multi-lingual content.  Orchestra does not, cannot use URL,
+                         URL path, domain name, etc.  It only has use of a query string var, ocmsLang=...
+                       - So Search Engines are nearly stuck.
+                       - The client-side code below inserts a meta-tag that the search engine can pick up to help it discover the
+                         french content. While browsing the site in english, an "alternate" metatag pointing to a fr version will be created and inserted into the <head>.  While browsing in french, the same is done for english.
+                       - Unfortunately this has to be done with client-side code.  The Spring '15 version of Orchestra does not offer
+                         a server-side method of retrieving the current page URL at cache time. This means search engines that can't
+                         execute javascript (or can't execute it well) like Bing/Yahoo won't be able to "see" this meta tag and discover
+                         the french content.  It will go unindexed.
+                       - Post-upgrade of Orchestra to any version from Winter '16 and onwards, we can use Orchestra's API to retrieve
+                         the current page URL...
+
+                         cms.ApexServiceInterface oua = (cms.ApexServiceInterface)cms.ServiceEndpoint.getService('OrchestraUtilityAPI');
+                         cms__Page__cpage=(cms__Page__c)oua.executeApex('getCurrentPage',null);
+
+                         ...and its translated versions...
+
+                         Map<String, String> multiLinks = (Map<String,String>)oua.executeApex('getCurrentMultilingualLinks', null);
+
+                         ...in order to generate these alternate meta tags in the header, server-side
+
+            2016-03-15 - [Stephen Scholtz] Added JS to automatically set the ocmsLang cookie if the user comes into the page with the
+                         ocmsLang URL parameter in place.  Done in order to ensure consistent site behaviour for the user if they come
+                         into the site from a search engine.
+                       - Also added handling for when the ocmsLang param is already present, and added a canonical URL as well
+
+            2016-03-21 - [Stephen Scholtz] Revised code due to exposure of XSS vulnerability brought about by passing the query string
+                         unaltered or unsanitized to the meta tag that is generated in the page.
+                       - Revised code and made it more secure by rebuilding the query string variable using only white listed,
+                         expected query string parameters
+
+            2016-03-22 - [Stephen Scholtz] Removed meta-tag code, despite fix.  Too risky to deploy now and perhaps still fail pen test.
+
+            2016-03-30 - [Stephen Scholtz] Aaaannnd revised again. More secure code dropped back in.  And simplified to only focus on
+                         necessary query string params.
+            -->
+            <script type="text/javascript">
+            $(document).ready(function() {
+
+
+                var accLanguage = "";
+                var langCode = "";
+                var hostname = window.location.hostname, exprHostname = /manulife.com/;
+                var params = window.location.search, exprParams = /\?/;
+                var hash = window.location.hash, exprHash = /#/;
+
+                var hasMoreParams = exprParams.test(params);
+                var hasHash = exprHash.test(hash);
+
+                var redirect = "";
+
+                if (exprHostname.test(hostname)) { //we're on the english site, so the redirect goes to the french site
+                    redirect += "http://www.manuvie.com";
+                    accLanguage += "Français";
+                    langCode="fr";
+                }
+                else {  // and vice versa
+                    redirect += "http://www.manulife.com";
+                    accLanguage += "English";
+                    langCode="en_US";
+                }
+
+                redirect += window.location.pathname;
+                if (hasMoreParams) redirect += params;
+                if (hasHash) redirect += hash;
+
+                var strButton = '<a class="mastheadLanguageTrigger accessibleLink" href="' + redirect + '" title="' + accLanguage + '">' +
+                        '<span aria-hidden="true">' + accLanguage + '</span>' +
+                        '<span class="accessible" lang="' + langCode + '">' + accLanguage + '</span>' +
+                        '</a>';
+                $('#languageSelector').html(strButton); //responsive
+
+                // This isn't great code, JS assumes that there's only one of this content type
+                // on the page, but we'll follow what was originally developed
+                $('#mastheadDesktopLanguageSelector').html(strButton);  //desktop
+
+
+
+
+
+
+
+
+
+                // 2016-03-16 - if ocmsLang already present, set the cookie right away.
+                // #tags #keep
+                if (document.location.search!=='' && document.location.search.indexOf('ocmsLang=') >=0) {
+                    OCMS.setCookie('apex__ocmsLang', '{!api.lang}');
+                }
+
+                // 2016-03-15 - Insert alternate meta-tag for search crawlers to find language-specific version of this page.
+                // #tags #probablyremove
+                var here = document.location;
+                var lang = '{!api.lang}';
+                var langCodeMap = {
+                    'en_US': 'fr'
+                    , 'fr' : 'en_US'
+                }
+                var domainMap = {
+                    'en_US': 'www.manulife.com'
+                    , 'fr' : 'www.manuvie.com'
+                };
+
+                var langOpp = langCodeMap[lang];
+                var domainOpp = domainMap[langOpp];
+
+                var link = here.protocol + '//' + domainOpp + here.pathname;
+
+                // 2016-03-21 - Acceptable query string params: content_id, ocmsLang
+                var q1 = here.search;
+
+                // Parse and retrieve only content_id; all others can be ignored for meta tags
+                var cId_arr = new RegExp(/content_id=[a-zA-Z0-9]{18}/).exec(q1);
+                var cId = cId_arr!==null ? cId_arr[0] : '';
+                cId = cId.length > 0 ? 'content_id=' + encodeURI(cId.substring(11,cId.length)) : '';
+                //console.log('CHECK: cId = ' + cId);
+
+                // Rebuild the query string param based on what we found
+                var q2 = cId!==''
+                    ? '?' + cId
+                    : '';
+                //console.log('CHECK: ' + q2);
+
+                // Add the rebuilt query string and the ocmsLang param to the meta tag link
+                link += q2!== ''
+                    ? q2 + '&ocmsLang=' + langOpp
+                    : '?ocmsLang=' + langOpp;
+                //console.log('CHECK: link = ' + link);
+
+                var metaTag = '<link rel="alternate" hreflang="' + (langOpp=="en_US" ? "en" : langOpp ) + '" href="' + link + '" />';
+
+                // Create canonical meta tag as well, just in case
+                var canonical = here.protocol + '//' + domainMap[lang] + here.pathname;
+                canonical += q2!== ''
+                    ? q2 + '&ocmsLang=' + lang
+                    : '?ocmsLang=' + lang;
+                //console.log('SS: canonical = ' + canonical);
+                
+                var metaTagCanonical = '<link rel="canonical" href="' + canonical + '" />';
+
+                $('head').append(metaTagCanonical).append(metaTag);
+
+                // TODO: temporary solution, should be removed after description feature is introduced
+                setMetaDescriptionContent();
+            });
+
+            //set content of "description" MetaTag to be the first sentence of article
+            function setMetaDescriptionContent(){
+                var targetPTag = $(".details p:first");
+
+                // check if first p tag is bullet, if so take second p tag
+                if(targetPTag && targetPTag.has("em").length !== 0 && targetPTag.has("span").length === 0 && $(".details p:nth-child(2)")){
+                    targetPTag = $(".details p:nth-child(2)");
+                }
+
+                // extract first paragraph, trim and replace non-breaking spaces
+                var paras = targetPTag.text().split(/[\u2010\u2011\u2012\u2013\u2014](.+)/);
+                var firstPara = paras[1];
+                if(!firstPara)
+                    firstPara = paras[0];
+                firstPara = firstPara.trim().replace(/\u00a0/g, " ");
+
+                // extract first sentence
+                var sentences = firstPara.split(/[^\.].[\?\.\!] /);
+                var firstSen = firstPara.substring(0,sentences[0].length+3);
+
+                var twoLExcep = firstSen.substring(firstSen.length-3, firstSen.length-1);
+                var threeLExcep = firstSen.substring(firstSen.length-4, firstSen.length-1);
+                var fourLExcep = firstSen.substring(firstSen.length-5, firstSen.length-1);
+                if(twoLExcep === "Mr" || twoLExcep === "Ms" || twoLExcep === "Dr" || threeLExcep === "Mrs" || fourLExcep === "Miss")
+                    firstSen = firstPara.substring(0,sentences[0].length + sentences[1].length + 6);
+
+                // create meta tag if not exist, fill in first sentence
+                if($("meta[name=description]").length == 0)
+                    $("head").append('<meta name="description" content="">');
+                $("meta[name=description]").attr("content",firstSen);
+            }
+            </script>
+        </apex:define>
+    </apex:composition>
+</apex:page>

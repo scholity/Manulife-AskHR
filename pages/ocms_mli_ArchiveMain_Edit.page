@@ -1,0 +1,137 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_ArchiveMain" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if ($('#sArchiveSectionTitle').val() == null || $('#sArchiveSectionTitle').val() == '') {
+                    $ele = $('#sArchiveSectionTitle');
+                    errorField($ele, languageUsed + 'Archive Section Title must be provided.');
+                    return false;
+                }
+                if (CKEDITOR.instances.sArchiveSectionBody.getData() == null || CKEDITOR.instances.sArchiveSectionBody.getData() == '') {
+                    $ele = $('#sArchiveSectionBody');
+                    errorField($ele, languageUsed + 'Archive Item Body must be provided.');
+                    return false;
+                }
+                if ($('#sArchiveSectionButtonLink').val() != null && $('#sArchiveSectionButtonLink').val() != '') {
+                    if ($('#sArchiveSectionButton').val() == null || $('#sArchiveSectionButton').val() == '') {
+                        $ele = $('#sArchiveSectionButton');
+                        errorField($ele, languageUsed + 'Button Label must be provided as Button Link is added.');
+                        return false;
+                    }
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            CKEDITOR.replace('sArchiveSectionBody', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            CKEDITOR.replace('sArchiveItemCategory', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig',
+                   contentsCss : "{!URLFOR($Resource.ocms_mli_CKEditorExtras, 'css/editorExtras.css')}"
+            });
+
+            CKEDITOR.replace('sArchiveItemFile', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig',
+                   contentsCss : "{!URLFOR($Resource.ocms_mli_CKEditorExtras, 'css/editorExtras.css')}"
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sArchiveSectionIcon", "value": $('#sArchiveSectionIcon').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sArchiveSectionTitle", "value": $('#sArchiveSectionTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sArchiveSectionBody", "value": CKEDITOR.instances.sArchiveSectionBody.getData(), "type": "Text", "simple": false});
+                attributes.push({"name":"sArchiveSectionButton", "value": $('#sArchiveSectionButton').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sArchiveSectionButtonLink", "value": $('#sArchiveSectionButtonLink').val(), "type": "cms.Link", "simple": false});
+                attributes.push({"name":"sArchiveItemCategory", "value": CKEDITOR.instances.sArchiveItemCategory.getData(), "type": "Text", "simple": false});
+                attributes.push({"name":"sArchiveItemFile", "value": CKEDITOR.instances.sArchiveItemFile.getData(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sArchiveSectionIcon">Archive Section Icon</label>
+                        <input type="hidden" name="sArchiveSectionIcon" id="sArchiveSectionIcon" value="{!sArchiveSectionIcon}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sArchiveSectionIcon" cPassThroughId="sArchiveSectionIcon" cImage="{!sArchiveSectionIcon}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W100 X H74 pixel (72ppi)<br/>
+                        Retina: W200 X H148 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sArchiveSectionTitle">Archive Section Title</label>
+                        <input class="ocmsTextInputLrg" id="sArchiveSectionTitle" name="sArchiveSectionTitle" type="text" value="{!sArchiveSectionTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sArchiveSectionBody">Archive Item Body</label>
+                        <textarea  id="sArchiveSectionBody" name="sArchiveSectionBody">
+                            <apex:outputText value="{!sArchiveSectionBody}" />
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sArchiveSectionButton">Button Label</label>
+                        <input class="ocmsTextInputLrg" id="sArchiveSectionButton" name="sArchiveSectionButton" type="text" value="{!sArchiveSectionButton}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sArchiveSectionButtonLink">Button Link</label>
+                        <input type="hidden" name="sArchiveSectionButtonLink" id="sArchiveSectionButtonLink" value="{!sArchiveSectionButtonLink}" />
+                        <cms:PageSelector cPassThroughId="sArchiveSectionButtonLink" value="{!sArchiveSectionButtonLink}"  dialogId="sArchiveSectionButtonLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sArchiveItemCategory">Archive Item Category (max 4)</label>
+                        <textarea  id="sArchiveItemCategory" name="sArchiveItemCategory">
+                            <apex:outputText value="{!sArchiveItemCategory}" />
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sArchiveItemFile">Archive File</label>
+                        <textarea  id="sArchiveItemFile" name="sArchiveItemFile">
+                            <apex:outputText value="{!sArchiveItemFile}" />
+                        </textarea>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

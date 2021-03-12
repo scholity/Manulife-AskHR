@@ -1,0 +1,25 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:stylesheet value="{!URLFOR($Resource.pos_css, 'demo.css')}"/>
+      
+    <div class="wrap" style="left: 0px; top: 0px;">
+      <div class="cent" align="center">
+        <ul id="navigation" >
+            <li class="bt1"><a href="{!$Site.Prefix}/apex/POS_Home" title="Home">Home</a></li>
+            <li class="bt2"><a href="{!$Site.Prefix}/apex/POS_About" title="About the Program">About the Program</a></li>
+            <!--li class="bt3"><a href="{!$Site.Prefix}/apex/POS_Prototype" title="Prototype">Prototype</a></li-->
+            <li class="bt3"><a href="#" onclick="window.open('http://bcove.me/u2d7dz31', 'newwindow', 'height=480px,width=720px');return false;"
+             title="Prototype">Prototype</a></li>
+            <li class="bt4"><a href="{!$Site.Prefix}/apex/POS_Vision" title="End State Vision">End State Vision</a></li>
+            <li class="bt5"><a href="{!$Site.Prefix}/apex/POS_Archives" title="Archives">Archives</a></li>
+            <li class="bt6"><a href="{!$Site.Prefix}/apex/POS_Contacts" title="Contacts">Contacts</a></li>
+            <li class="bt7"><a href="{!$Site.Prefix}/apex/POS_Rollout" title="How to Roll it out">How to Roll it out</a></li>
+        </ul>
+      </div>
+    
+      <apex:insert name="body"/>
+    
+      <div id="footer" align="center" >
+           <img src="{!URLFOR($Resource.pos_images, 'image/footer.gif')}" align="middle" alt="" />
+      </div>
+    </div>
+</apex:page>

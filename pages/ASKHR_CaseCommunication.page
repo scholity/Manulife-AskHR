@@ -1,0 +1,268 @@
+<!-- Page for Employee to leave comment -->
+<apex:page standardstylesheets="false" extensions="ASKHR_CaseCommunicationExt" applyhtmltag="false" tabstyle="Custom_Case_Tab__tab" applybodytag="false" doctype="html-5.0" showheader="false" sidebar="false" standardcontroller="Case">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <head>
+        <title>Case {!Case.CaseNumber}</title>
+        <apex:stylesheet value="{!URLFOR($Resource.SLDS_0122,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        <apex:includescript value="https://code.jquery.com/jquery-1.12.1.min.js" />
+    </head>
+    <apex:remoteobjects >
+        <apex:remoteobjectmodel jsshorthand="articleFeedback" name="ASKHR_ArticleFeedback__c" fields="CreatedDate,Article_Feedback_User_Name__c,Comment__c,Case__c,Case_Owner__c,Case_Contact_Name__c,Case_Contact_Email__c">
+        </apex:remoteobjectmodel>
+    </apex:remoteobjects>
+<style>
+    .description-field{
+        max-height: 240px !important;
+    }
+</style>
+    <body>
+        <div class="slds">
+            <div class="slds-grid slds-grid--vertical slds-container--center slds-container--medium" style="{!IF(mIsError, 'display:none', 'display:block')}">
+                <div class="slds-page-header" role="banner">
+                    <div class="slds-grid">
+                        <div class="slds-col slds-has-flexi-truncate">
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <img class="slds-icon slds-icon--large slds-icon-standard-feedback" src="{!URLFOR($Resource.SLDS_0122, '/assets/icons/standard/case_comment_60.png')}" />
+                                </div>
+                                <div class="slds-media__body">
+                                    <p class="slds-text-heading--label">Case Communications</p>
+                                    <div class="slds-grid">
+                                        <h1 class="slds-text-heading--medium slds-m-right--small slds-truncate slds-align-middle" title="Case Number">{!Case.CaseNumber}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-page-header__detail-row slds-wrap slds-has-divider--bottom-space">
+                        <div class="slds-col">
+                            <dl>
+                                <dt>
+                                    <p class="slds-text-heading--label" title="Case Details">Case Details</p>
+                                </dt>
+                                <br />
+                                <dd>
+                                    <p><b>Subject</b></p>
+                                    <p class="slds-text-body--regular" title="case subject"><apex:outputfield value="{!Case.Subject}" /></p>
+                                </dd>
+                                <br />
+                                <dd>
+                                    <p><b>Description</b></p>
+                                    <p class="slds-text-body--regular" title="case description"><apex:outputfield styleClass="description-field" value="{!Case.Description__c}" /></p>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-page-header__detail-row slds-wrap">
+                        <div class="slds-col">
+                            <dl>
+                                <dt>
+                                    <p class="slds-text-heading--label slds-truncate" title="Owner">Case Owner</p>
+                                </dt>
+                                <dd>
+                                    <p class="slds-text-body--regular slds-truncate" title="case owner">{!Case.Owner.FirstName} {!Case.Owner.LastName}</p>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="slds-col">
+                            <dl>
+                                <dt>
+                                    <p class="slds-text-heading--label slds-truncate" title="Status">Status</p>
+                                </dt>
+                                <dd>
+                                    <p class="slds-text-body--regular slds-truncate" title="case status">{!Case.Status}</p>
+                                </dd>
+                            </dl>
+                        </div>
+                        <div class="slds-col">
+                            <dl>
+                                <dt>
+                                    <p class="slds-text-heading--label slds-truncate" title="Date Created">Date Created</p>
+                                </dt>
+                                <dd>
+                                    <p class="slds-text-body--regular slds-truncate"><apex:outputfield value="{!Case.CreatedDate}" /></p>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <br />
+                    <!--<span class="slds-badge slds-theme--inverse">Global</span>
+                    <span class="slds-badge slds-theme--inverse">Topic</span> -->
+                </div>
+                <div class="slds-page-header">
+                    <p class="slds-text-heading--label">Comments</p>
+                    <div class="slds-feed slds-m-top--small">
+                        <ul id="commentList" class="slds-feed__list"></ul>
+                        <div class="slds-form-element" style="{!IF(mIsAllowComment,'display:block','display:none')}">
+                            <div class="slds-form-element__control">
+                                <textarea id="comment-input" class="slds-textarea" placeholder="Write a comment"></textarea>
+                                <div class="slds-clearfix slds-m-top--small">
+                                    <div class="slds-tile slds-m-around--small slds-float--left">
+                                        <div class="slds-tile__detail slds-text-body--small">
+                                            <p class="slds-truncate">Logged in as {!$User.FirstName}</p>
+                                        </div>
+                                    </div>
+                                    <button id="comment-submit-btn" class="slds-button slds-button--brand slds-float--right" type="button" onclick="insertNewComment()">Submit</button>
+                                    <div class="slds-spinner--small slds-float--right" id="comment-loading" style="display:none">
+                                        <apex:image value="{!URLFOR($Resource.SLDS_0122,'/assets/images/spinners/slds_spinner.gif')}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-tile slds-m-around--small" style="{!IF(mIsAllowComment,'display:none','display:block')}">
+                          <!--  <p><span style="{!IF(Case.Status =='Closed', 'display:block','display:none')}">The case has been {!Case.Status}. </span>If you have additional questions, please submit them online <a href="https://mfcemployee.manulife.com/apex/ASKHR_CustomCaseView">here</a></p>-->
+                                <p><span style="{!IF(Case.Status =='Closed', 'display:block','display:none')}">The case has been {!Case.Status}. </span>If you have additional questions, send an email to <a href="mailto:workday_support@manulife.com"><u>Workday_Support@manulife.com</u></a></p>
+                            <div class="slds-tile__detail slds-text-body--small">
+                                <p class="slds-truncate">Logged in as  {!$User.FirstName}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="{!IF(mIsError, 'display:block','display:none')}">
+                <div aria-hidden="false" role="dialog" class="slds-modal slds-modal--prompt slds-fade-in-open">
+                    <div class="slds-modal__container slds-modal--prompt">
+                        <div class="slds-modal__header slds-theme--error slds-theme--alert-texture">
+                            <h2 class="slds-text-heading--medium">Case Does Not Exist</h2>
+                            <button class="slds-button slds-button--icon-inverse slds-modal__close">
+                                <img class="slds-button__icon slds-button__icon--large" src="{!URLFOR($Resource.SLDS_0122,'/assets/icons/action/close_60.png')}" />
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                        </div>
+                        <div class="slds-modal__content">
+                            <div class="slds-p-around--medium">
+                                <p>You are getting this error because you are trying to view this page from a broken link. Please contact AskHR Support for more details on this page.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-backdrop slds-backdrop--open"></div>
+            </div>
+        </div>
+    </body>
+    <script>
+        j$ = jQuery.noConflict();
+
+        var comment = new SObjectModel.articleFeedback();
+        var outputDiv = document.getElementById("commentList");
+        var hideComment = true;
+
+        j$('#comment-submit-btn').attr('disabled', true);
+        j$('#comment-input').keyup(function() {
+            if(j$(this).val() != '') {
+                j$('#comment-submit-btn').attr('disabled' , false);
+            }else{
+                j$('#comment-submit-btn').attr('disabled' , true);
+            }
+        });
+
+        function insertNewComment(){
+            document.getElementById("comment-loading").style.display="block";
+            j$('#comment-submit-btn').attr('disabled' , true);
+
+            var caseContactName = getContactName();
+            var commentDetails = document.getElementById("comment-input").value;
+            var newCommentFields = {
+                 Case__c : '{!Case.Id}',
+                        Case_Contact_Email__c : '{!Case.SuppliedEmail}',
+                        Case_Owner__c : '{!Case.OwnerId}',
+                        Case_Contact_Name__c : caseContactName,
+                        Article_Feedback_User__c : '{!$User.Id}',
+                        Comment__c  : commentDetails,
+                        RecordTypeId : '{!mCommentRecordTypeId}'
+            };
+            comment.create(newCommentFields, function(error, results){
+                document.getElementById("comment-loading").style.display="none";
+
+                if(error){
+                    console.log(error.message);
+                }else{
+                    getComments();
+                    document.getElementById("comment-input").value = '';
+                    //console.log(JSON.stringify(results));
+                }
+            });
+        }
+
+        function getContactName(){
+            var str = "{!Case.Sender_Email_Address__c}";
+
+            if(~str.indexOf("(")){
+                var nameFromEmail = str.substring(0, str.indexOf("("));
+                return nameFromEmail;
+            }else{
+                var nameFromCaseContact = "{!Case.Contact.FirstName}";
+                return nameFromCaseContact;
+            }
+        }
+
+
+        function getComments(){
+
+        if({!mIsError}){
+            return;
+        }
+
+             var query = {
+                    where: {
+                        Case__c: {eq: '{!Case.Id}'}
+                    },
+                     orderby: [ {CreatedDate: 'ASC'}]
+
+                };
+            comment.retrieve(query,
+                             function(error, records){
+                                 if(error){
+                                     console.log(error.message);
+                                 }else{
+                                     var html='';
+                                     //max is 3
+                                     for(i = 0; i < records.length; i++){
+
+                                         if(records.length - 3 > i && hideComment){
+                                             html = '<li class="slds-comment__overflow slds-m-top--small">' +
+                                                 '<button class="slds-button slds-button--neutral" onClick="toggleMoreComment()">' + (i+1) + ' more comments</button>' +
+                                                 '</li>';
+                                         }else{
+                                             html +=    '<li class="slds-feed__item">' +
+                                                 '  <div class="slds-media slds-comment slds-hint-parent">' +
+                                                 '      <div class="slds-media__body">'+
+                                                 '      <div class="slds-grid slds-grid--align-spread slds-has-flexi-truncate">' +
+                                                 '              <p class="slds-truncate"><a id="' + records[i].get("Article_Feedback_User_Name__c") + '">' + records[i].get("Article_Feedback_User_Name__c") +  '</a> -'+
+                                                 '                  <span class="slds-text-body--small">' + normalizeDateExtended(records[i].get('CreatedDate')) + '</span>' +
+                                                 '              </p>' +
+                                                 '      </div>' +
+                                                 '      <div class="slds-comment__content slds-text-longform">' +
+                                                 '      <p>' + records[i].get("Comment__c") + '</p>' +
+                                                 '      </div>' +
+                                                 '      </div>' +
+                                                 '  </div>' +
+                                                 '</li>';
+                                         }
+                                     }
+
+                                     outputDiv.innerHTML = html;
+
+                                 }
+                             }
+                            );
+
+        }
+        function normalizeDateExtended(mydate){
+            mydate = new Date(mydate);
+            data = new Date(mydate -  mydate.getTimezoneOffset() * 60000);
+            var d = mydate.getDate();
+            var m = mydate.getMonth()+1;
+            var y = mydate.getFullYear();
+            return '' + (d<=9?'0'+d:d)+'/'+ (m<=9?'0'+m:m) +'/' + y + ' ' + mydate.getHours() + ':' + mydate.getMinutes();
+        }
+
+        function toggleMoreComment(){
+            hideComment = !hideComment;
+            getComments();
+        }
+
+        getComments();
+    </script>
+</html>
+</apex:page>

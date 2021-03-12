@@ -1,0 +1,65 @@
+<apex:page standardController="Case"  extensions="ASKHR_CaseExtension" lightningStylesheets="true">
+
+    <apex:form >
+        <apex:sectionHeader title="Case Close" subtitle="{!Case.CaseNumber}"/>
+        <apex:pageBlock mode="edit" title="Case Close">
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton styleClass="slds-button slds-button_brand" value="Close Case" action="{!doCaseClose}" />
+                <apex:commandButton action="{!cancel}" immediate="true" value="Cancel"/>
+            </apex:pageBlockButtons>
+            <apex:outputPanel id="pageMessages">
+                <apex:pageMessages />
+            </apex:outputPanel> 
+  
+            <apex:pageBlockSection title="Case Information" collapsible="false" columns="2" >
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Case Owner</apex:outputLabel>                    
+                    <apex:outputField id="caseOwner" value="{!case.ownerid}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Status</apex:outputLabel>
+                    <apex:outputField id="caseStatus" value="{!case.Status}" />
+                </apex:pageBlockSectionItem>
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Case Number</apex:outputLabel>                    
+                    <apex:outputField id="caseNumber" value="{!case.CaseNumber}" />
+                </apex:pageBlockSectionItem>
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Priority</apex:outputLabel>
+                    <apex:outputField id="casePriority" value="{!case.Priority}" />
+                </apex:pageBlockSectionItem>                
+                            
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Case Origin</apex:outputLabel>
+                    <apex:outputField id="caseOrigin" value="{!case.Origin}" />
+                </apex:pageBlockSectionItem>   
+                 
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Type</apex:outputLabel>                    
+                    <apex:outputField value="{!case.Type}" />
+                </apex:pageBlockSectionItem>
+
+                 <apex:pageBlockSectionItem >
+                    <apex:outputLabel >Subject</apex:outputLabel>                    
+                    <apex:inputField value="{!case.Subject}"/>
+                </apex:pageBlockSectionItem>              
+            </apex:pageBlockSection>
+            
+            <apex:pageBlockSection title="Case Closure Information" collapsible="false" columns="1">
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.Reason.Label}" />
+                     <apex:selectList value="{!caseCloseReason}" size="1">
+                        <apex:selectOptions value="{!CaseCloseReasons}"  />
+                    </apex:selectList>                    
+                </apex:pageBlockSectionItem>  
+                
+                <apex:pageBlockSectionItem rendered="{!Case.RecordType.DeveloperName != 'Translation_Knowledge_and_Policy_Management'}" > 
+                    <apex:outputLabel value="{!$ObjectType.CaseComment.Label}" />
+                    <apex:inputTextArea value="{!caseCloseComment}"/>
+                </apex:pageBlockSectionItem>       
+            </apex:pageBlockSection>
+               
+        </apex:pageBlock>        
+    </apex:form>
+</apex:page>

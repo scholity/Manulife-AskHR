@@ -1,0 +1,36 @@
+<!-- ocms_mfc_AppDetail_Edit.page -->
+<!--
+    This is the OrchestraCMS content editor page for "ocms_mfc_AppCategoryLauncher" custom content
+    
+    2015-Apr-21 Wilder
+        - original
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_AppCategoryLauncher"
+	showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+	
+	<link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+
+	<apex:outputPanel layout="block">
+
+	<script id="ocms_application_Edit">
+		$(document).ready(function() {
+			ce.content_editor('registerSaveFunction', function() {			   
+				return [
+					{type: 'text', name: 'title', 		value: $('#title').val()}
+				];
+			});
+		});
+	</script>
+
+	<table class="ocmsContentEditor ocmsContentEditorNested">
+            <tr><td>
+            	<label class="ocmsLabel" for="title" title="The application name">Title</label>
+                <input type='text' id="title" placeholder="application name" value="{!title}"/>
+			</td></tr>
+	</table>
+
+	</apex:outputPanel>
+	
+</apex:page>
+<!-- ocms_mfc_AppLauncher_Edit.page -->

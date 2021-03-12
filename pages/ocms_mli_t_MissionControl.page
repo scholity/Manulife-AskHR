@@ -1,0 +1,44 @@
+<apex:page docType="html-5.0" id="MILK" controller="cms.CoreController" standardStylesheets="false" showHeader="false" sidebar="false" >
+
+    <apex:composition template="{!page_template}">
+
+        <apex:define name="header">
+            <title>Mission Control</title>
+            <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, shrink-to-fit=no" />
+
+            <!-- >Touch Icons -->
+            <link rel="apple-touch-icon" sizes="180x180" href="{!URLFOR($Resource.ocms_mc_buildPack, 'img/apple-touch-icon.png')}" />
+            <link rel="icon" type="image/png" sizes="32x32" href="{!URLFOR($Resource.ocms_mc_buildPack, 'img/favicon-32x32.png')}" />
+            <link rel="icon" type="image/png" sizes="16x16" href="{!URLFOR($Resource.ocms_mc_buildPack, 'img/favicon-16x16.png')}" />
+            <link rel="manifest" href="{!URLFOR($Resource.ocms_mc_buildPack, 'img/site.webmanifest')}" />
+            <link rel="mask-icon" href="{!URLFOR($Resource.ocms_mc_buildPack, 'img/safari-pinned-tab.svg')}" color="#5bbad5" />
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mc_buildPack, 'img/favicon-mc.ico')}" />
+            <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mc_buildPack, 'index.css')}" />
+            <meta name="msapplication-TileColor" content="#00aba9" />
+            <meta name="msapplication-config" content="{!URLFOR($Resource.ocms_mc_buildPack, 'img/browserconfig.xml')}" />
+            <meta name="theme-color" content="#ffffff" />
+
+            <!-- Adobe Tag Manager -->
+            <script src="//assets.adobedtm.com/launch-ENee9a2ac537cc429ebe0a84807f8bbabc.min.js" async=""></script>
+            <!-- EMAIL SHARES -->
+            <link rel="stylesheet" href="https://fonts.googleapis.com/earlyaccess/notosanssc.css" />
+            <script>
+                if (!!window.location.search.split('&mc=')[1]) {
+                    window.location.hash = window.location.search.match(/mc=([A-Za-z0-9\-\/]+)&?/)[1]
+                }
+            </script>
+            <!-- YAMMER -->
+            <script type="text/javascript" data-app-id="K0oCBF6BkPsqbeUGu1TbkA" src="https://c64.assets-yammer.com/assets/platform_js_sdk.js"></script>
+
+            <cms:Panel panelName="head-content" panelController="{!controller}" panelHeight="72px" panelWidth="880px" />
+        </apex:define>
+
+        <apex:define name="body">
+            <div id="root"></div>
+            <script type="text/javascript" src="{!URLFOR($Resource.ocms_mc_buildPack, 'build.js')}"></script>
+
+            <cms:Panel panelName="body-content" panelController="{!controller}" panelHeight="72px" panelWidth="880px" />
+        </apex:define>
+    </apex:composition>
+
+</apex:page>

@@ -1,0 +1,369 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_Article" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+
+                if ($('#title').val() == null || $('#title').val() == '') {
+                    $ele = $('#title');
+                    errorField($ele, languageUsed + 'Article Title must be provided.');
+                    return false;
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+    </script>
+
+    <apex:outputPanel layout="block">
+
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+        <script type="text/javascript" language="javascript">
+
+            $(document).ready(function() {
+                /* *****
+                   * enforcing mandatory fields to be filled before save
+                 * *****/
+                ce.content_editor('registerBindings', {
+                    'Save'    : validateAttributes,
+                    'Publish' : validateAttributes
+                });
+
+
+                // Get flags from a json file located in ocms_mli_pageSupport.resource
+                // This allows the select options to be easily maintained.
+                $.getJSON( "{!URLFOR($Resource.ocms_mli_json, 'json/flags.min.json')}", function(data){
+                    for (val in data){
+                        $('<option />', {value: data[val]['flag-code'], text: data[val]['country-name']}).appendTo('#articleFlagIcon');
+                    }
+
+                    var articleFlagIcon =  "{!articleFlagIcon}";
+                    $('select#articleFlagIcon').val(articleFlagIcon);
+                });
+
+
+
+                CKEDITOR.replace('articleDetail', {
+                    customConfig: '/apex/c__ocms_mli_CKEConfig'
+                });
+
+                var textMax = 1000;
+                var textLength;
+                var textRemaining;
+
+                /* *****
+                 * Initialize the remaining character count in the summary text boxes
+                 * Character limit is set to 1000
+                 * *****/
+                textLength = $('#articleSummaryHeader').val().length;
+                textRemaining = textMax - textLength;
+                $('#charHeaderCount').html(textRemaining + ' characters remaining');
+
+                textLength = $('#articleSummary').val().length;
+                textRemaining = textMax - textLength;
+                $('#charSummaryCount').html(textRemaining + ' characters remaining');
+
+                /* *****
+                 * Update the character count as characters are entered
+                 * *****/
+                $('#articleSummaryHeader').keyup(function() {
+                    textLength = $('#articleSummaryHeader').val().length;
+                    textRemaining = textMax - textLength;
+                    $('#charHeaderCount').html(textRemaining + ' characters remaining');
+                });
+
+                $('#articleSummary').keyup(function() {
+                    textLength = $('#articleSummary').val().length;
+                    textRemaining = textMax - textLength;
+                    $('#charSummaryCount').html(textRemaining + ' characters remaining');
+                });
+
+                ce.content_editor('registerSaveFunction', function() {
+                    // Invalidate SAL cache here until we have an on-publish trigger
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mli_Article', {action:'invalidateSALCache'}, $.noop);
+
+                    return [
+                        {type: 'text', name: 'title', value: $('#title').val()},
+                        {type: 'text', name: 'author', value: $('#author').val()},
+                        {type: 'text', name: 'articleDate', value: $('#articleDate').val()},
+                        {type: 'text', name: 'sNewsArticleLeaderText', value: $('#sNewsArticleLeaderText').val()},
+                        {type: 'text', name: 'articleLocation', value: $('#articleLocation').val()},
+                        {type: 'text', name: 'articleFlagIcon', value: $('#articleFlagIcon').val()},
+
+                        {type: 'text', name: 'articleType', value: $('#articleType').val(), lang: ''},
+                        {type: 'text', name: 'articleFeatureItem', value: $('input[name=articleFeatureItem]:checked').val()},
+                        {type: 'cms.Link', name: 'detailPage', value: $('#detailPage').val()},
+
+                        {type: 'text', name: 'actionLabel', value: $('#actionLabel').val()},
+                        {type: 'text', name: 'accessibleActionLabel', value: $('#accessibleActionLabel').val()},
+                        {type: 'cms.Link', name: 'actionPage', value: $('#actionPage').val()},
+
+                        {type: 'text', name: 'articleSummaryImage', value: $('#articleSummaryImage').val()},
+                        {type: 'text', name: 'summaryImageAlt', value: $('#summaryImageAlt').val()},
+                        {type: 'text', name: 'articleDetailImage', value: $('#articleDetailImage').val()},
+                        {type: 'text', name: 'detailImageAlt', value: $('#detailImageAlt').val()},
+                        {type: 'text', name: 'sVideoURL', value: $('#sVideoURL').val()},
+                        {type: 'text', name: 'sOverlayTitle', value: $('#sOverlayTitle').val()},
+                        {type: 'text', name: 'sOverlayCloseAccessible', value: $('#sOverlayCloseAccessible').val()},
+
+
+                        {type: 'text', name: 'articleSummaryHeader', value: $('#articleSummaryHeader').val()},
+                        {type: 'text', name: 'articleSummary', value: $('#articleSummary').val()},
+                        {type: 'text', name: 'articleDetail', value: CKEDITOR.instances.articleDetail.getData()}
+
+                    ];
+                });
+
+                $('#articleDate').datetimepicker();
+            });
+        </script>
+
+        <table class="ocmsContentEditor ocmsContentEditorNested">
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Article Header Values</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="title">Title</label>
+                        <input class="ocmsTextInputLrg" id="title" name="title" type="text" value="{!title}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="author">Author</label>
+                        <input class="ocmsTextInputLrg" id="author" name="author" type="text" value="{!author}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleDate">Release Date (EST)</label>
+                        <input class="ocmsTextInputLrg" id="articleDate" name="articleDate" type="text" value="{!articleDate}" readonly="readonly"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sNewsArticleLeaderText">Article Leader Text</label>
+                        <input class="ocmsTextInputLrg" id="sNewsArticleLeaderText" name="sNewsArticleLeaderText" type="text" value="{!sNewsArticleLeaderText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleLocation">Article Location Label : Enter a location that will be displayed on the relevant Article renderings</label>
+                        <input class="ocmsTextInputLrg" id="articleLocation" name="articleLocation" type="text" value="{!articleLocation}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleFlagIcon">Select Article Flag Icon</label>
+                        <select name="articleFlagIcon" id="articleFlagIcon" value="{!articleFlagIcon}">
+                            <option value="none">None</option>
+                        </select>
+
+                        <script defer="defer" type="text/javascript" language="javascript">
+                            var articleFlagIcon =  "{!articleFlagIcon}";
+                            $('select#articleFlagIcon').val(articleFlagIcon);
+                        </script>
+
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Blog and News Article Display Settings</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleType">Article Type : Blog Post or News Item</label>
+                        <select name="articleType" id="articleType" value="{!articleType}" class="ocmsLanguageNeutral">
+                            <option value="Blog">Blog</option>
+                            <option value="News">News</option>
+                        </select>
+                    </td>
+                </tr>
+
+
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleFeatureItem">Featured Item : Latest one will be displayed as top most tile.</label>
+
+                        <apex:outputText rendered="{!articleFeatureItem == 'true'}">
+                            <input type="radio" name="articleFeatureItem" value="true" checked="checked" />Yes
+                            <input type="radio" name="articleFeatureItem" value="false" />No
+                        </apex:outputText>
+                        <apex:outputText rendered="{!articleFeatureItem == 'false'}">
+                            <input type="radio" name="articleFeatureItem" value="true" />Yes
+                            <input type="radio" name="articleFeatureItem" value="false" checked="checked" />No
+                        </apex:outputText>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="detailPage">Article Destination Page</label>
+                        <input type="hidden" name="detailPage" id="detailPage" value="{!detailPageAsData}" />
+                        <cms:PageSelector cPassThroughId="detailPage" value="{!detailPageAsData}"  dialogId="detailPageLinkDialog" disabled="{!layout_disabled}" sname="{!content.cms__Site_Name__c}" token="{!token}"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <strong>Additional Link Values</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="actionLabel">Additional Link Label - Label for the Call to Action link </label>
+                        <input class="ocmsTextInputLrg" id="actionLabel" name="actionLabel" type="text" value="{!actionLabel}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accessibleActionLabel">Additional Link Accessibility Text</label>
+                        <input class="ocmsTextInputLrg" id="accessibleActionLabel" name="accessibleActionLabel" type="text" value="{!accessibleActionLabel}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="actionPage">Additional Link - Destination Page for the call to Action link</label>
+                        <input type="hidden" name="actionPage" id="actionPage" value="{!actionPageAsData}"/>
+                        <cms:PageSelector cPassThroughId="actionPage" value="{!actionPageAsData}"  dialogId="actionPageLinkDialog" disabled="{!layout_disabled}" sname="{!content.cms__Site_Name__c}" token="{!token}"/>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <strong>Images and Video Overlay</strong>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleSummaryImage">Article Summary Image</label>
+                        <input type="hidden" name="articleSummaryImage" id="articleSummaryImage" value="{!articleSummaryImage}" />
+                        <br/><br/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="articleSummaryImage" cPassThroughId="articleSummaryImage" cImage="{!articleSummaryImage}" type="Image" disabled="{!disableAll}" />
+                        <span>Image to display on article summary tiles.</span>
+                        <p class="ocmsHelpText">
+                            Normal: W682 X H384 to W682 X H550 pixel (72ppi)<br/>
+                            Retina: W1364 X H768 to W1364 X H1100 pixel (144ppi)
+                        </p>
+                        <br/><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="summaryImageAlt">Article Summary Image alt text</label>
+                        <input class="ocmsTextInputLrg" type="text" name="summaryImageAlt" id="summaryImageAlt" value="{!summaryImageAlt}" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleDetailImage">Article Detail Image</label>
+                        <input type="hidden" name="articleDetailImage" id="articleDetailImage" value="{!articleDetailImage}" />
+                        <br/><br/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="articleDetailImage" cPassThroughId="articleDetailImage" cImage="{!articleDetailImage}" type="Image" disabled="{!disableAll}" />
+                        <span>Image to display on the article's detail page.</span>
+                        <p class="ocmsHelpText">
+                            Normal: W1015 X H675 pixel (72ppi)<br/>
+                            Retina: W2030 X H1350 pixel (144ppi)
+                        </p>
+                        <br/><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="detailImageAlt">Article Detail Image alt text</label>
+                        <input class="ocmsTextInputLrg" type="text" name="detailImageAlt" id="detailImageAlt" value="{!detailImageAlt}" />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sVideoURL">Video URL - Enter video embed code here</label>
+                        <input class="ocmsTextInputLrg" id="sVideoURL" name="sVideoURL" type="text" value="{!sVideoURL}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sOverlayTitle">Video Overlay Title</label>
+                        <input class="ocmsTextInputLrg" id="sOverlayTitle" name="sOverlayTitle" type="text" value="{!sOverlayTitle}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sOverlayCloseAccessible">Video Overlay Close Button Accessibility Text</label>
+                        <input class="ocmsTextInputLrg" id="sOverlayCloseAccessible" name="sOverlayCloseAccessible" type="text" value="{!sOverlayCloseAccessible}"></input>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td>
+                        <strong>Article Body Values</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleSummaryHeader">Article Summary Header</label>
+                        <textarea  id="articleSummaryHeader" name="articleSummaryHeader" style="width: 600px; height: 150px;" maxlength="1000"><apex:outputText value="{!articleSummaryHeader}" /></textarea>
+                        <p class="ocmsHelpText">
+                            (<span id="charHeaderCount"></span>)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleSummary">Article Summary Body</label>
+                        <textarea  id="articleSummary" name="articleSummary" style="width: 600px; height: 150px;" maxlength="1000"><apex:outputText value="{!articleSummary}" /></textarea>
+                        <p class="ocmsHelpText">
+                            (<span id="charSummaryCount"></span>)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleDetail">Article Detail</label>
+                        <textarea  id="articleDetail" name="articleDetail">
+                            <apex:outputText value="{!articleDetail}" />
+                        </textarea>
+                    </td>
+                </tr>
+
+
+            </tbody>
+        </table>
+
+        <script defer="defer" type="text/javascript" language="javascript">
+            // Initialize picklist values here - populate each picklist with values from their last save
+            var articleType =  "{!articleType}";
+            $('select#articleType').val(articleType);
+
+            var articleFlagIcon =  "{!articleFlagIcon}";
+            $('select#articleFlagIcon').val(articleFlagIcon);
+        </script>
+    </apex:outputPanel>
+</apex:page>

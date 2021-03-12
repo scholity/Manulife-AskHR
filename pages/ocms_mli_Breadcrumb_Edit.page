@@ -1,0 +1,37 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_Breadcrumb" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function(){
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"strHomeLabel", "value": $('#strHomeLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strHomeLink", "value": $('#strHomeLink').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strHomeLabel">Home node label</label>
+                        <input class="ocmsTextInputLrg" id="strHomeLabel" type="text" value="{!strHomeLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strHomeLink">Link</label>
+                        <input class="ocmsTextInputLrg" type="hidden" name="strHomeLink" id="strHomeLink" value="{!strHomeLink}" />
+                        <cms:PageSelector cPassThroughId="strHomeLink" value="{!strHomeLink}"  dialogId="strHomeLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

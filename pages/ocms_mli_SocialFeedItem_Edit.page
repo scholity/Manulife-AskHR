@@ -1,0 +1,78 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_SocialFeedItem" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function(){
+
+            $('#strSocialMedia').val('{!strSocialMedia}')
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                // attributes.push({"name":"foobar", "value": $('#foobar').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strSocialMedia", "value": $('#strSocialMedia').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"strLink", "value": $('#strLink').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accLinkTitle", "value": $('#accLinkTitle').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"accDescription", "value": $('#accDescription').val(), "type": "Text", "simple": true});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strSocialMedia">Social Media</label>
+                        <apex:outputText escape="false" rendered="{!disableAll}">
+                            <!-- Disabled -->
+                            <select id="strSocialMedia" name="strSocialMedia" disabled="disabled">
+                                <option value="facebook">Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </apex:outputText>
+                        <apex:outputText escape="false" rendered="{!!disableAll}">
+                            <!-- Enabled -->
+                            <select id="strSocialMedia" name="strSocialMedia">
+                                <option value="facebook">Facebook</option>
+                                <option value="instagram">Instagram</option>
+                                <option value="twitter">Twitter</option>
+                                <option value="linkedin">LinkedIn</option>
+                                <option value="youtube">YouTube</option>
+                            </select>
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink">Link</label>
+                        <input type="hidden" name="strLink" id="strLink" value="{!strLink}" />
+                        <cms:PageSelector cPassThroughId="strLink" value="{!strLink}"  dialogId="strLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accLinkTitle">Link title</label>
+                        <input id="accLinkTitle" class="ocmsTextInputLrg" name="accLinkTitle" type="text" value="{!accLinkTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accDescription">Description</label>
+                        <input id="accDescription" class="ocmsTextInputLrg" name="accDescription" type="text" value="{!accDescription}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

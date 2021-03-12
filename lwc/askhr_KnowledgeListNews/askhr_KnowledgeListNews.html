@@ -1,0 +1,19 @@
+<template>
+    <!-- Loop thru each Article -->
+    <template for:each={listKnowledgeNewsArticles} for:item="knowledgeNewsArticle">
+        <div class="slds-grid slds-m-around_small slds-border_bottom" key={knowledgeNewsArticle.record.Id}>
+            <div class="slds-size_1-of-6">
+                <div class="slds-text-align_center slds-m-around_x-small">
+                    <lightning-formatted-rich-text value={knowledgeNewsArticle.record.Image__c}></lightning-formatted-rich-text>
+                </div>
+            </div>
+            <div class="slds-size_5-of-6">
+                <div class="slds-text-align_left slds-m-around_x-small">
+                    <p class=""><lightning-formatted-date-time value={knowledgeNewsArticle.record.LastPublishedDate}></lightning-formatted-date-time></p>
+                    <p class="slds-text-title_bold"><lightning-formatted-text value={knowledgeNewsArticle.record.Title}></lightning-formatted-text></p>
+                    <p class=""><lightning-formatted-rich-text value={knowledgeNewsArticle.record.General_Purpose_Content__c}></lightning-formatted-rich-text></p>
+                </div>
+            </div>
+        </div>
+    </template>
+</template>

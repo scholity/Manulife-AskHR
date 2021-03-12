@@ -1,0 +1,165 @@
+<!-- ocms_mfc_t_Dashboard -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mfc_FavIcon, 'img/favicon.ico')}" type="image/x-icon"/>
+            <apex:include pageName="ocms_mfc_i_headSpace" />
+        </apex:define><!-- header -->
+
+        <apex:define name="body">
+            <div class="pg pgDashboard" id="page-dashboard-template">
+
+                <apex:include pageName="ocms_mfc_i_headerAndSideNav" />
+
+                <div class="global-layer-wrap main-global-layer">
+
+                    <div class="global-align-center">
+                        <div class="global-drawer-slider">
+
+                            <apex:include pageName="ocms_mfc_i_globalNavTools" />
+
+                            <div class="content-layer main-layer sticky-footer-fix">
+
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>TextBlock</strong> ❧ critical alerts section
+                                    </div>
+
+                                </apex:outputText>
+                                <div class='critical-alerts'>
+                                    <cms:Panel panelName="criticalAlerts" panelController="{!controller}" panelWidth="550px" panelHeight="30px" />
+                                </div>
+
+                                <div class="content-wrap main-article">
+                                    <!-- WIDGET-BAR CONTENT -->
+                                    <section id="widget-bar">
+                                        <div class='touch-slider'>
+                                            <div class='inner'>
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                                    <strong>Widgets</strong><br />
+                                                    <div class="ocmsInstructions expandy">
+                                                        Suggested widget order:
+                                                        <ul>
+                                                            <li>Greeting</li>
+                                                            <li>App</li>
+                                                            <li>Notification</li>
+                                                            <li>Stock</li>
+                                                            <li>Weather</li>
+                                                        </ul>
+                                                    </div>
+                                                    ❧ the top-to-bottom widget order in the list below corresponds to the left-to-right order they will appear within the widget bar
+                                                </div></apex:outputText>
+                                                <cms:Panel panelName="widgetBar" panelController="{!controller}" panelWidth="350px" panelHeight="160px" panelDynamic="true" panelDynamicGroup="1"/>
+                                            </div>
+                                        </div>
+                                    </section>
+                                    <!-- WIDGET-BAR CONTENT -->
+
+                                    <!-- TEMPLATE CONTENT -->
+                                    <main id="dashboard-content">
+                                        <div class="sidebar-bg"></div>
+
+                                        <div class="header">
+                                            <div class="inner">
+                                                <div class="news selected">
+                                                    <div class="pad">
+                                                        <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                                            <strong>PlainText</strong> ❧ title for news stream page area
+                                                        </div></apex:outputText>
+                                                        <h2><cms:Panel panelName="newsTabTitle" panelController="{!controller}" panelWidth="320px"
+                                                                       panelHeight="20px" panelContentLayouts="PlainText" panelLimit="1" /></h2>
+                                                    </div>
+                                                </div>
+                                                <div class="activity">
+                                                    <div class="pad">
+                                                        <div class="top-bg main-title">
+                                                            <!-- SUBJECT TO CHANGE! - MFConnect Activity feed may be moving below events; when it does
+                                                                will this tab title remain as it is now?  Waiting on K2 markup update. -->
+                                                            <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                                                <strong>PlainText</strong> ❧ title for activity feed page area
+                                                            </div></apex:outputText>
+                                                            <h2><cms:Panel panelName="activityTabTitle" panelController="{!controller}" panelWidth="320px"
+                                                                           panelHeight="20px" panelContentLayouts="PlainText" panelLimit="1" /></h2>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="content">
+                                            <div class="news selected" id="news-container">
+                                                <div class="pad">
+                                                    <!--
+                                                    <div class="controls">…</div>
+                                                    <div class="tile-block" id="dashboard-tile-block">…</div>
+                                                    -->
+                                                    <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                                        <strong>News Stream Loader</strong><br />
+                                                        ❧ add the news stream content loader for the MFC Dashboard page<br />
+                                                        ❧ within the news stream editor, specify the contents of the top-right special promotion block (e.g. used to promote Executive Leadership Messages)
+                                                    </div></apex:outputText>
+                                                    <cms:Panel panelName="newsStream" panelController="{!controller}" panelWidth="350px" panelHeight="160px" panelLimit="1"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="activity">
+                                                <div class="pad">
+
+                                                    <!-- SUBJECT TO CHANGE - not final as of May-12, or Jun-05! -->
+                                                    <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                                        <strong>Calendar List, and MFConnect Feed</strong><br />
+                                                        ❧ add the Calendar List and MFConnect Feed content items to the Dashboard’s right sidebar
+                                                        <br />
+                                                        <strong>Image</strong> ❧ placed images will auto size to fit width, optimal is JPG or PNG with width 340px and smallest size possibe.
+                                                    </div></apex:outputText>
+                                                    <cms:Panel panelName="activityFeeds" panelController="{!controller}" panelWidth="320px" panelHeight="160px"
+                                                               panelDynamic="true" panelDynamicGroup="1" />
+
+                                                    <!--<apex:outputText rendered="{!api.page_mode != 'edit'}"> -->
+                                                    <!-- fake MFConnect Feed data follows inside div.message-block -->
+                                                    <div class="top-bg discover">
+                                                        <h2>
+                                                            <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                                                <strong>Plain Text</strong><br />
+                                                                ❧ Title for the placeholder image
+                                                            </div></apex:outputText>
+                                                            <cms:Panel panelName="placeholderImageText" panelController="{!controller}" panelWidth="320px" panelHeight="60px"
+                                                                       panelContentLayouts="PlainText" panelLimit="1" />
+                                                        </h2>
+                                                    </div>
+
+                                                    <div class="message-block no-feed" >
+                                                        <div class="inner">
+                                                            <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                                                <strong>Image</strong><br />
+                                                                ❧ Placeholder image
+                                                            </div></apex:outputText>
+                                                            <cms:Panel panelName="placeholderImage" panelController="{!controller}" panelWidth="320px" panelHeight="60px"
+                                                                       panelContentLayouts="Image" panelLimit="1" />
+                                                        </div>
+                                                    </div><!-- .message-block -->
+                                                    <!-- </apex:outputText> -->
+                                                </div><!-- .pad -->
+                                            </div><!-- .activity -->
+                                        </div><!-- .content -->
+
+                                        <div class="clear"></div>
+                                    </main>
+                                    <!-- TEMPLATE CONTENT -->
+                                </div><!-- .content-wrap.main-article -->
+
+                                <apex:include pageName="ocms_mfc_i_pageFooter" />
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .global-layer-wrap.main-global-layer -->
+                <a id="back-to-top">
+                    <span class="i18n" id="uiLabelBackToTop">Back to top</span>
+                </a>
+            </div><!-- .pg.pgGeneric#page-dashboard-template -->
+
+            <!--script type="text/javascript">_satellite.pageBottom();</script-->
+        </apex:define><!-- body -->
+    </apex:composition>
+</apex:page>
+<!-- ocms_mfc_t_Dashboard -->

@@ -1,0 +1,1295 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_Article" showHeader="false" sidebar="false"
+           cache="false" title="OrchestraCMS" standardStylesheets="false">
+
+
+    <apex:outputPanel layout="block">
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/ocms-reset+support.css')}" type="text/css"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/selectize.css')}" type="text/css"/>
+        <link rel="stylesheet" href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}" class="psContentEditorCSS" type="text/css"/>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"/>
+
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/jquery/jquery.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/selectize/js/jquery-ui.min.js')}"></script>
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/selectize/js/selectize.min.js')}"></script>
+
+        <script type="text/javascript" language="javascript">
+            var $$ = $.noConflict(true);
+            var $select;
+            var selectize;
+            var authorSelectize;
+            var relatedSeparator = '~!~!';
+            var relatedArticleSelectize;
+            var relatedArticlesString = '';
+
+            $$(document).ready(function () {
+                function initSelectize() {
+                    $select = $$('#adHocTags').selectize({
+                        plugins: ['remove_button', 'drag_drop'],
+                        delimiter: ',',
+                        persist: false,
+                        create: function (input) {
+                            return {
+                                value: input,
+                                text: input
+                            }
+                        }
+                    });
+
+                    selectize = $select[0].selectize;
+
+                    $select = $$('#articleAuthor').selectize({
+                        delimiter: ',',
+                        persist: false,
+                        maxItems: 1
+                    });
+
+                    authorSelectize = $select[0].selectize;
+
+                    $select = $$('#relatedArticles').selectize({
+                        plugins: ['remove_button', 'drag_drop'],
+                        delimiter: ',',
+                        persist: false,
+                    });
+
+                    relatedArticleSelectize = $select[0].selectize;
+
+                    loadTags();
+                    loadAuthor();
+                    loadRelatedArticles();
+                }
+
+                //Load all the tags on doc ready
+                //***NOTE**** Load tags before initializing selectize
+                function loadTags() {
+                    var loadTagsVar = {
+                        action: 'loadTags',
+                        contentId: '{!versionOriginId}',
+                        languageId: cms.languageInUse.Id
+                    };
+
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_AdHocTag', loadTagsVar, function (textStatus, json, xhr) {
+                        if (json.success) {
+                            if (json.hasTags) {
+                                for (var i = 0; i < json.tagList.length; i++) {
+                                    selectize.addOption({value: json.tagList[i].Name, text: json.tagList[i].Name});
+                                    selectize.addItem(json.tagList[i].Name);
+                                }
+                            }
+                        }
+                    });
+                }
+
+                //This function will save all tags on save click
+                function saveTags() {
+                    var removeTagVar = {
+                        action: 'removeTags',
+                        contentId: '{!versionOriginId}',
+                        languageId: cms.languageInUse.Id
+                    };
+
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_AdHocTag', removeTagVar, function (textStatus, json, xhr) {
+                        if (json.success) {
+                            var selectizeValsArray = selectize.getValue().split(',');
+                            if (selectizeValsArray.length > 0 && selectizeValsArray[0]) {
+                                var addTagsVar = {
+                                    action: 'addTags',
+                                    contentId: '{!versionOriginId}',
+                                    tagNameList: JSON.stringify(selectizeValsArray),
+                                    languageId: cms.languageInUse.Id
+                                };
+
+                                $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_AdHocTag', addTagsVar, function (textStatus, json, xhr) {
+                                    if (!json.success) {
+                                        console.log("something wrong happened");
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+
+                function relatedArticlesSaveString() {
+                    var aRelatedArticles = relatedArticleSelectize.getValue().split(',');
+                    relatedArticlesString = '';
+                    for (var i = 0; i < aRelatedArticles.length; i++) {
+                        if ((i + 1) == aRelatedArticles.length) {
+                            relatedArticlesString += aRelatedArticles[i];
+                        } else {
+                            relatedArticlesString += aRelatedArticles[i] + relatedSeparator;
+                        }
+                    }
+                }
+
+                function loadRelatedArticles() {
+                    var aRelatedArticles = '{!relatedArticles}'.split(relatedSeparator);
+                    for (var i = 0; i < aRelatedArticles.length; i++) {
+                        if (i % 2) {
+                            relatedArticleSelectize.addOption({
+                                value: aRelatedArticles[i - 1] + relatedSeparator + aRelatedArticles[i],
+                                text: aRelatedArticles[i - 1]
+                            });
+                            relatedArticleSelectize.addItem(aRelatedArticles[i - 1] + relatedSeparator + aRelatedArticles[i]);
+                        }
+                    }
+                }
+
+                initSelectize();
+
+                //Ad Hoc Tag autocomplete search
+                $('#adHocTags').next().children('.selectize-input').children('input').keyup(function () {
+                    var tagName = $(this).val();
+                    if (tagName.length >= 2) {
+                        var autoCompleteTagsVar = {
+                            action: 'tagAutoComplete',
+                            tagName: $(this).val(),
+                            languageId: cms.languageInUse.Id
+                        };
+
+                        $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_AdHocTag', autoCompleteTagsVar, function (textStatus, json, xhr) {
+                            if (json.success) {
+                                for (var i = 0; i < json.tagNames.length; i++) {
+                                    selectize.addOption({value: json.tagNames[i].Name, text: json.tagNames[i].Name});
+                                }
+                                ;
+                            }
+                        });
+                    }
+                });
+
+                $('#relatedArticles').next().children('.selectize-input').children('input').keyup(function () {
+                    var tagName = $(this).val();
+                    if (tagName.length >= 3) {
+                        var autoCompleteTagsVar = {
+                            action: 'getArticleTilesByName',
+                            term: $(this).val(),
+                            contentId: '{!content.Id}'
+                        };
+
+                        $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_Article', autoCompleteTagsVar, function (textStatus, json, xhr) {
+                            if (json.success) {
+                                for (var i = 0; i < json.contentList.length; i++) {
+                                    var replacedString = json.contentList[i].cms__Name__c.replace(',', ' ');
+                                    relatedArticleSelectize.addOption({
+                                        value: replacedString + relatedSeparator + json.contentList[i].Id,
+                                        text: replacedString
+                                    });
+                                }
+                                ;
+                            }
+                        });
+                    }
+                });
+
+                //Load the author information
+                function loadAuthor() {
+                    var authorName = '{!author}';
+                    if (authorName != '') {
+
+                        var authorVar = {
+                            action: 'getAuthor',
+                            name: authorName,
+                            email: '{!authorEmail}'
+                        }
+
+                        $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_Article', authorVar, function (textStatus, json, xhr) {
+                            if (json.success) {
+                                authorSelectize.addOption({
+                                    value: JSON.stringify(json.users[0]),
+                                    text: json.users[0].Name
+                                });
+                                authorSelectize.setValue(JSON.stringify(json.users[0]));
+                            }
+                        });
+                    }
+
+                }
+
+                //Author autocomplete search
+                $('#articleAuthor').next().children('.selectize-input').children('input').keyup(function () {
+                    var tagName = $(this).val();
+                    if (tagName.length >= 2) {
+                        var autoCompleteVar = {
+                            action: 'authorAutoComplete',
+                            name: $(this).val()
+                        };
+
+                        $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_Article', autoCompleteVar, function (textStatus, json, xhr) {
+                            if (json.success) {
+                                for (var i = 0; i < json.users.length; i++) {
+                                    authorSelectize.addOption({
+                                        value: JSON.stringify(json.users[i]),
+                                        text: json.users[i].Name
+                                    });
+                                }
+                                ;
+                            }
+                        });
+                    }
+
+                });
+
+                //When an item is selected
+                authorSelectize.on('change', function () {
+                    var inputVal = authorSelectize.getValue();
+                    var userInfo = '';
+                    if (inputVal) {
+                        userInfo = JSON.parse(inputVal);
+                        $('#author').val(userInfo.Name);
+                        $('#authorEmail').val(userInfo.Email);
+                        $('#authorTitle').val(userInfo.Title);
+                        $('#authorPhone').val(userInfo.Phone);
+                    } else {
+                        $('#author').val('');
+                        $('#authorEmail').val('');
+                        $('#authorTitle').val('');
+                        $('#authorPhone').val('');
+                    }
+
+                });
+
+                $('#detailSidebar').attr('checked', '{!detailSidebar}' === 'true');
+
+                var textMax = 180;
+                var textLength;
+                var textRemaining;
+
+                /* *****
+                 * Initialize the remaining character count in the summary text boxes
+                 * Character limit is set to 150
+                 * *****/
+                textLength = $('#summary').val().length;
+                textRemaining = textMax - textLength;
+                if (textRemaining < 0) {
+                    $('#charCount').addClass('over');
+                } else {
+                    $('#charCount').addClass('under');
+                }
+                $('#charCount').html(textRemaining);
+
+                /* *****
+                 * Update the character count as characters are entered
+                 * *****/
+                $('#summary').keyup(function () {
+                    textLength = $('#summary').val().length;
+                    textRemaining = textMax - textLength;
+                    if (textRemaining < 0) {
+                        $('#charCount').addClass('over');
+                        $('#charCount').removeClass('under');
+                    } else {
+                        $('#charCount').addClass('under');
+                        $('#charCount').removeClass('over');
+                    }
+                    $('#charCount').html(textRemaining);
+                });
+
+                //initialize daily clipping summary counts
+                if (editorType === 'newsItem') {
+                    var clipping1TL = $('#clipping1Summary').val().length;
+                    var Clipping1TR = textMax - clipping1TL;
+                    if (Clipping1TR < 0) {
+                        $('#charCountClipping1').addClass('over');
+                    } else {
+                        $('#charCountClipping1').addClass('under');
+                    }
+                    $('#charCountClipping1').html(Clipping1TR);
+
+                    /* *****
+                     * Update the character count as characters are entered
+                     * *****/
+                    $('#clipping1Summary').keyup(function () {
+                        var clipping1TL = $('#clipping1Summary').val().length;
+                        var clipping1TR = textMax - clipping1TL;
+                        if (clipping1TR < 0) {
+                            $('#charCountClipping1').addClass('over');
+                            $('#charCountClipping1').removeClass('under');
+                        } else {
+                            $('#charCountClipping1').addClass('under');
+                            $('#charCountClipping1').removeClass('over');
+                        }
+                        $('#charCountClipping1').html(clipping1TR);
+                    });
+
+                    var clipping2TL = $('#clipping2Summary').val().length;
+                    var Clipping2TR = textMax - clipping2TL;
+                    if (Clipping2TR < 0) {
+                        $('#charCountClipping2').addClass('over');
+                    } else {
+                        $('#charCountClipping2').addClass('under');
+                    }
+                    $('#charCountClipping2').html(Clipping2TR);
+
+                    /* *****
+                     * Update the character count as characters are entered
+                     * *****/
+                    $('#clipping2Summary').keyup(function () {
+                        var clipping2TL = $('#clipping2Summary').val().length;
+                        var clipping2TR = textMax - clipping2TL;
+                        if (clipping2TR < 0) {
+                            $('#charCountClipping2').addClass('over');
+                            $('#charCountClipping2').removeClass('under');
+                        } else {
+                            $('#charCountClipping2').addClass('under');
+                            $('#charCountClipping2').removeClass('over');
+                        }
+                        $('#charCountClipping2').html(clipping2TR);
+                    });
+                }
+
+                // CKEDITOR.replace('body');
+                //CKEDITOR.replace('body', {
+                //    customConfig: '/apex/c__ocms_mfc_CKEConfig',
+                //});
+
+                CKEDITOR.replace('body', $.extend({
+                    customConfig: '/apex/c__ocms_mfc_CKEConfig',
+                    readOnly: false
+                }, {!CKEditorConfig}));
+
+                if (!({!disableAll})) {
+                    //CKEDITOR.replace('body');
+                    //$('#summary').acceptChars('length 180');
+                }
+
+                //Setup the radio buttons
+                function loadRadioButtons(radioName, value) {
+                    if (value) {
+                        $('input[name=' + radioName + '][value=' + value + ']').attr('checked', 'checked');
+                    }
+                };
+
+                function loadDropDownbox(dropdownName, value) {
+                    $('#' + dropdownName).val(value);
+                }
+
+                function survey(selector, callback) {
+                    var input = $(selector);
+                    var oldvalue = input.val();
+                    setInterval(function () {
+                        if (input.val() != oldvalue) {
+                            oldvalue = input.val();
+                            savePageId();
+                        }
+                    }, 100);
+                }
+
+                survey('#webLink', function () {
+                });
+
+                //Save Page Id
+                function savePageId() {
+                    var webLink = $('#webLink').val();
+                    var webLinkArray = webLink.split(',');
+                    if (webLinkArray[0] === 'Internal') {
+
+                        var autoCompleteVar = {
+                            action: 'getPOID',
+                            pageId: webLinkArray[1]
+                        };
+
+                        $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_Article', autoCompleteVar, function (textStatus, json, xhr) {
+                            if (json.success) {
+                                $('#pageId').val(json.pageId);
+                            }
+                        });
+                    }
+                }
+
+                function loadCEOCategoryDropDown() {
+                    var categoriesVar = {
+                        action: 'getCEOCategories',
+                        ocmsLang: cms.languageInUse.LanguageCode
+                    }
+
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_Article', categoriesVar, function (textStatus, json, xhr) {
+                        if (json.success) {
+                            $.each(json.ceoCategories, function (key, value) {
+                                $("#ceoCategory").append(new Option(value, key));
+                            });
+
+                            loadCEOCategory();
+                        }
+                    });
+                }
+
+                function loadCEOCategory() {
+                    var categoryIndex = '{!ceoCategory}';
+
+                    if (categoryIndex !== '') {
+                        $("#ceoCategory").val(categoryIndex);
+                    }
+                }
+
+                //debug
+                console.log('editorType is ' + editorType);
+
+                //On load set editor based on layout
+                //editorType var is set by parent editor pages
+                if (editorType === 'socialPost') {
+                    $('.socialContainer').show();
+                    loadRadioButtons('socialPost', '{!socialType}');
+                    $('.tileTitleRow').hide();
+                    $('.tileImageRow').hide();
+                } else if (editorType === 'webLink') {
+                    $('.linkContainer').show();
+                    loadDropDownbox('webLinkType', '{!webLinkType}');
+                    $('.imageLoaderContainer').hide
+                } else if (editorType === 'article' || editorType === 'obituary') {
+                    $('.articleContainer').show();
+                    $('.imageLoaderContainer').show();
+                } else if (editorType === 'newsItem') {
+                    $('.newsItemContainer').show();
+                    $('.imageLoaderContainer').hide();
+                    $('.tileContainer').hide();
+                } else if (editorType === 'MCTrend') {
+                    $('.MCTrendContainer').show();
+                    $('.imageLoaderContainer').hide();
+                    $('.tileContainer').hide();
+                } else if (editorType === 'ceoArticle') {
+                    $('.articleContainer').show();
+                    $('.imageLoaderContainer').show();
+                    $('.ceoContainer').show();
+                    loadCEOCategoryDropDown();
+                }
+
+                window.parent.frameElement.contentWindow.$.ocmsValidator.validator['IMAGEDIMENSIONEQ'] = function (theData, options) {
+                    var bIsValid = true;
+                    var sourceImage = new Image();
+
+                    // Only perform this if we have a value for the image
+                    if (theData.value) {
+                        sourceImage.src = theData.value;
+
+                        if (sourceImage.height != options.height || sourceImage.width != options.width) {
+
+                            debug.log('Image height.', sourceImage.height);
+                            debug.log('Image width.', sourceImage.width);
+                            debug.log('Desired height.', options.height);
+                            debug.log('Desired width.', options.width);
+
+                            bIsValid = false;
+                        }
+                    }
+
+                    return bIsValid;
+                }
+
+                window.parent.frameElement.contentWindow.$.ocmsValidator.validator['RATIOVALIDATOR'] = function (theData, options) {
+                    var bIsValid = true;
+                    var sourceImage = new Image();
+
+                    // Only perform this if we have a value for the image
+                    if (theData.value) {
+                        sourceImage.src = theData.value;
+
+                        var a = sourceImage.height;
+                        var b = sourceImage.width;
+
+                        var remainder = 0;
+
+                        while (b != 0) {
+                            remainder = a % b;
+                            a = b;
+                            b = remainder;
+                        }
+
+                        var ratiox = sourceImage.height / a;
+
+                        a = sourceImage.height;
+                        b = sourceImage.width;
+
+                        remainder = 0;
+                        while (b != 0) {
+                            remainder = a % b;
+                            a = b;
+                            b = remainder;
+                        }
+
+                        var ratioy = sourceImage.width / a;
+
+                        if (ratiox != options.ratiox || ratioy != options.ratioy) {
+                            bIsValid = false;
+                        }
+                    }
+
+                    return bIsValid;
+                }
+
+                // Validation rules for all except 'newItem'
+                if (editorType !== 'newsItem' && editorType !== 'MCTrend') {
+                    ce.content_editor('registerValidationRule', 'summary', 'REQUIRED', ' • Summary is a required field.');
+                }
+
+                // Article validation rules
+                if (editorType === 'article' || editorType === 'obituary') {
+                    ce.content_editor('registerValidationRule', 'title', 'REQUIRED', ' • Title is a required field.');
+                    ce.content_editor('registerValidationRule', 'imageHero', 'IMAGEDIMENSIONEQ', ' • Article image should be 255 px x 150 px.', {
+                        width: 255,
+                        height: 150
+                    });
+                    ce.content_editor('registerValidationRule', 'authorImage', 'RATIOVALIDATOR', ' • Author image should be a 1:1 ratio.', {
+                        ratiox: 1,
+                        ratioy: 1
+                    });
+                }
+                // Social post validation rules
+                if (editorType === 'socialPost') {
+                    ce.content_editor('registerValidationRule', 'socialType', 'REQUIRED', ' • Need to select social post type.');
+                    ce.content_editor('registerValidationRule', 'socialLink', 'REQUIRED', ' • URL reference is a required field.');
+                }
+                // Weblink validation rules.
+                if (editorType === 'webLink') {
+                    ce.content_editor('registerValidationRule', 'title', 'REQUIRED', ' • Title is a required field.');
+                    ce.content_editor('registerValidationRule', 'webLink', 'REQUIRED', ' • URL reference is a required field.');
+                    ce.content_editor('registerValidationRule', 'webLinkType', 'REQUIRED', ' • Link to is a required field.');
+                    ce.content_editor('registerValidationRule', 'webLinkType', 'REQUIRED', ' • Link to is a required field.');
+
+
+                    $('.newsStreamRotatorImage').hide();
+                    $('.listPageRotatorImage').hide();
+                    $('.thumbnailImage').hide();
+                }
+
+                // newItem a.k.a. Daily trending
+                if (editorType === 'newsItem') {
+                    ce.content_editor('registerValidationRule', 'clipping1', 'REQUIRED', ' • Clipping 1 Title is a required field.');
+                    ce.content_editor('registerValidationRule', 'clipping2', 'REQUIRED', ' • Clipping 2 Title is a required field.');
+                    ce.content_editor('registerValidationRule', 'clipping1Summary', 'REQUIRED', ' • Clipping 1 Summary is a required field.');
+                    ce.content_editor('registerValidationRule', 'clipping2Summary', 'REQUIRED', ' • Clipping 2 Summary is a required field.');
+                    ce.content_editor('registerValidationRule', 'clipping1Link', 'REQUIRED', ' • Clipping 1 Link is a required field.');
+                    ce.content_editor('registerValidationRule', 'clipping2Link', 'REQUIRED', ' • Clipping 2 Link is a required field.');
+                    ce.content_editor('registerValidationRule', 'newsLink', 'REQUIRED', ' • Web page reference is a required field.');
+                }
+
+                // Trending
+                // Taken out to allow less than 4 links
+                if (editorType === 'MCTrend') {
+                    ce.content_editor('registerValidationRule', 'trending1', 'REQUIRED', ' • Trending 1 Title is a required field.');
+//                    ce.content_editor('registerValidationRule', 'trending2', 'REQUIRED', ' • Trending 2 Title is a required field.');
+//                    ce.content_editor('registerValidationRule', 'trending3', 'REQUIRED', ' • Trending 3 Title is a required field.');
+//                    ce.content_editor('registerValidationRule', 'trending4', 'REQUIRED', ' • Trending 3 Title is a required field.');
+                    ce.content_editor('registerValidationRule', 'trending1Link', 'REQUIRED', ' • Trending 1 Link is a required field.');
+//                    ce.content_editor('registerValidationRule', 'trending2Link', 'REQUIRED', ' • Trending 2 Link is a required field.');
+//                    ce.content_editor('registerValidationRule', 'trending3Link', 'REQUIRED', ' • Trending 3 Link is a required field.');
+//                    ce.content_editor('registerValidationRule', 'trending4Link', 'REQUIRED', ' • Trending 4 Link is a required field.');
+                }
+
+                if (editorType === 'ceoArticle') {
+                    ce.content_editor('registerValidationRule', 'title', 'REQUIRED', ' • Title is a required field.');
+                    ce.content_editor('registerValidationRule', 'body', 'REQUIRED', ' • Text area is a required field.');
+                    ce.content_editor('registerValidationRule', 'imageHero', 'IMAGEDIMENSIONEQ', ' • Article image should be 255 px x 150 px.', {
+                        width: 255,
+                        height: 150
+                    });
+                }
+
+                if ($('#newsStreamRotatorImage').length) {
+                    ce.content_editor('registerValidationRule', 'newsStreamRotatorImage', 'IMAGEDIMENSIONEQ', ' • News rotator image should be 417 px x 312 px.', {
+                        width: 417,
+                        height: 312
+                    });
+                }
+
+                if ($('#listPageRotatorImage').length) {
+                    ce.content_editor('registerValidationRule', 'listPageRotatorImage', 'IMAGEDIMENSIONEQ', ' • List page rotator image should be 718 px x 534 px.', {
+                        width: 718,
+                        height: 534
+                    });
+                }
+
+                if ($('#imageIcon').length) {
+                    ce.content_editor('registerValidationRule', 'imageIcon', 'IMAGEDIMENSIONEQ', ' • Article image should be 199 px x 146 px.', {
+                        width: 199,
+                        height: 146
+                    });
+                }
+
+                if ($('#thumbnailImage').length) {
+                    ce.content_editor('registerValidationRule', 'thumbnailImage', 'IMAGEDIMENSIONEQ', ' • Thumbnail image should be 80 px x 80 px.', {
+                        width: 80,
+                        height: 80
+                    });
+                }
+
+                function updateLastPublishedDate() {
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_Article', {action: 'updateLastPublishedDate'});
+                }
+
+                ce.content_editor('registerSaveFunction', function () {
+                    saveTags();
+                    relatedArticlesSaveString();
+                    updateLastPublishedDate();
+
+                    //Common items saved for all editors.
+                    var returnArray = [
+                        {type: 'text', name: 'title', value: $('#title').val()},
+                        {type: 'text', name: 'imageIcon', value: $('#imageIcon').val()},
+                        {type: 'text', name: 'summary', value: $('#summary').val()},
+                        {type: 'text', name: 'newsStreamRotatorImage', value: $('#newsStreamRotatorImage').val()},
+                        {type: 'text', name: 'listPageRotatorImage', value: $('#listPageRotatorImage').val()}
+                    ];
+
+                    // Article
+                    if (editorType === 'article') {
+                        returnArray.push({type: 'text', name: 'thumbnailImage', value: $('#thumbnailImage').val()});
+                        returnArray.push({
+                            type: 'text',
+                            name: 'detailSidebar',
+                            value: $('#detailSidebar').is(':checked')
+                        });
+                        returnArray.push({type: 'text', name: 'imageHero', value: $('#imageHero').val()});
+                        returnArray.push({type: 'text', name: 'body', value: CKEDITOR.instances['body'].getData()});
+                        returnArray.push({type: 'text', name: 'author', value: $('#author').val()});
+                        returnArray.push({type: 'text', name: 'authorTitle', value: $('#authorTitle').val()});
+                        returnArray.push({type: 'text', name: 'authorPhone', value: $('#authorPhone').val()});
+                        returnArray.push({type: 'text', name: 'authorEmail', value: $('#authorEmail').val()});
+                        returnArray.push({type: 'text', name: 'authorImage', value: $('#authorImage').val()});
+                        returnArray.push({type: 'text', name: "contentFlavor", value: 'article'});
+                        returnArray.push({type: 'text', name: "relatedArticles", value: relatedArticlesString});
+                    } else if (editorType === 'obituary') {
+                        returnArray.push({type: 'text', name: 'thumbnailImage', value: $('#thumbnailImage').val()});
+                        returnArray.push({
+                            type: 'text',
+                            name: 'detailSidebar',
+                            value: $('#detailSidebar').attr('checked')
+                        });
+                        returnArray.push({type: 'text', name: 'imageHero', value: $('#imageHero').val()});
+                        returnArray.push({type: 'text', name: 'body', value: CKEDITOR.instances['body'].getData()});
+                        returnArray.push({type: 'text', name: 'author', value: $('#author').val()});
+                        returnArray.push({type: 'text', name: 'authorTitle', value: $('#authorTitle').val()});
+                        returnArray.push({type: 'text', name: 'authorPhone', value: $('#authorPhone').val()});
+                        returnArray.push({type: 'text', name: 'authorEmail', value: $('#authorEmail').val()});
+                        returnArray.push({type: 'text', name: 'authorImage', value: $('#authorImage').val()});
+                        returnArray.push({type: 'text', name: "contentFlavor", value: 'obituary'});
+                        returnArray.push({type: 'text', name: "relatedArticles", value: relatedArticlesString});
+                        // Social Post
+                    } else if (editorType === 'socialPost') {
+                        returnArray.push({
+                            type: 'text',
+                            name: "socialLink",
+                            value: $('#socialLink.selected-page-label').page_selector_input('getSerializedLink'),
+                            type: 'Link'
+                        });
+                        returnArray.push({
+                            type: 'text',
+                            name: "socialType",
+                            value: $("input[name='socialPost']:checked").val()
+                        });
+                        returnArray.push({type: 'text', name: "contentFlavor", value: 'socialPost'});
+                        // Web Link
+                    } else if (editorType === 'webLink') {
+                        returnArray.push({type: 'text', name: "webLink", value: $('#webLink').val()});
+                        //returnArray.push({type: 'text', name: 'thumbnailImage', value: $('#thumbnailImage').val()});
+                        returnArray.push({type: 'text', name: "webLinkType", value: $("#webLinkType").val()});
+                        returnArray.push({type: 'text', name: "pageId", value: $("#pageId").val()})
+                        returnArray.push({type: 'text', name: "contentFlavor", value: 'webLink'});
+                        // News Items
+                    } else if (editorType === 'newsItem') {
+                        returnArray.push({type: 'text', name: "newsLink", value: $('#newsLink').val()});
+                        returnArray.push({type: 'text', name: "contentFlavor", value: 'newsItem'});
+                        returnArray.push({type: 'text', name: "clipping1", value: $("#clipping1").val()});
+                        returnArray.push({type: 'text', name: "clipping2", value: $("#clipping2").val()});
+                        returnArray.push({type: 'text', name: "clipping1Summary", value: $("#clipping1Summary").val()});
+                        returnArray.push({type: 'text', name: "clipping2Summary", value: $("#clipping2Summary").val()});
+                        returnArray.push({type: 'text', name: "clipping1Link", value: $("#clipping1Link").val()});
+                        returnArray.push({type: 'text', name: "clipping2Link", value: $("#clipping2Link").val()});
+                    } else if (editorType === 'MCTrend') {
+                        returnArray.push({type: 'text', name: "contentFlavor", value: 'MCTrend'});
+                        returnArray.push({type: 'text', name: "trending1", value: $("#trending1").val()});
+                        returnArray.push({type: 'text', name: "trending2", value: $("#trending2").val()});
+                        returnArray.push({type: 'text', name: "trending3", value: $("#trending3").val()});
+                        returnArray.push({type: 'text', name: "trending4", value: $("#trending4").val()});
+                        returnArray.push({type: 'text', name: "trending1Link", value: $("#trending1Link").val()});
+                        returnArray.push({type: 'text', name: "trending2Link", value: $("#trending2Link").val()});
+                        returnArray.push({type: 'text', name: "trending3Link", value: $("#trending3Link").val()});
+                        returnArray.push({type: 'text', name: "trending4Link", value: $("#trending4Link").val()});
+                    } else if (editorType === 'ceoArticle') {
+                        returnArray.push({type: 'text', name: 'thumbnailImage', value: $('#thumbnailImage').val()});
+                        returnArray.push({type: 'text', name: 'ceoCategory', value: $('#ceoCategory').val()});
+                        returnArray.push({
+                            type: 'text',
+                            name: 'detailSidebar',
+                            value: $('#detailSidebar').is(':checked')
+                        });
+                        returnArray.push({type: 'text', name: 'ceoBannerImage', value: $('#ceoBannerImage').val()});
+                        returnArray.push({type: 'text', name: 'imageHero', value: $('#imageHero').val()});
+                        returnArray.push({type: 'text', name: 'body', value: CKEDITOR.instances['body'].getData()});
+                        returnArray.push({type: 'text', name: 'author', value: $('#author').val()});
+                        returnArray.push({type: 'text', name: 'authorTitle', value: $('#authorTitle').val()});
+                        returnArray.push({type: 'text', name: 'authorPhone', value: $('#authorPhone').val()});
+                        returnArray.push({type: 'text', name: 'authorEmail', value: $('#authorEmail').val()});
+                        returnArray.push({type: 'text', name: 'authorImage', value: $('#authorImage').val()});
+                        returnArray.push({type: 'text', name: "contentFlavor", value: 'ceoArticle'});
+                        returnArray.push({type: 'text', name: "relatedArticles", value: relatedArticlesString});
+                    }
+                    return returnArray;
+                });
+            });
+
+            $(document).ready(function () {
+                switch (editorType) {
+                    case 'webLink':
+                        var webLinkVal = '{!webLinkAsData}';
+                        var webLinkSplit = webLinkVal.split(',,,,');
+                        setTimeout(function () {
+                            $('#webLinkdlg .selected-page-label').text(webLinkSplit[1]);
+                        }, 300);
+                        break;
+
+                    case 'newsItem', 'MCTrend':
+                        var newsLinkVal = '{!newsLinkAsData}';
+                        var newsLinkSplit = newsLinkVal.split(',,,,');
+                        setTimeout(function () {
+                            $('#newsLinkDlg .selected-page-label').text(newsLinkSplit[1]);
+                        }, 300);
+                        break;
+
+                    case 'socialPost':
+                        var selectedLinkJSON =  {!IF(OR(socialLink.LinkJSON == null,socialLink.LinkJSON == ''), 'null',socialLink.LinkJSON)};
+                        $('#socialLink.selected-page-label').page_selector_input({
+                            selected: selectedLinkJSON,
+                            selected_name: '{!JSENCODE(socialLink.LinkName)}',
+                            showCategories: 'true'
+                        });
+                        break;
+                }
+            });
+        </script>
+        <style>
+            textarea {
+                display: block;
+                margin-top: 5px;
+                width: 290px;
+                height: 100px;
+            }
+
+            .authorInfo {
+                margin-top: 20px;
+                padding: 5px;
+                border: 1px solid #d0d0d0;
+                border-radius: 5px;
+                width: 350px;
+            }
+
+            .authorInfoTable {
+                width: 100%;
+            }
+
+            .authorInfoTable tr {
+                height: 45px;
+            }
+
+            .authorInfoTable td {
+                width: 125px;
+                max-width: 125px;
+                overflow: hidden;
+            }
+
+            .articleContainer,
+            .socialContainer,
+            .linkContainer,
+            .newsItemContainer,
+            .MCTrendContainer,
+            .ceoContainer {
+                display: none;
+            }
+
+            .defaultEmail {
+                display: none;
+            }
+
+            .authorContactInfo.disabled,
+            .authorContactInfo.disabled .ocmsLabel {
+                color: lightgray;
+            }
+
+            #charCount.over,
+            #charCountClipping1.over,
+            #charCountClipping2.over {
+                color: red;
+            }
+
+            #charCount.under,
+            #charCountClipping1.over,
+            #charCountClipping2.over {
+                color: #788E1E;
+            }
+        </style>
+
+        <style class="CKE_fix_for_small_content_templates_picker">
+            td.cke_dialog_contents_body {
+                height: auto;
+            }
+
+            div.cke_dialog_ui_vbox.cke_dialog_page_contents[name="selectTpl"] .cke_tpl_list {
+                height: 340px;
+            }
+        </style>
+
+        <div class="tileContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Common tile info</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="title">Title</label>
+                        <input class="ocmsTextInputLrg" id="title" name="title" type="text" value="{!title}"></input>
+                    </td>
+                </tr>
+                <tr class="tileSummaryRow">
+                    <td>
+                        <label class="ocmsLabel" for="summary">Summary</label>
+                        <textarea id="summary" name="summary" maxlength="180"><apex:outputText value="{!summary}"/></textarea>
+                        <p class="ocmsHelpText"><span id="charCount">180</span> characters remaining.</p>
+                        <p class="ocmsHelpText">
+                            Depending on the text, fewer than 180 characters will be displayed due to limited space.
+                        </p>
+                    </td>
+                </tr>
+                <tr class="ceoContainer">
+                    <td>
+                        <label class="ocmsLabel" for="ceoCategory">CEO message category</label>
+                        <select id="ceoCategory">
+                        </select>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="imageLoaderContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Article loader images</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr class="tileImageRow newsStreamRotatorImage">
+                    <td>
+                        <label class="ocmsLabel" for="newsStreamRotatorImage" title="Image for the homepage rotator">Homepage
+                            rotator image</label>
+                        <input type="hidden" name="newsStreamRotatorImage" id="newsStreamRotatorImage"
+                               value="{!newsStreamRotatorImage}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="newsStreamRotatorImage"
+                                           cImage="{!newsStreamRotatorImage}" type="Image" disabled="{!disableAll}"
+                                           DialogId="newsStreamRotatorImageId"/>
+                        <p class="ocmsHelpText">
+                            Image that will be on the news stream rotator.<br/>
+                            Image size is 471 x 312 pixels.
+                        </p>
+                    </td>
+                </tr>
+                <tr class="tileImageRow listPageRotatorImage">
+                    <td>
+                        <label class="ocmsLabel" for="listPageRotatorImage" title="Image for the list rotator image">List
+                            featured image</label>
+                        <input type="hidden" name="listPageRotatorImage" id="listPageRotatorImage"
+                               value="{!listPageRotatorImage}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="listPageRotatorImage"
+                                           cImage="{!listPageRotatorImage}" type="Image" disabled="{!disableAll}"
+                                           DialogId="listPageRotatorImageId"/>
+                        <p class="ocmsHelpText">
+                            Image that will be on the list page rotator.<br/>
+                            Image size is 718 x 534 pixels.
+                        </p>
+                    </td>
+                </tr>
+                <tr class="tileImageRow imageIcon">
+                    <td>
+                        <label class="ocmsLabel" for="imageIcon" title="Image for the article summary">Minor news
+                            image</label>
+                        <input type="hidden" name="imageIcon" id="imageIcon" value="{!imageIcon}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="imageIcon"
+                                           cImage="{!imageIcon}" type="Image" disabled="{!disableAll}"
+                                           DialogId="imageInput1"/>
+                        <p class="ocmsHelpText">
+                            Image for the minor news items on the news stream page.<br/>
+                            Image size is 199 x 146 pixels.
+                        </p>
+                    </td>
+                </tr>
+                <tr class="tileImageRow thumbnailImage">
+                    <td>
+                        <label class="ocmsLabel" for="thumbnailImage" title="Image for the article detail">Thumbnail
+                            image</label>
+                        <input type="hidden" name="thumbnailImage" id="thumbnailImage" value="{!thumbnailImage}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="thumbnailImage"
+                                           cImage="{!thumbnailImage}" type="Image" disabled="{!disableAll}"
+                                           DialogId="thumbImageDlg"/>
+                        <p class="ocmsHelpText">
+                            The small image for list page tiles.<br/>
+                            Minimum image size 80 x 80, please maintain a 1:1 image aspect ratio.
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="linkContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Web link</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="title">Link to</label>
+                        <select id="webLinkType">
+                            <option value="default">Please pick link type</option>
+                            <option value="webLink">Web Page</option>
+                            <option value="pdf">PDF</option>
+                            <option value="doc">MS-Word</option>
+                            <option value="excel">MS-Excel</option>
+                            <option value="zip">ZIP</option>
+                            <option value="othe">Other File</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="title">URL reference</label>
+                        <input type="hidden" id="webLink" name="webLink" value="{!webLinkAsData}"/>
+                        <cms:PageSelector cPassThroughId="webLink" value="{!webLinkAsData}" dialogId="webLinkdlg"
+                                          sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}"
+                                          token="{!token}"/>
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links.
+                            For Mission Control articles, please use the link provided from the share functionality instead
+                            of pasting the URL directly from the browser.
+                        </p>
+                        <input type="hidden" id="pageId" name="pageId" value="{!pageId}"/>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="socialContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Social post</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr>
+                    <td>
+                        <p><label for="twitter">
+                            <input type="radio" name="socialPost" value="twitter" id="twitter"/> twitter
+                        </label></p>
+                        <p><label for="facebook">
+                            <input type="radio" name="socialPost" value="facebook" id="facebook"/> facebook
+                        </label></p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="title">URL Reference</label>
+                        <input type="hidden" id="socialLink" name="socialLink" value="{!socialLinkAsData}"/>
+                        <div id="socialLink" class="selected-page-label"/>
+                        <!-- <cms:PageSelector cPassThroughId="socialLink" value="{!socialLinkAsData}"  dialogId="socialLinkDlg" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/> -->
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="newsItemContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">News Page Link</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="clipping1">Clipping 1 Title</label>
+                        <input class="ocmsTextInputLrg" id="clipping1" name="clipping1" type="text"
+                               value="{!clipping1}"></input>
+                    </td>
+                </tr>
+                <tr class="tileSummaryRow">
+                    <td>
+                        <label class="ocmsLabel" for="clipping1Summary">Clipping 1 Summary</label>
+                        <textarea id="clipping1Summary" name="clipping1Summary" maxlength="180"><apex:outputText value="{!clipping1Summary}"/></textarea>
+                        <p class="ocmsHelpText"><span id="charCountClipping1">180</span> characters remaining.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="clipping1Link">Clipping 1 Link</label>
+                        <input class="ocmsTextInputLrg" id="clipping1Link" name="clipping1Link" type="text"
+                               value="{!clipping1Link}"></input>
+                    </td>
+                </tr>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="clipping2">Clipping 2 Title</label>
+                        <input class="ocmsTextInputLrg" id="clipping2" name="clipping2" type="text"
+                               value="{!clipping2}"></input>
+                    </td>
+                </tr>
+                <tr class="tileSummaryRow">
+                    <td>
+                        <label class="ocmsLabel" for="clipping2Summary">Clipping 2 Summary</label>
+                        <textarea id="clipping2Summary" name="clipping2Summary" maxlength="180"><apex:outputText value="{!clipping2Summary}"/></textarea>
+                        <p class="ocmsHelpText"><span id="charCountClipping2">180</span> characters remaining.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="clipping2Link">Clipping 2 Link</label>
+                        <input class="ocmsTextInputLrg" id="clipping2Link" name="clipping2Link" type="text"
+                               value="{!clipping2Link}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="newsLink">Web page reference</label>
+                        <input type="hidden" id="newsLink" name="newsLink" value="{!newsLinkAsData}"/>
+                        <cms:PageSelector cPassThroughId="newsLink" value="{!newsLinkAsData}" dialogId="newsLinkDlg"
+                                          sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}"
+                                          token="{!token}"/>
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="MCTrendContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">News Page Link</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="trending1">Trending 1 Title</label>
+                        <input class="ocmsTextInputLrg" id="trending1" name="trending1" type="text"
+                               value="{!trending1}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="trending1Link">Trending 1 Link</label>
+                        <input class="ocmsTextInputLrg" id="trending1Link" name="trending1Link" type="text"
+                               value="{!trending1Link}"></input>
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links
+                        </p>
+                    </td>
+                </tr>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="trending2">Trending 2 Title</label>
+                        <input class="ocmsTextInputLrg" id="trending2" name="trending2" type="text"
+                               value="{!trending2}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="trending2Link">Trending 2 Link</label>
+                        <input class="ocmsTextInputLrg" id="trending2Link" name="trending2Link" type="text"
+                               value="{!trending2Link}"></input>
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links
+                        </p>
+                    </td>
+                </tr>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="trending3">Trending 3 Title</label>
+                        <input class="ocmsTextInputLrg" id="trending3" name="trending3" type="text"
+                               value="{!trending3}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="trending3Link">Trending 3 Link</label>
+                        <input class="ocmsTextInputLrg" id="trending3Link" name="trending3Link" type="text"
+                               value="{!trending3Link}"></input>
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links
+                        </p>
+                    </td>
+                </tr>
+                <tr class="tileTitleRow">
+                    <td>
+                        <label class="ocmsLabel" for="trending4">Trending 4 Title</label>
+                        <input class="ocmsTextInputLrg" id="trending4" name="trending4" type="text"
+                               value="{!trending4}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="trending4Link">Trending 4 Link</label>
+                        <input class="ocmsTextInputLrg" id="trending4Link" name="trending4Link" type="text"
+                               value="{!trending4Link}"></input>
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links
+                        </p>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="articleContainer">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Article detail</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr class="ceoContainer">
+                    <td>
+                        <label class="ocmsLabel" for="ceoBannerImage">CEO article banner image (optional)</label>
+                        <input type="hidden" name="ceoBannerImage" id="ceoBannerImage" value="{!ceoBannerImage}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="ceoBannerImage"
+                                           cImage="{!ceoBannerImage}" type="Image" disabled="{!disableAll}"
+                                           DialogId="ceoBannerImageDlog"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="detailSidebar">Sidebar</label>
+                        <input type="checkbox" id="detailSidebar" name="detailSidebar" value="detailSidebar">Show detail
+                        sidebar</input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="imageHero">Article image (required when sidebar is shown)</label>
+                        <input type="hidden" name="imageHero" id="imageHero" value="{!imageHero}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="imageHero"
+                                           cImage="{!imageHero}" type="Image" disabled="{!disableAll}"
+                                           DialogId="imageInput2"/>
+                        <p class="ocmsHelpText">
+                            Recommended image size 255 px x 150 px<br/>
+                            Please maintain a 1.7:1 aspect ratio.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="adHocTags">Ad hoc topics</label>
+                        <input id="adHocTags" name="adHocTags" type="text" value="" style="width:300px;"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="articleAuthor">Author search</label>
+                        <input id="articleAuthor" name="articleAuthor" type="text" value=""
+                               style="width:300px;"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="author">Author name</label>
+                        <input class="ocmsTextInputLrg" id="author" name="author" type="text" value="{!author}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="authorTitle">Author title</label>
+                        <input class="ocmsTextInputLrg" id="authorTitle" name="authorTitle" type="text"
+                               value="{!authorTitle}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="authorPhone">Author phone</label>
+                        <input class="ocmsTextInputLrg" id="authorPhone" name="authorPhone" type="text"
+                               value="{!authorPhone}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="authorEmail">Author email</label>
+                        <input class="ocmsTextInputLrg" id="authorEmail" name="authorEmail" type="text"
+                               value="{!authorEmail}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="authorEmail">Author image</label>
+                        <input type="hidden" name="authorImage" id="authorImage" value="{!authorImage}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="authorImage"
+                                           cImage="{!authorImage}" type="Image" disabled="{!disableAll}"
+                                           DialogId="authorImageInput"/>
+                        <p class="ocmsHelpText">
+                            Recommended image size 80 px x 80 px.<br/>
+                            Please maintain a 1:1 aspect ratio.
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="defaultEmail">Related articles</label>
+                        <input id="relatedArticles" name="relatedArticles" type="text" value=""
+                               style="width:300px;"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="body">Article body text</label>
+                        <textarea id="body" name="body">
+                                <apex:outputText value="{!body}"/>
+                            </textarea>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- This is a fix for a past publishing issue in OCMS Spring '15. OCMS Summer '15 fixes the issue. -->
+        <div class="pastPublishingFix">
+            <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Past Publishing Fix</h3>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tbody>
+                <tr class="pastPublishingContainer">
+                    <td>
+                        <label class="ocmsLabel" for="pastPublishingFix">Past Publish Date</label>
+                        <div id="pastPublishingFix">
+                            <input type="hidden" id="pastPublishingFixInput"/>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="pastPublishingSubmitContainer">
+                    <td>
+                        <button class="pastPublishingSubmit">Update</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <script>
+            var currentStart = '{!content.cms__Original_Published_Start_Date__c}';
+            if (currentStart) {
+                currentStart = new Date(currentStart);
+                currentStart = currentStart.toISOString();
+                currentStart = currentStart.replace('T', ' ');
+                currentStart = currentStart.substring(0, currentStart.indexOf('.'));
+            }
+            $('#pastPublishingFix').datetime_selector({
+                passThruId: '#pastPublishingFixInput',
+                type: 'datetime',
+                value: currentStart
+            });
+
+            $(function () {
+                $('.pastPublishingContainer input').removeAttr('disabled');
+            });
+
+            $('.pastPublishingSubmit').click(function () {
+                var dtString = $('#pastPublishingFixInput').val();
+                var dtParts = dtString.match(/(\d{4})-(\d{1,2})-(\d{1,2}) (\d{2}):(\d{2}):(\d{2})/);
+                var d = new Date(dtParts[1], dtParts[2] - 1, dtParts[3], dtParts[4], dtParts[5], dtParts[6]);
+                $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_Article', {
+                    action: 'updateOriginPublishStartDate',
+                    contentId: '{!content.Id}',
+                    startDate: JSON.stringify(d)
+                });
+            });
+        </script>
+        <!-- End past publishing fix -->
+    </apex:outputPanel>
+
+    <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+</apex:page>

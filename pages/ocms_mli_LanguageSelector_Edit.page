@@ -1,0 +1,151 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_LanguageSelector" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+    <script type="text/javascript" language="javascript">
+
+        function initLanguageTable(){
+
+            var availableLanguages = '{!jsnAvailableLanguages}';
+            var jsnLanguageButtons = '{!jsnLanguageButtons}';
+
+            console.log(availableLanguages);
+            console.log(jsnLanguageButtons);
+
+            if(availableLanguages != ''){
+                availableLanguages = JSON.parse(availableLanguages);
+            } else {
+                availableLanguages = {};
+            }
+
+            if(jsnLanguageButtons != ''){
+                jsnLanguageButtons = JSON.parse(jsnLanguageButtons);
+            } else {
+                jsnLanguageButtons = {};
+            }
+
+            if (!$.isEmptyObject(availableLanguages)){
+                for (var key in availableLanguages){
+                    if (availableLanguages.hasOwnProperty(key)){
+                        
+                        var inputVal = '';
+                        var accLanguage = '';
+
+                        if(jsnLanguageButtons[key] !== undefined){
+                            inputVal = jsnLanguageButtons[key].inputVal;
+                            accLanguage = jsnLanguageButtons[key].accLanguage;
+                        }
+                        addRow(key, availableLanguages[key], inputVal, accLanguage);
+
+                    }
+                }
+            }
+
+            if({!disableAll}){
+                $('#languageTable tr td input').attr('readonly',true);
+            }
+
+        }
+
+        function addRow(code, language, inputVal, accLanguage){
+            var rowString = '<tr>' +
+                                '<td>' +
+                                    language +
+                                    '<input type="hidden" name="langCode" value="' + code + '">' + 
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="inputVal" type="text" value="' + inputVal + '"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="accLanguage" type="text" value="' + accLanguage + '"></input>' +
+                                '</td>' +
+                            '</tr>';
+            $('#languageTable tbody').append(rowString);
+        }
+
+        $(document).ready(function(){
+
+            initLanguageTable();
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+                var languageButtons = {};
+                
+                $('#languageTable tbody tr').each(function(){
+
+                    var code = $(this).children().children('input[type=hidden]').val();
+                    var inputVal = $(this).children().children('.inputVal').val();
+                    var accLanguage = $(this).children().children('.accLanguage').val();
+
+                    if(code !== '' && inputVal !== ''){
+                        languageButtons[code] = { inputVal: inputVal, accLanguage: accLanguage };
+                    }
+                    
+                });
+
+                languageButtons = JSON.stringify(languageButtons);
+                console.log(languageButtons);
+
+                attributes.push({"name":"jsnLanguageButtons", "value": languageButtons, "type": "Text", "simple": false})
+
+                return attributes;
+
+            });
+        });
+
+    </script>
+    <style>
+        .disabled thead tr th {
+            color: #5b5b5b;
+        }
+    </style>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <td>
+                    <label class="ocmsLabel" for="languageTable">Language buttons</label>
+                    <apex:outputText escape="false" rendered="{!disableAll}">
+                        <div id="errorMessage" style="display:none;"></div>
+                        <table id="languageTable" style="border:1px dashed #cdcdcd;" class="disabled">
+                            <thead>
+                                <tr>
+                                    <th width="30%">
+                                        Language
+                                    </th>
+                                    <th width="35%">
+                                        Button text
+                                    </th>
+                                    <th width="35%">
+                                        Language name
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </apex:outputText>
+                    <apex:outputText escape="false" rendered="{!!disableAll}">
+                        <div id="errorMessage" style="display:none;"></div>
+                        <table id="languageTable" style="border:1px solid black;">
+                            <thead>
+                                <tr>
+                                    <th width="30%">
+                                        Language
+                                    </th>
+                                    <th width="35%">
+                                        Button text
+                                    </th>
+                                    <th width="35%">
+                                        Language name
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </apex:outputText>
+                </td>
+            </table>
+        </form>
+    </apex:outputPanel>
+    
+</apex:page>

@@ -1,0 +1,207 @@
+<!-- ocms_mfc_i_globalNavTools.page -->
+<apex:page showHeader="false" sidebar="false" controller="cms.CoreController" cache="false" standardStylesheets="false">
+    <script type="text/javascript">
+        $(document).ocmsDynamicLoadFinished(function () {
+            // generate navigation icons
+            const data = JSON.parse(MFC.sitePreferences.uiTopIconsGroup);
+            data.topIcons.forEach(function(topIcon){
+                const isExternal = topIcon.link.indexOf('http') !== -1 ? 'target="_blank"' : '';
+                const notMobile = topIcon.isMobile === true ? '' : 'notMobile';
+                $('#uiLabelSearch').before(
+                    '<li class="icon naviIcons ' + topIcon.name + ' i18nTitle ' + notMobile + '" title="' + topIcon.tooltip + '" style="background-image: url(' + topIcon.icon + ');" >' +
+                        (topIcon.tooltip === 'Notifications'? '' : ('<a id="' + topIcon.name + '"href="' + topIcon.link + '" ' + isExternal + '></a>')) +
+                    '</li>'
+                );
+            });
+
+            // Get notifications
+            $('#global-navigation nav .default-bar .side ul .naviIcons.notifications').html('<div class="count"  style="display: none;"><span>0</span></div>');
+            MFC.fLoadUnreadNotifications();
+
+            // Notification analytics
+            $('#global-navigation nav .default-bar .side ul .naviIcons.notifications').click(function(){
+                clickTracking('topNav', 'notification');
+            });
+
+            // Other nav bar item analytics
+            $('.naviIcons a').click(function(){
+                // Tools' ID is "launchpad"
+                clickTracking('topNav', $(this).attr('id') === 'launchpad' ? 'tools' : $(this).attr('id'), $(this).attr('href'));
+            });
+
+            $('.naviIcons a').contextmenu(function(){
+                // Tools' ID is "launchpad"
+                clickTracking('topNav', $(this).attr('id') === 'launchpad' ? 'tools' : $(this).attr('id'), $(this).attr('href'));
+            });
+
+            /* BrandHub click tracking */
+            $('.widget.brandhub-widget .widget-content a').click(function(){
+                clickTracking('widget', 'brand_hub', $(this).attr('href'));
+            });
+            $('.widget.brandhub-widget .widget-content a').contextmenu(function(){
+                clickTracking('widget', 'brand_hub', $(this).attr('href'));
+            });
+        });
+
+        $( window ).unload(function() {
+            document.cookie = "last_mfc_page=" + window.location.href;
+        });
+    </script>
+
+    <div>
+        <div id="global-navigation">
+            <nav>
+                <div class="default-bar">
+                    <div class="side">
+                        <div class="fill-bg"></div>
+                        <ul>
+                            <li class="icon bg menu">
+                                <div class="bars">
+                                    <div class="bar"></div>
+                                    <div class="bar"></div>
+                                </div>
+                                <!-- turn off google indexing of the following content -->
+                                <apex:outputText value=" <" escape="false" />!--googleoff: all--<apex:outputText value="> " escape="false" />
+                                <div class="title">
+                                    <span id="uiLabelMenu" class="i18n"><!-- uluiLabelMenu --></span>
+                                    <!-- DS,2016-jul-12, removed as per "IE-033,IE-034" <span id="uiLabelClose" class="i18n">Close</span> -->
+                                </div>
+                                <!-- resume google indexing of the following content -->
+                                <apex:outputText value=" <" escape="false" />!--googleon: all--<apex:outputText value="> " escape="false" />
+                            </li>
+                            <li class="title">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                    <strong>PlainText</strong> ❧ page group or web site section title
+                                </div></apex:outputText>
+                                <h1 id="pageGroupTitle"><cms:Panel panelName="pageGroupTitle" panelController="{!controller}" panelWidth="550px"
+                                                                   panelHeight="20px" panelContentLayouts="PlainText" panelLimit="1"
+                                /></h1>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- turn off google indexing of the following content -->
+                    <apex:outputText value=" <" escape="false" />!--googleoff: all--<apex:outputText value="> " escape="false" />
+                    <div class="side">
+                        <ul>
+                            <li class="icon bg search i18nTitle" id="uiLabelSearch" title="Search">
+                                <a href="cms__Main?name=Search"></a>
+                            </li>
+                        </ul>
+                    </div>
+
+
+                    <!-- resume google indexing of the following content -->
+                    <apex:outputText value=" <" escape="false" />!--googleon: all--<apex:outputText value="> " escape="false" />
+                </div>
+
+                <!-- turn off google indexing of the following content -->
+                <apex:outputText value=" <" escape="false" />!--googleoff: all--<apex:outputText value="> " escape="false" />
+
+                <div class="back">
+                    <a href="#"><span id="uiLabelBack" class="i18n">Back</span></a>
+                </div>
+
+                <div class="notifications-bar">
+                    <div class="center v-align">
+                        <div class="inner">
+                            <!-- <h2>Notifications</h2> -->
+                            <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                <strong>PlainText</strong> ❧ Notifications banner label
+                            </div></apex:outputText>
+                            <h2><cms:Panel panelName="NotificationsLabel" panelController="{!controller}" panelWidth="550px"
+                                           panelHeight="20px" panelContentLayouts="PlainText" panelLimit="1"
+                            /></h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="launchpad-bar">
+                    <div class="center v-align">
+                        <div class="inner">
+                            <!-- <h2>Launchpad</h2> -->
+                            <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                <strong>PlainText</strong> ❧ LaunchPad banner label
+                            </div></apex:outputText>
+                            <h2><cms:Panel panelName="launchPadLabel" panelController="{!controller}" panelWidth="550px"
+                                           panelHeight="20px" panelContentLayouts="PlainText" panelLimit="1"
+                            /></h2>
+                        </div>
+                    </div>
+                </div>
+                <!-- resume google indexing of the following content -->
+                <apex:outputText value=" <" escape="false" />!--googleon: all--<apex:outputText value="> " escape="false" />
+            </nav>
+        </div><!-- #global-navigation -->
+
+        <div class="content-layer notifications-layer sticky-footer-fix">
+            <div class="content-wrap">
+                <div id="global-notifications">
+                    <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsEditPlaceholder">
+                        An up-to-date collection of personalized notifications will automatically appear here on the published page.
+                    </div></apex:outputText>
+                </div>
+                <div id="global-notifications-show-more">
+                    <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsEditPlaceholder">
+                        The text below will be substituted with the “Show More” button text as defined within Site Preferences.
+                    </div></apex:outputText>
+
+                    <a class="global-show-more">
+                        <span id="uiLabelShowMore" class="i18n">Show More</span>
+                        <img src="{!URLFOR($Resource.ocms_mfc_siteFiles, '/img/global-show-more-sm.gif')}" alt="…" />
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-layer launchpad-layer sticky-footer-fix">
+            <div class="content-wrap">
+                <nav id="global-launchpad">
+                    <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                        <strong>TextBlock – LaunchPad tab label</strong><br />
+                        ❧ see detailed edit instructions (click ?)
+                        <div class="ocmsInstructions expandy">
+                            <ul>
+                                <li>each tab label must within a &lt;a class="tab" href="#"&gt;INSERT LABEL HERE&lt;/a&gt;</li>
+                                <li>both tab label links must be wrapped by a single be &lt;div class="global-content-tabs"&gt; … &lt;/div&gt; container</li>
+                                <li>copy the markup below and paste it into the HTML <i>Source View</i> within the text editor</li>
+                                <li>remember to translate the tab labels as necessary</li>
+                            </ul>
+                            <pre>&lt;div class="global-content-tabs"&gt;
+                              &lt;a class="tab selected" href="#"&gt;My Apps&lt;/a&gt;
+                              &lt;a class="tab " href="#"&gt;Bookmarks&lt;/a&gt;
+                            &lt;/div&gt;
+                            </pre>
+                        </div>
+                    </div></apex:outputText>
+                    <cms:Panel panelName="launchPadTabs" panelController="{!controller}" panelWidth="550px"
+                               panelHeight="20px" panelContentLayouts="TextBlock" panelLimit="1" />
+
+                    <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsEditPlaceholder">
+                        The user’s personal collection of “Apps” will automatically appear here on the published page.
+                    </div></apex:outputText>
+                    <div class="tab-content apps-tab selected">
+                        <footer>
+                            <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                                <strong>TextBlock</strong> ❧ label for the LaunchPad’s “Manage Apps” link<br />
+                                – must be of the form <code>&lt;a href="#"&gt;INSERT LABEL HERE&lt;/a&gt;</code>
+                            </div></apex:outputText>
+                            <cms:Panel panelName="manageAppsLabel" panelController="{!controller}" panelWidth="550px"
+                                       panelHeight="20px" panelContentLayouts="TextBlock" panelLimit="1" />
+                        </footer>
+                    </div>
+
+                    <div class="tab-content bookmarks-tab">
+                        <apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                            <strong>Bookmark List</strong> ❧ personal list of favourite links
+                        </div></apex:outputText>
+                        <cms:Panel panelName="bookmarkList" panelController="{!controller}" panelWidth="550px"
+                                   panelHeight="20px" panelContentLayouts="BookmarkList" panelLimit="1" />
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+</apex:page>
+
+<!-- ocms_mfc_i_globalNavTools.page -->

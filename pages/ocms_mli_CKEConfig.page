@@ -1,0 +1,62 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" contentType="text/javascript">
+
+/**
+ *
+ *  The content editor page will reference this like so, for a textarea with the id of 'richText'
+ *      CKEDITOR.replace('richText', {
+ *         customConfig: '/apex/c__ocms_mli_CKEConfig',
+ *      });
+ *
+ */
+
+CKEDITOR.editorConfig = function(config) {
+
+    // Define changes to default configuration here. For example:
+    // config.language = 'fr';
+    // config.uiColor = '#AADC6E';
+    CKEDITOR.config.toolbar = 'Custom';
+
+    CKEDITOR.config.toolbar_Custom =
+    [
+        { name: 'document',     items : [ 'Source','-', 'Templates'] },
+        { name: 'clipboard',    items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+        { name: 'editing',      items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] },
+        '/',
+        { name: 'basicstyles',  items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
+        { name: 'paragraph',    items : [ 'NumberedList','BulletedList','CustomUL','-','Outdent','Indent','-','Blockquote','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl' ] },
+        { name: 'links',        items : [ 'Link','Unlink','Anchor' ] },
+        { name: 'insert',       items : [ 'OrchestraCMSImage','orchestracmsimage','OrchestraCMSFlash','Table','HorizontalRule','SpecialChar'] },
+        { name: 'styles',       items : [ 'Format' ] },
+        { name: 'tools',        items : [ 'Maximize'] }
+    ];
+
+    CKEDITOR.config.contentsCss = ["{!URLFOR($Resource.ocms_mli_pageSupport, 'css/hw-mli.css')}"];
+    CKEDITOR.config.bodyClass = 'generic-content';
+    CKEDITOR.config.allowedContent = true;
+
+    CKEDITOR.plugins.addExternal('customUL',  "{!URLFOR($Resource.ocms_mli_CKEditorExtras, 'js/customUL/')}");
+
+    // use the instanceReady() function to dynamically add a script element to the current page that will
+    // add one or more template sets, each with one or more CKEditor content templates
+    CKEDITOR.on('instanceReady', function(evt) {
+        var setsScript = document.createElement('script');
+        setsScript.className = 'ocms_mli_CKETemplateSets';
+        setsScript.type = 'text/javascript';
+        setsScript.src = '{!URLFOR("/apex/ocms_mli_CKETemplateSets")}';
+        document.getElementsByTagName('HEAD').item(0).appendChild(setsScript);
+    });
+
+    // bad things happen if named plugins are not present!
+    // no space in this comma separated list
+    config.extraPlugins = 'templates,customUL';
+
+    // specify which template sets defined above by /apex/ocms_mli_CKETemplateSets.page will be used when
+    // this CKEConfig page has been referenced by the content editor page
+    // no space in this comma separated list!
+    config.templates = 'MLI-Generic';
+
+    // insert content template at insertion point; don’t replace the whole darn editor text
+    config.templates_replaceContent = false;
+};
+
+</apex:page>

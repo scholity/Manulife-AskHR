@@ -1,0 +1,81 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_ListingCarousel" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+	<apex:stylesheet value="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"/>
+	<script src="{!URLFOR($Resource.ocms_mfc_pageSupport, 'js/tagPathSelector.js')}"></script>
+	<script type="text/javascript" language="javascript">
+		var ListPageContentTypes;
+		
+		$(document).ready(function() {
+			var $contentTypeSelect = $("#contentTypeSelect");
+
+			// extended styles not appropriate for this CKEditor
+			ce.content_editor('registerSaveFunction', function () {
+				return [
+					{type: 'Text', simple: true, name: 'category', value: $('#category').val()},
+					{type: 'Text', simple: true, name: 'contentType', value: $('#contentTypeSelect option:selected').data('contenttype')},
+					{type: 'Text', simple: true, name: 'hideTilesLikeAction', value: $('#hideTilesLikeAction').is(':checked')},
+                    {type: 'Text', simple: true, name: 'hideTilesShareAction', value: $('#hideTilesShareAction').is(':checked')}
+                    
+				];
+			});
+			
+			$('#hideTilesShareAction').attr('checked', '{!hideTilesShareAction}' === 'true');
+            $('#hideTilesLikeAction').attr('checked', '{!hideTilesLikeAction}' === 'true');
+			
+			if (!{!disableAll}) {
+				initializeTagPathSelectors();
+			}
+			
+					
+			var requestParams = {
+		        action: 'getContentTypes',
+		        contentTemplate: '{!contentTemplate}'
+		    };
+		    
+		    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_ListPage', 
+				requestParams,
+				function (textStatus, json, xhr) {
+				 	ListPageContentTypes = json.contentTypes;
+				    $.each(json.contentTypes, function(i, value) {
+				   		$contentTypeSelect.append('<option data-contentType="' + value.name + '" value="' + value.id + '">' + value.label + '</option>');
+					});
+
+			    	// Find the selected content option and select it if it exist
+				    if ('{!contentType}') {
+				   		$('option[data-contenttype="{!contentType}"]').attr('selected', 'selected');
+				    }
+				}
+			);
+		});
+	</script>
+	<apex:outputPanel layout="block">
+		<form>
+			<table class="ocmsContentEditor ocmsContentEditorNested">
+				<tr>
+					<td>
+						<label class="ocmsLabel">Category</label><!-- Filter Bar Taxonomy Parent-->
+						<div class="taxSelect">
+							<input class="ocmsTextInputLrg" type="text" name="category" id="category" value="{!category}"/>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="contentTypeSelect">Content Type</label>
+						<select id="contentTypeSelect"></select>
+					</td>
+				</tr>
+
+                <tr>
+                    <td>
+                        <label><input type="checkbox" id="hideTilesLikeAction" name="hideTilesLikeAction" />
+                            Hide 'like' actions in tiles if present</label>
+                        <br />
+                        <label><input type="checkbox" id="hideTilesShareAction" name="hideTilesShareAction" />
+                            Hide 'share' actions in tiles if present</label>
+                        <br />
+                    </td>
+                </tr>
+			</table>
+		</form>
+	</apex:outputPanel>
+</apex:page>

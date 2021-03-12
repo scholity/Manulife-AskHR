@@ -1,0 +1,67 @@
+<apex:page standardController="mli_Quarterly_Report__c" extensions="ml_mli_ReportAttachmentController" >
+    <style>
+        .list{
+        border: 1px solid #e0e3e5;
+        }
+        .header{
+        border:solid 1px; 
+        background:#f2f3f3;
+        border-color:#e0e3e5;
+        font-weight:bold;
+        font-size: .95em;
+        color: #000;
+        padding: 5px 2px 4px 5px;
+        }
+        
+        .rowClass .actionLink{      	
+        color: #015ba7;
+        text-decoration: none;
+        font-weight: normal;
+        } 
+    </style>
+    <apex:form >
+        <apex:commandButton onclick="window.open('/p/attach/NoteAttach?pid={!mReport.Id}&retURL={!mReport.Id}','_top');" value="New Attachment" style="margin-bottom: 1em;" rendered="{!IF(mCount == 0 && $ObjectType.mli_Quarterly_Report__c.updateable, true,false)}"/>
+        <div style="{!IF(mCount >= 1, 'display:block;','display:none;')}">
+            <apex:dataTable cellpadding="0" cellspacing="0" value="{!attachments}" width="100%" var="attachment" id="theAttachments" styleClass="list" border="0.2em" headerClass="header" rowClasses="rowClass">
+            <apex:column >
+                <apex:facet name="header" >Action</apex:facet>
+                <apex:outputLink styleClass="actionLink" rendered="{!$ObjectType.mli_Quarterly_Report__c.deletable}" target="_top" value="{!URLFOR($Action.Attachment.Delete,attachment.Id, [retURL='/' + attachment.ParentId], true)}" onClick="return confirmDelete()">Del | </apex:outputLink>
+                <apex:outputLink styleClass="actionLink" target="_top" value="/apex/ml_mli_UploadAttachmentPage?attachmentId={!attachment.Id}" rendered="{!$ObjectType.mli_Quarterly_Report__c.updateable}"> Replace | </apex:outputLink>
+                <apex:outputLink value="/servlet/servlet.FileDownload?file={!attachment.Id}" target="_blank" styleClass="actionLink"> View</apex:outputLink>
+            </apex:column>
+            <apex:column >
+                <apex:facet name="header">Name</apex:facet>
+                <apex:outputText value="{!attachment.name}"/>
+            </apex:column> 
+            <apex:column >
+                <apex:facet name="header">Description</apex:facet>
+                <apex:outputText value="{!attachment.Description}"/>
+            </apex:column>
+            <!-- <apex:column >
+            <apex:facet name="header">ContentType</apex:facet>
+            <apex:outputText value="{!attachment.ContentType}"/>
+            </apex:column> -->
+            <apex:column >
+                <apex:facet name="header">Last Modified By</apex:facet>
+                <apex:outputField value="{!attachment.LastModifiedBy.Name}"/>
+            </apex:column>   
+            <apex:column >
+                <apex:facet name="header">Last Modified Date</apex:facet>
+                <apex:outputField value="{!attachment.LastModifiedDate}"/>
+            </apex:column>            
+        </apex:dataTable> 
+        </div>
+        <p>            
+        	<apex:outputText rendered="{!IF(mCount >= 1, false,true)}" value="No attachment available"/>
+        </p>
+    </apex:form>
+    <script type="text/javascript">
+    function confirmDelete(){
+        if (confirm('Are you sure?')) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    </script>
+</apex:page>

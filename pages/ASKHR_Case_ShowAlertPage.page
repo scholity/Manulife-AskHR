@@ -1,0 +1,14 @@
+<apex:page standardController="Case" extensions="ASKHR_CaseExtension" >
+    <apex:stylesheet value="{!$Resource.alertsCSS}" />
+    <apex:stylesheet value="{!$Resource.warningIcon}" />
+    
+    <apex:form rendered="{!Case.Display_Alert__c == true}">
+        
+        <warning>
+            <img src="{!$Resource.warningIcon}" border="0" />
+            <apex:outputText value="{!Case.Alert_Message__c}" /><apex:commandLink id="cmdLink" value="(Dismiss)" action="{!DismissAlert}" />
+        </warning>      
+        
+    </apex:form>
+
+</apex:page>

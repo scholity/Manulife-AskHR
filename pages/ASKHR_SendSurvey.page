@@ -1,0 +1,29 @@
+<apex:page controller="ASKHR_SendSurveyController" showHeader="false" sidebar="false" >
+    <script type="text/javascript">   
+        if({!SurveysSuccessfullySent} == true)
+        {           
+            window.alert('Survey(s) successfully sent.');
+            window.close();
+        }       
+        else if({!Cancelling} == true)
+        {
+            window.close();
+        }
+    </script>
+    <apex:pageMessages rendered="{!renderButton}"></apex:pageMessages> 
+    <apex:form > 
+        <apex:pageBlock >       
+            <apex:pageBlockSection columns="1"> 
+                Send Survey(s) out for Case {!CaseNumber}
+                <apex:inputField value="{!Recipient1.Contact__c}" label="Recipient 1:" />
+                <apex:inputField value="{!Recipient2.Contact__c}" label="Recipient 2:" />
+                <apex:inputField value="{!Recipient3.Contact__c}" label="Recipient 3:" />
+                <apex:inputField value="{!Recipient4.Contact__c}" label="Recipient 4:" />                                
+            </apex:pageBlockSection>             
+            <apex:pageBlockButtons location="bottom" style="width:200px"  >
+                <apex:commandButton value="Cancel" action="{!Cancel}" immediate="true" />                                           
+                <apex:commandButton value="Send Survey" action="{!SendSurvey}" disabled="{!disableButton}"/>
+            </apex:pageBlockButtons>            
+        </apex:pageBlock>
+    </apex:form>
+</apex:page>

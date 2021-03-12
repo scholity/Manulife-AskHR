@@ -1,0 +1,8 @@
+<apex:component access="global" controller="ASKHR_EmailTemplateVFCompController">
+    <apex:attribute name="relatedToId" access="global" description="Attribute for relatedTo Id" type="String" required="required" assignTo="{!mRelatedToId}" />
+    <apex:attribute name="recipientId" access="global" description="Attribute for recipient Id" type="String" required="required" assignTo="{!mRecipientId}" />
+       
+    <apex:attribute name="inputLabel" access="global" description="Attribute for input from Custom Label" type="String" required="required" assignTo="{!mInput}" />
+
+    <apex:outputText value="{!mOutput}"></apex:outputText>
+</apex:component>

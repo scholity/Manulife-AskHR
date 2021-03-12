@@ -1,0 +1,53 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_LinkTile" showHeader="false" sidebar="false" cache="false" title="OrchestraCMS" standardStylesheets="false">
+	<apex:outputPanel layout="block">
+    	
+    	<link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/ocms-reset+support.css')}" rel="stylesheet" type="text/css"/>
+        <link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+        rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+        <script type="text/javascript" src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+
+		<script type="text/javascript" language="javascript">
+			$(document).ready(function() {
+			    ce.content_editor('registerSaveFunction', function() {
+			        
+			        var returnArray = [ 
+			            {type: 'text', name: 'linkImage', value: $('#linkImage').val()},
+			            {type: 'text', name: 'linkText', value: $('#linkText').val()},
+			            {type: 'text', name: 'link', value: $('#link').val()},
+			        ];
+
+			        return returnArray;
+			    });
+			});
+		</script>
+
+    	<div class="tileContainer">
+    	    <h3 class="OCMSExpandyNext ocmsEditorSubtitle">Common tile info</h3>
+    	    <table class="ocmsContentEditor ocmsContentEditorNested">
+    	        <tbody>
+    	            <tr><td>
+    	                <label class="ocmsLabel" for="linkImage" title="Image for the link tile">Tile image</label>
+    	                <input type="hidden" name="linkImage" id="linkImage" value="{!linkImage}" />
+    	                <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="linkImage" cImage="{!linkImage}" type="Image" disabled="{!disableAll}" DialogId="thumbImageDlg"/>
+    	                <p class="ocmsHelpText">
+    	                    Required image size of 310 x 130 pixels, or else image distortion will occur.  
+    	                </p>
+    	            </td></tr>
+    	            <tr class="tileTitleRow"><td>
+    	                <label class="ocmsLabel" for="linkText">Text</label>
+    	                <input class="ocmsTextInputLrg" id="linkText" name="linkText" type="text" value="{!linkText}"></input>
+    	            </td></tr>
+    	            <tr><td>
+                        <label class="ocmsLabel" for="title">Link</label>
+                        <input type="hidden" id="link" name="link" value="{!linkAsData}" />
+                        <cms:PageSelector cPassThroughId="link" value="{!linkAsData}"  dialogId="linkDlg" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+                        <p class="ocmsHelpText">
+                            Please enter "http://" before external links
+                        </p>
+                    </td></tr>
+    	        </tbody>
+    	    </table>
+    	</div>
+
+    </apex:outputPanel>
+</apex:page>

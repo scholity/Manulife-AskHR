@@ -1,0 +1,89 @@
+<!-- ocms_mfc_App_Edit.page -->
+<!--
+    This is the OrchestraCMS content editor page for "App" custom content
+    
+    2015-Mar-13 Wilder
+        - original
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_App"
+    showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+    
+    <link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+        rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+
+    <apex:outputPanel layout="block">
+
+    <script id="ocms_application_Edit">
+        $(document).ready(function() {
+            ce.content_editor('registerSaveFunction', function() {             
+                return [
+                    {type: 'text', name: 'iDisplayPriority',   value: $('#iDisplayPriority').val()},
+                    {type: 'text', name: 'title',       value: $('#title').val().replace(';', '')}, //strip ';' characters that we leverage a divider in `ocms_mfc_App`'
+                    {type: 'text', name: 'imageIcon',   value: $('#imageIcon').val()},
+                    {type: 'text', name: 'link',        value: $('#link').page_selector_input('getSerializedLink')},
+                    {type: 'text', name: 'summary',     value: $('#summary').val()},
+                    {type: 'text', name: 'tutorial',    value: CKEDITOR.instances.tutorial.getData()},
+                    {type: 'text', name: 'embedLink',   value: $('#embedLink').val()},
+                ];
+            });
+
+            var selectedLinkJSON =  {!IF(OR(link.LinkJSON == null,link.LinkJSON == ''), 'null',link.LinkJSON)};
+            $('#link').page_selector_input({
+                selected: selectedLinkJSON,
+                selected_name: '{!JSENCODE(link.LinkName)}',
+                showCategories: 'true'
+            });
+
+            //CKEDITOR.replace('tutorial');
+            CKEDITOR.replace('tutorial', $.extend({
+                readOnly: false
+            }, {!CKEditorConfig}));
+        });
+
+
+    </script>
+
+    <table class="ocmsContentEditor ocmsContentEditorNested">
+            <tr><td>
+                <label class="ocmsLabel" for="iDisplayPriority" >Display Priority</label>
+                <input type='number' id="iDisplayPriority"  value="{!iDisplayPriority}"/>
+                <p class="ocmsHelpText">
+                    When rendering apps in a list they will be ordered by this value in descending order followed alphabetically ascending by the app's 'Title' value, negative values are permitted.  
+                </p>
+                </td></tr>
+            <tr><td>
+                <label class="ocmsLabel" for="title" title="The application name">Title</label>
+                <input type='text' id="title" placeholder="application name" value="{!title}"/>
+                <p class="ocmsHelpText">
+                    Please note <kbd>;</kbd> character is not allowed and will be stripped.   
+                </p>
+            </td></tr>
+            <tr><td>
+                <label class="ocmsLabel" for="link" title="The application link">Link</label>
+                <div id="link" />
+            </td></tr>
+            <tr><td>
+                <label class="ocmsLabel" for="summary" title="The application description">Description</label>
+                <textarea  id="summary" name="summary" rows="8" cols="46"><apex:outputText value="{!summary}" /></textarea> 
+            </td></tr>
+            <tr><td>
+                <label class="ocmsLabel" for="embedLink" title="Embed link">Tutorial video embed code</label>
+                <textarea  id="embedLink" name="embedLink" rows="3" cols="46"><apex:outputText value="{!embedLink}" /></textarea> 
+            </td></tr>
+            <tr><td>
+                <label class="ocmsLabel" for="tutorial" title="The tutorial for the applcation.">Tutorial</label>
+                <textarea  id="tutorial" name="tutorial" rows="8" cols="46">
+                    <apex:outputText value="{!tutorial}"/>
+                </textarea> 
+            </td></tr>
+            <tr><td>
+                <label class="ocmsLabel" for="imageIcon" title="Image show for the application">Icon</label>
+                <input type="hidden" name="imageIcon" id="imageIcon" value="{!imageIcon}" />
+                <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="imageIcon" cImage="{!imageIcon}" type="Image" disabled="{!disableAll}"/>
+            </td></tr>
+    </table>
+
+    </apex:outputPanel>
+    
+</apex:page>
+<!-- ocms_mfc_App_Edit.page -->

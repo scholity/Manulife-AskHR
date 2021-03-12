@@ -1,0 +1,106 @@
+<apex:page sidebar="false" showHeader="false">
+    <!--!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"-->
+    <html xmlns="http://www.w3.org/1999/xhtml" style="visibility: visible;">
+        <head>
+            <meta name="viewport" content="initial-scale=1.0"/>
+            <title>{!$Label.ssoErrorHeading}</title>
+            <meta name="format-detection" content="telephone=no" />
+            <link rel="stylesheet" type="text/css" href="/css/sfdc_210.css" />
+            <style type="text/css">
+                a{color:#0070d2;}
+                body{background-color:#f4f6f9;min-width:380px; }
+                #content,.container{background-color:#ffffff; min-width:380px; }
+                #header{color:#16325c;}
+                #header,#footer{color:#000000;}
+            </style>
+        </head>
+        
+        <body onload="this.bodyOnLoad&&bodyOnLoad();" onunload="this.bodyOnUnload&&bodyOnUnload();">
+            <div id="wrap"><div id="main"><div id="wrapper">
+                <div id="logo_wrapper" class="standard_logo_wrapper mb24">
+                    <h1 style="height: 100%; display: table-cell; vertical-align: bottom;">
+                        <!--img id="logo" class="standard_logo" src="/img/logo198.png" alt="Salesforce" border="0" name="logo"/-->
+                        <!-- <img id="logo" class="standard_logo" src="{!$Resource.Logo_Manulife_JH}" alt="Manulife/JohnHancock" border="0" name="logo" /> -->
+                        <img id="logo" class="standard_logo" src="{!URLFOR($Resource.Logo_Manulife_JH_New)}" alt="Manulife/JohnHancock" border="0" name="logo" />
+                    </h1>
+                </div>
+                <h2 id="header" class="mb12">{!$Label.ssoErrorHeading}</h2>
+                <div id="content" >
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                 <div id="content" >	
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage_French}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                 <div id="content" >
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage_Japanese}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                 <div id="content" >
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage_ChineseT}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                 <div id="content" >
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage_ChineseS}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                <div id="content" >
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage_Thai}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                <div id="content" >
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage_Vietnamese}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                <div id="content" >
+                    <form  accept-charset="UTF-8" action="/_nc_external/identity/saml/SamlError" enctype="application/x-www-form-urlencoded" id="editPage" method="post" name="editPage" onsubmit="if (window.ffInAlert) { return false; }" >
+                        <input type="hidden" name="cancelURL" id="cancelURL" value="/home/home.jsp" />
+                        <input type="hidden" name="retURL" id="retURL" value="/home/home.jsp" />
+                        <input type="hidden" name="save_new_url" id="save_new_url" value="/_nc_external/identity/saml/SamlError" />
+                        <apex:outputText value="{!$Label.ssoErrorMessage_Indonesian}" escape="false">  </apex:outputText>
+                    </form>
+                </div>
+                </div>
+                </div>
+            </div>
+            
+            <div id="footer">&copy; manulife.com. All rights reserved.</div>
+            <script>
+                var p=document.getElementById('footer').parentNode;
+                while(p.nodeName.toLowerCase()==='div')
+                {p.style.height='100%';p=p.parentNode;}
+            </script>
+    
+    
+    <!-- Body events -->
+        <script type="text/javascript">function bodyOnLoad(){if(window.PreferenceBits){window.PreferenceBits.prototype.csrfToken="null";};}function bodyOnBeforeUnload(){}function bodyOnFocus(){}function bodyOnUnload(){}</script></body></html>
+</apex:page>

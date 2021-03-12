@@ -1,0 +1,207 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_CountryLocator" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <script type="text/javascript" language="javascript">
+
+        var selectBox = $('<select class="fullWidth tableInputs cntryCode" />');
+
+        $.getJSON( "{!URLFOR($Resource.ocms_mli_json, 'json/countries.min.json')}", function(data){
+            for (val in data){
+                $('<option />', {value: data[val]['alpha-2'], text: data[val]['name']}).appendTo(selectBox);
+            }
+        });
+
+        function initCountryTable(){
+
+            var countryInfo = '{!jsnCountryInfo}';
+            if(countryInfo != ''){
+                countryInfo = JSON.parse('{!jsnCountryInfo}');
+            } else {
+                countryInfo = {};
+            }
+
+            if (!$.isEmptyObject(countryInfo)){
+                for (var key in countryInfo){
+                    if (countryInfo.hasOwnProperty(key)){
+
+                        var code = key;
+                        var message = countryInfo[key].message;
+                        var buttonText = countryInfo[key].buttonText;
+                        var buttonLink = countryInfo[key].buttonLink;
+                        addRow(code, message, buttonText, buttonLink);
+
+                    }
+                }
+            } else {
+                addBlankRow();
+            }
+
+            if({!disableAll}){
+                $('#countryTable tr td input').attr('readonly',true);
+                $('.remove').remove();
+            } else {
+                $('#addRowButton').click(addBlankRow);
+                $('.removeButton').click(removeRow);
+            }
+        }
+
+        function addBlankRow(){
+            var rowString = '<tr>' +
+                                '<td class="countryDropdown">' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs cntryMessage" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs cntryButtonText" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs cntryButtonLink" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<a class="removeButton">' +
+                                        '<img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" />' +
+                                    '</a>' +
+                                '</td>' +
+                            '</tr>';
+            $('#countryTable tbody').append(rowString);
+            $('.countryDropdown').html(selectBox);
+            $('.removeButton').unbind();
+            $('.removeButton').click(removeRow);
+        }
+
+        function addRow(code, message, buttonText, buttonLink){
+
+            var row = $('<tr></tr>');
+            var countryField = $('<td></td>');
+            var messageField = $('<td><input class="fullWidth tableInputs cntryMessage" type="text" value="' + message + '"></input></td>');
+            var buttonTextField = $('<td><input class="fullWidth tableInputs cntryButtonText" type="text" value="' + buttonText + '"></input></td>');
+            var linkField = $('<td><input class="fullWidth tableInputs cntryButtonLink" type="text" value="' + buttonLink + '"></input></td>');
+            var buttonField = $('<td><a class="removeButton"><img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" /></a></td>"');
+
+            $(selectBox).clone().appendTo(countryField).val(code);
+            row.append(countryField);
+            row.append(messageField);
+            row.append(buttonTextField);
+            row.append(linkField);
+            row.append(buttonField);
+
+            $('#countryTable tbody').append(row);
+        }
+
+        function removeRow(){
+            if($('#countryTable tbody tr').length -1 > 0){
+                $(this).parent().parent().remove();
+            } else {
+                $(this).parent().parent().find('.cntryCode').val('');
+                $(this).parent().parent().find('.cntryMessage').val('');
+                $(this).parent().parent().find('.cntryButtonText').val('');
+                $(this).parent().parent().find('.cntryButtonLink').val('');
+            }
+        }
+
+        $(document).ajaxStop(function(){
+
+            initCountryTable();
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+                var countryInfo = {};
+
+                $('#countryTable tbody tr').each(function(){
+                    var code = $(this).find('.cntryCode').val();
+                    if(code != null && code != undefined && code != ''){
+                        countryInfo[code] = {};
+                        countryInfo[code].message = $(this).find('.cntryMessage').val();
+                        countryInfo[code].buttonText = $(this).find('.cntryButtonText').val();
+                        countryInfo[code].buttonLink = $(this).find('.cntryButtonLink').val();
+                    }
+                });
+
+                countryInfo = JSON.stringify(countryInfo);
+
+                attributes.push({"name":"lblClose", "value": $('#lblClose').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"jsnCountryInfo", "value": countryInfo, "type": "Text", "simple": false});
+                attributes.push({"name":"accAction", "value": $('#accAction').val(), "type": "Text", "simple": true});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="lblClose">Close label</label>
+                        <input class="ocmsTextInputLrg" id="lblClose" name="lblClose" type="text" value="{!lblClose}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fullWidth">
+                        <label class="ocmsLabel" for="countryTable">Country list</label>
+                        <apex:outputText escape="false" rendered="{!disableAll}">
+                            <table id="countryTable" style="border:1px dashed #cdcdcd;" class="disabled">
+                                <thead>
+                                    <tr>
+                                        <th width="10%">
+                                            Country
+                                        </th>
+                                        <th width="40%">
+                                            Message
+                                        </th>
+                                        <th width="20%">
+                                            Button text
+                                        </th>
+                                        <th width="30%" colspan="2">
+                                            Button link
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </apex:outputText>
+                        <apex:outputText escape="false" rendered="{!!disableAll}">
+                            <table id="countryTable" style="border:1px solid black;" class="">
+                                <thead>
+                                    <tr>
+                                        <th width="10%">
+                                            Country
+                                        </th>
+                                        <th width="40%">
+                                            Message
+                                        </th>
+                                        <th width="20%">
+                                            Button text
+                                        </th>
+                                        <th width="30%" colspan="2">
+                                            Button link
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <br/>
+                            <button id="addRowButton" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Add a new row</span></button>
+                        </apex:outputText>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accAction">Button action</label>
+                        <input class="ocmsTextInputLrg" id="accAction" name="accAction" type="text" value="{!accAction}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

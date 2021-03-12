@@ -1,0 +1,233 @@
+<apex:page controller="cms.CoreController" showHeader="false" sidebar="false" standardStylesheets="false" cache="false" docType="html-5.0">
+
+<meta http-equiv="X-UA-Compatible" content="IE=Edge"></meta>
+<html>
+<head>
+    <apex:includeScript value="https://code.jquery.com/jquery-1.11.3.min.js" />
+    <apex:includeScript value="https://code.jquery.com/ui/1.10.4/jquery-ui.min.js" />
+
+
+<script type="text/javascript">
+$j=jQuery.noConflict(),$j(document).ready(function(){    
+   if ( "{!$CurrentPage.parameters.qs}" == "1"  ){
+            document.getElementById("{!$Component.btnCanada}").src = "{!URLFOR($Resource.studentConnect,'./Canada_OFF.jpg')}";
+            document.getElementById("{!$Component.btnUS}").src = "{!URLFOR($Resource.studentConnect,'./US_On.jpg')}";
+            $j('[id$=userCountry]').text(1);
+            var newHTML = $j('#q7').text().replace('Manulife','John Hancock');
+            $j('#q7Text').text(newHTML); 
+    }else{
+            document.getElementById("{!$Component.btnCanada}").src = "{!URLFOR($Resource.studentConnect,'./Canada_ON.jpg')}";
+            document.getElementById("{!$Component.btnUS}").src = "{!URLFOR($Resource.studentConnect,'./US_OFF.jpg')}";
+            $j('[id$=userCountry]').text(0);
+            var newHTML = $j('#q7Text').text().replace('John Hancock','Manulife');
+            $j('#q7Text').html(newHTML); 
+    }
+
+ $j(".btnCountry").click(function( event ) {
+        //event.preventDefault();
+        if ( $j(this).attr("id").indexOf("btnCanada") >= 0  ){
+            document.getElementById('{!$Component.btnCanada}').src = '{!URLFOR($Resource.studentConnect,'./Canada_ON.jpg')}';
+            document.getElementById('{!$Component.btnUS}').src = '{!URLFOR($Resource.studentConnect,'./US_OFF.jpg')}';
+            $j('[id$=userCountry]').text(0);
+            var newHTML = $j('#q7Text').text().replace('John Hancock','Manulife');
+            $j('#q7Text').html(newHTML); 
+    
+        }else{
+            document.getElementById('{!$Component.btnCanada}').src = '{!URLFOR($Resource.studentConnect,'./Canada_OFF.jpg')}';
+            document.getElementById('{!$Component.btnUS}').src = '{!URLFOR($Resource.studentConnect,'./US_On.jpg')}';
+            $j('[id$=userCountry]').text(1);
+            var newHTML = $j('#q7').text().replace('Manulife','John Hancock');
+            $j('#q7Text').text(newHTML); 
+        }
+        setInfoText( $j('#userCountry').text() );
+
+      });
+ function ftnEnableNextBtn(){var a=$j("#currentPage").text(),b=4;switch(a){case"1":b=4;break;case"2":b=4;break;case"3":b=2}var c=!1;for(i=1;i<b+1;i++){if(!($j(".p"+a+"a"+i+":checked").val()>=0)){c=!1;break}c=!0}c?(3==a?document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./result.jpg')}":document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./next_on.jpg')}",$j(this).css("cursor","default")):(3==a?document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./result_off.jpg')}":document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./next_off.jpg')}",$j(this).css("cursor","pointer"))}function setInfoText(a){"0"==a?infoArr=["Manulife values individuals who integrate their personal volunteer activities and professional roles.  Here, all employees have access to resources like:<br><br><strong>GetVolunteering.ca</strong> - explore this site and be matched with available volunteer opportunities within the local community. We offer paid time off to volunteer!<br><strong>Flexible Benefits</strong> - customize your benefits plan with options best suited to you.<br><strong>Learning and Development Programs</strong> - discover opportunities for Manulife to fund your continuing education.<br><strong>Professional Development Events</strong> - take advantage of career talks, mentorship and networking opportunities.<br><strong>The Wellness Centre</strong> - meet with experienced consultants who can help you achieve your health and fitness goals.","Stand out...ask questions, take initiative, begin to develop relationships with your colleagues!","Our company believes that learning goes hand in hand with career development. Many opportunities are available to employees who are interested in furthering their education:<BR/>-Tuition Assistance<BR/>-Internally and externally facilitated learning sessions<BR/>-Lunch and Learns<BR/><BR/>Most of our new graduate student programs offer:<BR/>-paid study time for exams associated with professional designations<BR/>-part or full payment of exam fees for professional designations<BR/>-formal/informal mentorship","Take accountability when mistakes happen, implement feedback, and view the mishap as a learning opportunity.","Manulife is a performance - driven environment.  We recognize employees for going above and beyond in delivering high impact results, and we believe in supporting performance - based bonuses, merit - based promotions and employee appreciation programs.","Manulife encourages all employees - regardless of experience level - to take ownership of their career. Be ambitious, continue to grow, take advantage of the job opportunities available to you here and make an impact - you can achieve your professional goals at Manulife.","Our student programs are designed to attract and develop top talent. Successful students can begin charting their course by being important contributors and gaining valuable knowledge and skills during their work term or as they begin emerging talent roles.  At Manulife we recognize the value of well-rounded individuals and respect that they have much to offer.  Do you have what it takes?","Manulife&#39;s commitment to giving back to the communities where it does business puts employee volunteerism at the heart of its local support initiatives.  We believe in community involvement.  And our employees lead by example.","Passionate about having a great career!  Self-motivated to pursue opportunities and grow professionally, innovative and forward thinking, and willing to work hard.","Whether or not you are looking to work in another country, having a global mindset will advance your growth and development.  At Manulife, we support the movement of talented individuals through programs like Discover Asia, and we offer employees diverse opportunities to deliver business growth across divisions, functions and geographies. For those interested in participating in global operations without relocating to another country, there are always opportunities to work with individuals from our company&#39;s various divisions worldwide."]:infoArr=["John Hancock values individuals who wish to succeed professionally in a vibrant culture that values learning, development, and community engagement. Here, all employees have access to resources such as:<BR/><BR/><b>Flexible Benefits</b> - A full range of benefits and programs to meet the needs of today&#39;s multi-faceted and diverse workforce<BR/><b>Learning and Development Programs</b> - A variety of programs designed to increase job skills and aid in career growth and professional development<BR/><b>Tuition Assistance</b> -   A wealth of opportunities to further your education<BR/><b>HealthMatters</b> - John Hancock&#39;s wellness program aims to help employees reach their health related goals and improve their lives by providing health education, coaching support, activities and participant incentives<BR/><b>Volunteer &amp; Give</b> - Explore this site to see if one of the available volunteer opportunities within the local community is a good fit for you","Stand out...ask questions, take initiative, begin to develop relationships with your colleagues!","Our company believes that learning goes hand in hand with career development. Many opportunities are available to employees who are interested in furthering their education:<BR/>-Tuition Assistance<BR/>-Internally and externally facilitated learning sessions<BR/>-Lunch and Learns<BR/><BR/>Most of our new graduate student programs offer:<BR/>-paid study time for exams associated with professional designations<BR/>-part or full payment of exam fees for professional designations<BR/>-formal/informal mentorship","Take accountability when mistakes happen, implement feedback, and view the mishap as a learning opportunity.","John Hancock is a performance-driven environment. We recognize employees for going above and beyond in delivering high impact results, and we believe in supporting performance - based bonuses, merit - based promotions and employee appreciation programs.","John Hancock encourages all employees - regardless of experience level - to take ownership of  their career. Be ambitious, continue to grow, take advantage of the job opportunities available to you here and make an impact - you can achieve your professional goals at John Hancock.","Our student programs are designed to attract and develop top talent. Successful students can begin charting their course by being important contributors and gaining valuable knowledge and skills during their work term or as they begin emerging talent roles.  At John Hancock we recognize the value of well-rounded individuals and respect that they have much to offer.  Do you have what it takes?","John Hancock is proud to be a leader in corporate volunteerism in Boston, with thousands of hours committed to serving our community each year.  In 2013, John Hancock provided a $1 million donation to The One Fund.  The One Fund was established to raise money to help those families most affected by the tragic events that unfolded during the 2013 Boston Marathon.  We believe in community involvement and our employees have the opportunity to give back by volunteering during and after business hours, through a matching gift program, and various opportunities with community partners.","Passionate about having a great career!  Self-motivated to pursue opportunities and grow professionally, innovative and forward thinking, and willing to work hard.","Whether or not you are looking to work in another country, having a global mindset will advance your growth and development. At John Hancock, we support the movement of talented  individuals and offer employees diverse opportunities to deliver business growth across     divisions, functions and geographies. For those interested in participating in global operations without relocating to another country, there are always opportunities to work with individuals within our organization&#39;s various divisions worldwide."];var b=$j("#q1Info");b.dialog({autoOpen:!1,closeText:"Close",title:"test",modal:!1,minHeight:"auto",dialogClass:"divInfo",show:{effect:"fade",duration:500},hide:{effect:"fade",duration:500}})}function hovIn(){$j(this).attr("id");$j(this).css({"background-color":"white",color:"white","font-size":"12px"});var b=$j(this).attr("id").slice(-2);b.indexOf("o")>=0&&(b=b.replace("o","")),$j("#q1Info").html(infoArr[b-1]),$j("#q1Info").dialog("option","position",{my:"left+20 top",at:"left top",of:$j(this)}),$j("#q1Info").dialog("open")}function hovOut(){}$j("input").click(function(){ftnEnableNextBtn()}),$j(".next, .back, .start, #imgClose").hover(function(){$j(this).css("cursor","pointer")}),$j(".next, .start").click(function(){var a=$j("#currentPage").text(),b=parseInt(a)+1,c=!1;if($j("#imgBack").hide(),(document.getElementById("{!$Component.imgNext}").src.indexOf("next_on.jpg")>=0||document.getElementById("{!$Component.imgNext}").src.indexOf("result.jpg")>=0)&&(c=!0),c||"0"==a||"4"==a)switch($j("#p"+a).hide("fast"),$j("#p"+b).show("fast"),$j("#currentPage").html(b),$j("#pageText").html("Page "+b+" of 4 &nbsp;"),$j(".circle"+b).attr("src","{!URLFOR($Resource.studentConnect,'./Circle_on.gif')}"),$j(".footerBar").show(),b){case 1:$j(".back").hide(),document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./next_off.jpg')}",ftnEnableNextBtn();break;case 2:$j(".back").show(),document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./next_off.jpg')}",ftnEnableNextBtn();break;case 3:$j(".back").show(),document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./result_off.jpg')}",ftnEnableNextBtn();break;case 4:var d=new Array("1","3","3","2","2","2","3","1","1","3"),e=0,f=0;$j("input:radio:checked").each(function(){parseInt($j(this).val())+1==d[f]&&(e+=1),f+=1}),e>=6?"1"==$j("[id$=userCountry]").text()?$j("#result").html("<h2>We <i>are</i> CoNNected!</h2><br><p1> John Hancock would be an excellent place for you to kick start your career, and we encourage you to apply for opportunities in our co-op/intern, new graduate programs, and emerging talent opportunities. Connect with your school for current postings and visit our <a style='color:#1b8644;' href='http://www.johnhancock.com/careers/opportunities.php'>www.johnhancock.com/oncampus</a> for a complete overview of student programs. Be sure to check out our campus events calendar to see when we will be at your school! <BR/><BR/>To stay connected with John Hancock and network with your peers globally we encourage you to join our LinkedIn group, <a style='color:#1b8644;' href='http://www.linkedin.com/groups?gid=6532678&mostPopular=&trk=tyah&trkInfo=tas%3Amanulife%2Fjohn%2Cidx%3A1-2-2'>John Hancock Student CoNNect.</a></p1>"):$j("#result").html("<h2>We <i>are</i> CoNNected!</h2><br><p1> Manulife would be an excellent place for you to kick start your career, and we encourage you to apply for opportunities in our co-op/intern, new graduate programs, and emerging talent opportunities. Connect with your school for current postings and visit our <a style='color:#1b8644;' href='http://www.manulife.com/public/careers/index/0,,lang=en&navId=660004,00.html'>www.manulife.com/oncampus</a> for a complete overview of student programs. Be sure to check out our campus events calendar to see when we will be at your school! <BR/><BR/>To stay connected with Manulife and network with your peers globally we encourage you to join our LinkedIn group, <a style='color:#1b8644;' href='http://www.linkedin.com/groups?gid=6532678&mostPopular=&trk=tyah&trkInfo=tas%3Amanulife%2Fjohn%2Cidx%3A1-2-2'>Manulife Student CoNNect. </a></p1>"):"1"==$j("[id$=userCountry]").text()?$j("#result").html("John Hancock's distinctive culture is strong, reliable, trustworthy and forward - thinking. We emphasize quality performance, and the importance of having a global mindset and making an impact on your work environment. While some of your motivations and strengths differ from these key attributes, we encourage you to continue exploring who we are and what we have to offer if our culture really interests you. We encourage you to visit our <a style='color:#1b8644;' href='http://www.johnhancock.com/oncampus'>www.johnhancock.com/oncampus</a> for a complete overview of student programs. Be sure to check out our campus events calendar to see when we will be at your school!<br/><br/> To stay connected with John Hancock and network with your peers globally we encourage you to join our LinkedIn group, <a style='color:#1b8644;' href='http://www.linkedin.com/groups?gid=6532678&mostPopular=&trk=tyah&trkInfo=tas%3Amanulife%2Fjohn%2Cidx%3A1-2-2'>John Hancock Student CoNNect.</a>"):$j("#result").html("Manulife distinctive culture is strong, reliable, trustworthy and forward - thinking. We emphasize quality performance, and the importance of having a global mindset and making an impact on your work environment. While some of your motivations and strengths differ from these key attributes, we encourage you to continue exploring who we are and what we have to offer if our culture really interests you. We encourage you to visit our <a style='color:#1b8644;' href='http://www.manulife.com/oncampus'>www.manulife.com/oncampus</a> for a complete overview of student programs. Be sure to check out our campus events calendar to see when we will be at your school!<br/><br/> To stay connected with Manulife and network with your peers globally we encourage you to join our LinkedIn group, <a style='color:#1b8644;' href='http://www.linkedin.com/groups?gid=6532678&mostPopular=&trk=tyah&trkInfo=tas%3Amanulife%2Fjohn%2Cidx%3A1-2-2'>Manulife Student CoNNect.</a>"),$j("#footerBar").hide(),$j("#closeBtn").show()}}),$j(".close").click(function(){try{var a=window.open(window.location,"_self");a.close()}catch(b){return!1}}),$j(".back").click(function(){var a=$j("#currentPage").text(),b=parseInt(a)-1;$j("#p"+a).hide("fast"),$j("#p"+b).show("fast"),$j("#currentPage").html(b),$j("#pageText").html("Page "+b+" of 4 &nbsp;"),$j(".circle"+a).attr("src","{!URLFOR($Resource.studentConnect,'./Circle_off.gif')}"),"1"==b&&$j(".back").hide(),("4"==a||"3"==a||"2"==a)&&(document.getElementById("{!$Component.imgNext}").src="{!URLFOR($Resource.studentConnect,'./next_on.jpg')}")}),setInfoText($j("#userCountry").text()),$j(".info").hover(hovIn,hovOut),$j("#q1Info").click(function(){$j("#q1Info").dialog("close")});
+ 
+}); 
+</script>
+    <apex:stylesheet value="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css" />
+    <apex:stylesheet value="{!URLFOR($Resource.studentConnect, './studentConnect.css')}"/>
+</head>
+<body>
+
+<div id="userCountry" style="display:none;">0</div>
+<div id="currentPage" style="display:none;">0</div>
+
+<div class='divMain'>
+    <div id="p0" align="center">
+        <apex:image styleClass="start" id="imgPage0" url="{!URLFOR($Resource.studentConnect,'./ConnectedLandingNew.jpg')}" />
+    
+        <div style="padding-top:10px;padding-bottom:10px"><strong>What is your location?</strong></div>
+        <div>
+            <apex:image id="btnCanada" styleClass="btnCountry" url="{!URLFOR($Resource.studentConnect,'./Canada_ON.jpg')}" alt="Canada Button" style="cursor: pointer;"/>
+            <apex:image id="btnUS"  styleClass="btnCountry" url="{!URLFOR($Resource.studentConnect,'./US_OFF.jpg')}"  alt="US Button" style="cursor: pointer;"/>
+        </div>
+        <div style="border:solid gray 5px;"></div>
+    </div>
+
+<div id="p1" style="display:none;" align="center">
+        <apex:image url="{!URLFOR($Resource.studentConnect,'./ConnectedN1.jpg')}"/>  
+        <div class='questionHeaderText'>Q1</div>
+        <div class="group">
+            <div id="q1" class="questionText">I thrive in an organization that:<br/>
+                <apex:image id="imgInfo1" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+                <div id="q1Info" class="infoDiv"></div>
+            </div>
+            <div class="answer">
+                <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q1" value="0" class="p1a1"/>Values my community involvement, extracurricular activities, personal development and life goals.<br />
+                <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q1" value="1" class="p1a1"/>Allows me to work long hours to earn as much money as possible.<br />
+                <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q1" value="2" class="p1a1"/>Expects me to work 9 a.m. - 5 p.m. and nothing more.<br />
+            </div>
+        </div>
+        <div class='questionHeaderText'>Q2</div>
+        <div class="group">
+           <div id="q2" class="questionText">It's my first week at my new job and I don't have enough work to do. I:<br />
+               <apex:image id="imgInfo2" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+               <div id="q2Info" class="infoDiv"></div>
+           </div>
+           <div class="answer">
+               <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q2" value="0" class="p1a2"/>Decide not to tell my manager. I don't want to be bothersome.<br />
+               <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q2" value="1" class="p1a2"/>Browse the Internet to learn more about my organization or profession.<br />
+               <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q2" value="2" class="p1a2"/>Inform my manager that my work is done, offer to help out with any projects, and then find ways to learn more about my organization or profession.<br />
+           </div>       
+        </div>
+        <div class='questionHeaderText'>Q3</div>
+        <div class="group">
+           <div id="q3" class="questionText">I believe learning:<br />
+               <apex:image id="imgInfo3" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+               <div id="q3Info" class="infoDiv"></div>
+           </div>
+           <div class="answer">
+               <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q3" value="0" class="p1a3"/>Basically ends when I finish school.<br />
+               <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q3" value="1" class="p1a3"/>Can occur in both the classroom and workplace.<br />
+               <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q3" value="2" class="p1a3"/>Can occur everywhere and in everything, from the classroom and workplace to extracurricular activities and casual conversation.<br />
+           </div>       
+        </div>
+        <div class='questionHeaderText'>Q4</div>
+        <div class="group">
+           <div id="q4" class="questionText">When I make a mistake I:<br />
+               <apex:image id="imgInfo4" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+               <div id="q4Info" class="infoDiv"></div>
+           </div>
+           <div class="answer">
+               <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q4" value="0" class="p1a4"/>Fix it myself and move on. As long as I don't repeat the same mistake, everything will be fine.<br />
+               <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q4" value="1" class="p1a4"/>Identify the mistake and inform those who will be affected. I come to them with a plan to avoid the same mistake from happening again.<br />
+               <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q4" value="2" class="p1a4"/>Never own up to it. I don't want to get fired.<br />
+           </div>       
+        </div>        
+        <hr></hr>
+ </div>
+<!--//end of page1'>--> 
+<div id="p2" style="display:none;">
+        
+    <apex:image url="{!URLFOR($Resource.studentConnect,'./ConnectedN2.jpg')}"/>
+        <div class='questionHeaderText'>Q5</div>
+        <div class="group">
+            <div id="q5" class="questionText">I am motivated by:<br />
+            <apex:image id="imgInfo5" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+            <div id="q5Info" class="infoDiv"></div>
+            </div>
+            <div class="answer">
+                <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q5" value="0" class="p2a1"/>Co-workers and leaders recognizing that I am a hard worker.<br />
+                <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q5" value="1" class="p2a1"/>Co-workers and leaders recognizing that I have delivered results in my role.<br />
+                <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q5" value="2" class="p2a1"/>Co-workers and leaders recognizing that I am smarter than them.<br />
+            </div>
+        </div>
+        <div class='questionHeaderText'>Q6</div>
+        <div class="group">
+           <div id="q6" class="questionText">I hope to advance in my career by:<br />
+               <apex:image id="imgInfo6" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+               <div id="q6Info" class="infoDiv"></div>
+           </div>
+           <div class="answer">
+               <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q6" value="0" class="p2a2"/>Working very hard and waiting for promotions. I value a company that respects tenure in a role.<br />
+               <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q6" value="1" class="p2a2"/>Becoming an expert at my job, continuously learning about my industry and profession, and making solid improvements to my work and department. I value a company that recognizes people who make an impact.<br />
+               <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q6" value="2" class="p2a2"/>Staying in my role for a few months then moving to a different company. You are stuck if you stay at the same company for too long.<br />
+           </div>       
+        </div>
+        <div class='questionHeaderText'>Q7</div>
+        <div class="group">
+           <div id="q7" class="questionText"><label id="q7Text">In my opinion, the best candidate for John Hancock would be:</label><br />
+               <apex:image id="imgInfo7" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+               <div id="q7Info" class="infoDiv"></div>
+           </div>
+           <div class="answer">
+               <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q7" value="0" class="p2a3"/>Someone with excellent marks. The most important factor for success is how good you are technically - everything else can be learned.<br />
+               <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q7" value="1" class="p2a3"/>Someone with excellent soft skills. Technical skills don't matter. Once you're in the company, you won't need to write any more tests.<br />
+               <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q7" value="2" class="p2a3"/>Someone who is well rounded - a person who does well in school and has good communication skills, a positive attitude and strong leadership qualities.<br />
+           </div>       
+        </div>
+        <div class='questionHeaderText'>Q8</div>
+        <div class="group">
+           <div id="q8" class="questionText">I want to be part of an organization that cares about the community.<br />
+               <apex:image id="imgInfo8" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+               <div id="q8Info" class="infoDiv"></div>
+           </div>
+           <div class="answer">
+               <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q8" value="0" class="p2a4"/>True <br />
+               <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q8" value="1" class="p2a4"/>False<br />
+           </div>       
+        </div>
+        <hr></hr>
+</div>  
+<!--//end of page2'>--> 
+<div id="p3" style="display:none;">
+    <apex:image url="{!URLFOR($Resource.studentConnect,'./ConnectedN3.jpg')}"/>
+    
+        <div class='questionHeaderText'>Q9</div>
+        <div class="group">
+            <div id="q9" class="questionText">I chose my specific career path because:<br />
+                <apex:image id="imgInfo9" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+                <div id="q9Info" class="infoDiv"></div>
+            </div>
+            <div class="answer">
+                <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q9" value="0" class="p3a1"/>I am passionate about my field and enjoy what I do.<br />
+                <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q9" value="1" class="p3a1"/>I know that I can make a lot of money in this line of work.<br />
+                <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q9" value="2" class="p3a1"/>I don't mind getting any job. It's the organization that matters.<br />
+            </div>
+        </div>
+        <div class='questionHeaderText'>Q10</div>
+        <div class="group">
+           <div id="q10" class="questionText">A global mindset is:<br />
+               <apex:image id="imgInfo10" url="{!URLFOR($Resource.studentConnect,'./Information_icon.jpg')}" styleClass="info" style="cursor: pointer;"/>
+               <div id="q10Info" class="infoDiv"></div>
+           </div>
+           <div class="answer">
+               <apex:image alt="a" url="{!URLFOR($Resource.studentConnect,'./a.gif')}"/> <input type="radio" name="q10" value="0" class="p3a2"/>Only important when I am working in a foreign country or directly with individuals outside of North America.<br />
+               <apex:image alt="b" url="{!URLFOR($Resource.studentConnect,'./b.gif')}"/> <input type="radio" name="q10" value="1" class="p3a2"/>Integral to my success and career development at a global organization if I plan to work internationally.<br />
+               <apex:image alt="c" url="{!URLFOR($Resource.studentConnect,'./c.gif')}"/> <input type="radio" name="q10" value="2" class="p3a2"/>Integral to my success and career development at a global organization, whether or not I plan to work internationally.<br />
+           </div>       
+        </div>
+        <hr></hr>
+</div>  
+<!--//end of page3'>--> 
+<div id="p4" style="display:none;">
+    <apex:image url="{!URLFOR($Resource.studentConnect,'./ConnectedResultsN.jpg')}"/>
+        <div class='questionHeaderText'>Result</div>
+        <div class="group">
+           <div id="result" class="page4Text"></div>
+           <apex:image styleClass="result" url="{!URLFOR($Resource.studentConnect,'./TypeM_Result.jpg')}" style="float:right;"/>     
+        </div>
+        <hr></hr>
+</div>
+ 
+    <div id="closeBtn" class='footerButtons' style="display:none;float:left;">
+        <apex:image id="imgClose" styleClass="close" alt="Close" url="{!URLFOR($Resource.studentConnect,'./close.jpg')}"/>
+    </div>
+    <div id="footerBar" class='footerBar'>
+       <div id="pageText" class='footerPages'>Page 1 of 4 &nbsp;</div>
+        <div class='imgPage'><apex:image styleClass="circle1" id="circle1" alt="*" url="{!URLFOR($Resource.studentConnect,'./Circle_off.gif')}"/>&nbsp;
+        <apex:image styleClass="circle2" id="circle2" alt="-" url="{!URLFOR($Resource.studentConnect,'./Circle_off.gif')}"/>&nbsp;
+        <apex:image styleClass="circle3" id="circle3" alt="-" url="{!URLFOR($Resource.studentConnect,'./Circle_off.gif')}"/>&nbsp;
+        <apex:image styleClass="circle4" id="circle4" alt="-" url="{!URLFOR($Resource.studentConnect,'./Circle_off.gif')}"/></div>
+        <div class='footerButtons' style="width:190px;" >
+            <apex:image id="imgNext" styleClass="next" url="{!URLFOR($Resource.studentConnect,'./next_off.jpg')}" alt="Next" style="float:right;" />
+            <apex:image id="imgBack" styleClass="back" url="{!URLFOR($Resource.studentConnect,'./back.jpg')}" alt="Back"/>
+        </div>
+    </div>
+</div>
+<!--//<div class="tm"><a href="#" target="_blank">&copy; 1999-2015 The Manufacturers Life Insurance Company</a></div>-->
+</body>
+</html>
+</apex:page>

@@ -1,0 +1,6 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_MissionControl" showHeader="false" sidebar="false" cache="false" title="OrchestraCMS" standardStylesheets="false">
+    <script>
+        window.editorType = 'page';
+    </script>
+    <apex:include pageName="ocms_mfc_i_MCItem_Edit" />
+</apex:page>

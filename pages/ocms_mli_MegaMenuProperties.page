@@ -1,0 +1,18 @@
+<apex:page controller="cms.CreateContentController" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script type="text/javascript">
+        $(document).ready(function(){
+            ce.content_pageproperties_editor('registerSaveFunction', function(){
+                var attributes = new Array();
+                attributes.push({"name": "ActiveMenuItem", "value": $('#ActiveMenuItem').tree_node_selector('getSelectedNode'), "type":"Text", "lang":""});
+                return attributes; 
+            });
+            $('#ActiveMenuItem').tree_node_selector({
+                'content_id': $.orchestracmsUtil.htmlEncode(uiContent.content.Id)
+                ,'selected': ocmsEditorAPI.getPageSpecificProperty('ActiveMenuItem').getDecodedValue()
+                ,'label':'Active Item'
+                ,'buttonLabel': 'Open Menu Item Selector'
+            });
+        });
+    </script>
+    <div id="ActiveMenuItem" />
+</apex:page>

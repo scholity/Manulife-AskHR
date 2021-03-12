@@ -1,0 +1,40 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" contentType="text/javascript">
+	
+(function _loadCKETemplates() {
+	CKEDITOR.addTemplates('MFC-Articles', {
+        templates: [
+            {
+                title: 'Banner Image',
+                description: 'An image that is 100% width of article body.',
+                html: '<div class="article-banner ckeContentBorder"><div class="img-wrapper"><img src="#" alt="" /></div></div>'
+            },
+            {
+                title: 'Employee Profile Tile',
+                description: 'Employee Profiles Tile.',
+                html: '<div class="related-block employee-profile-tile ckeContentBorder"><div class="related-thumb"><img src="#" alt="" /></div><div class="related-info"><a class="related-title" href="#">Employee Title/Name</a><p class="related-desc ellipsis-2">Description</p></div></div>'
+            },
+            {
+                title: 'Employee Testimonial Tile',
+                description: 'Employee Testimonial Tile',
+                html: '<div class="feed-block ckeContentBorder"><div class="feed-thumb"><img src="#" alt="" /></div><div class="feed-info"><h3 class="feed-title ellipsis-2">Employee Title/Name</h3><p class="feed-desc ellipsis-2">Description</p></div></div>'
+            }, 
+            {
+                title: 'Blockquotes',
+                description: 'Large quoted text',
+                html: '<blockquote class="ckeContentBorder"><p>“Place text here”</p></blockquote>' 
+            },
+            {
+                title: 'Attention Message',
+                description: 'Text with an exclamation mark image in the left',
+                html: '<div class="alert ckeContentBorder"><span>Change text here</span></div>'
+            },
+            {
+                title: 'Video Content',
+                description: 'Large video',
+                html: '<div class="video-wrapper ckeContentBorder"><div class="inner"><iframe width="560" height="315" src="#" frameborder="0" allowfullscreen=""></iframe></div></div>'
+            }                               
+        ]
+    });
+})();
+
+</apex:page>

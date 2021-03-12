@@ -1,0 +1,22 @@
+<apex:page standardController="Case" extensions="ASKHR_CaseExtension" showHeader="false" sidebar="false" >	
+	<script type="text/javascript">
+   
+		if({!ActionStepAdded})
+		{			
+		 	window.close();
+		}
+	</script>
+	<apex:form >		
+		<apex:pageBlock id="mainBlock" title="Add an Action">
+			<apex:inputField style="visibility:hidden"  value="{!Case.Type}" />			
+			<apex:pageBlockSection columns="1">				
+				<apex:outputField value="{!Case.CaseNumber}" />
+				<apex:inputField value="{!Case.Step_Taken__c}" />
+				<apex:inputField value="{!Case.Date_Time_of_Action__c}" />			
+			</apex:pageBlockSection>
+			<apex:pageBlockButtons location="bottom" >
+				<apex:commandButton value="Add Action" action="{!AddActionStep}" />
+			</apex:pageBlockButtons>					
+		</apex:pageBlock>		
+	</apex:form>
+</apex:page>

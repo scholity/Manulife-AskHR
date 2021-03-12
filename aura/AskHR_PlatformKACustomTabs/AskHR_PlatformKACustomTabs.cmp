@@ -1,0 +1,63 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes,flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="AskHR_KnowledgeCustomTabs">
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="articleData"  type="Object" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+
+    <lightning:tabset>
+        <!-- Loop through the sections -->
+        <aura:iteration items="{! v.articleData }" var="section">
+            <lightning:tab label="{! section.name }">
+                <!-- Loop through the fields -->
+                <aura:iteration items="{! section.fields }" var="field">
+                        <div style="cursor: pointer;" >
+                            <!-- outer div with class outerDivClass to identify a single field block --> 
+                            <!-- When user clicks the header, find all the elements with id fieldBlock in this block and toggle the show/hide class -->
+                            <div class="outerDivClass">
+                                <!-- When user clicks on header toggleField method is called -->
+                                <div class="slds-page-header fieldLabelBackground" onclick="{!c.toggleField}">
+                                    <section class="slds-clearfix">
+                                        <div class="slds-float--left">
+                                            <!-- Show the image + or - -->
+                                            <span id="fieldBlock" class="slds-show"><lightning:icon class="whiteIcon" iconName="utility:add" size="x-small" alternativeText="Indicates add"/></span>
+                                            <span id="fieldBlock" class="slds-hide"><lightning:icon class="whiteIcon" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/></span>
+                                            <div class="slds-m-left--large">{! field.label }</div>
+                                        </div>
+                                    </section>
+                                </div>
+                                <div id="fieldBlock" class="slds-show slds-p-around--medium">
+                                    
+                                    <!-- Based on the field type use the appropriate ui elements -->
+                                    <aura:if isTrue="{! field.type == 'DATE'}">
+                                        <!-- for Date field use ui:outputDate -->
+                                    	<!-- <ui:outputDate value="{! field.value }" /> -->
+                                    	<lightning:formattedDateTime value="{! field.value }" />
+                                    	<aura:set attribute="else">
+                                            <aura:if isTrue="{! field.type == 'STRING'}">
+                                                <!-- for Text field use ui:outputText -->
+                                                <!-- <ui:outputText value="{! field.value }" /> -->
+                                                <lightning:formattedText value="{! field.value }" />
+                                                <aura:set attribute="else">
+                                                    <aura:if isTrue="{! field.type == 'REFERENCE'}">
+                                                        <!-- for Lookup use ui:outputURL with the Id as url and Name as label -->
+                                                        <!-- <ui:outputURL value="{! '/' + field.value}" label="{! field.lookupNameValue }"/> -->
+                                                        <lightning:formattedURL value="{! '/' + field.value}" label="{! field.lookupNameValue }"/>
+                                                        <aura:set attribute="else">
+                                                            <!-- for everything else use ui:outputRichText -->
+															<!-- ui:outputRichText value="{! field.value }" /-->
+															<lightning:formattedRichText value="{! field.value }" />                                                            
+                                                        </aura:set>
+                                                    </aura:if>
+                                                </aura:set>
+                                            </aura:if>
+                                        </aura:set>
+                                    </aura:if>
+
+                                </div>
+                            </div>
+                        </div>
+                </aura:iteration>
+            </lightning:tab>
+        </aura:iteration>
+    </lightning:tabset>
+</aura:component>

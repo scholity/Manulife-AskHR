@@ -1,0 +1,52 @@
+<aura:component implements="flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes" access="global" controller="AskHR_DynamicCloseCaseController2">
+	<aura:attribute name="recordId" type="Id" /> 
+    <aura:attribute name="closeCaseLayoutFields" type="String[]" />
+    <aura:attribute name="showPopup" type="Boolean" default="false" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+    
+    <div class="slds-clearfix">
+      <div class="slds-float_right">
+        <lightning:button  label="Close Case 2" variant="brand" onclick="{!c.showCloseCaseModal}"  />&nbsp;
+      </div>
+    </div>
+    
+    <aura:if isTrue="{!v.showPopup}">
+        <div class="demo-only" style="">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container slds-modal_medium slds-backdrop_open">
+                    <header class="slds-modal__header">
+                        <lightning:buttonIcon iconName="utility:close"
+                                              onclick="{!c.hideCloseCaseModal}"
+                                              alternativeText="close"
+                                              variant="bare-inverse"
+                                              class="slds-modal__close"/>
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Close Case</h2>
+                        
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1" style="padding:5px 16px;">
+                    	<lightning:recordEditForm objectApiName="Case" recordId="{!v.recordId}" onsuccess="{!c.handleSuccess}">
+                            <lightning:layout multipleRows="true">
+                                <aura:iteration items="{!v.closeCaseLayoutFields}" var="field">
+                                    <lightning:layoutItem size="6" flexibility="auto">
+                                        <aura:if isTrue="{!field == 'Status'}">
+                                            <lightning:inputField fieldName="{!field}" value="Closed"/>
+                                            <aura:set attribute="else">
+                                                <lightning:inputField fieldName="{!field}"/>
+                                            </aura:set>
+                                        </aura:if>
+                                    </lightning:layoutItem>
+                                </aura:iteration>
+                            </lightning:layout>
+                            <lightning:button variant="brand" class="slds-align_absolute-center" type="submit" label="Save" />
+                        </lightning:recordEditForm>
+                    </div>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </div>
+    </aura:if>
+    
+	
+</aura:component>

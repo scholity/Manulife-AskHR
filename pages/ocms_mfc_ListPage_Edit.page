@@ -1,0 +1,365 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_ListPage" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+	<apex:stylesheet value="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"/>
+	<script src="{!URLFOR($Resource.ocms_mfc_pageSupport, 'js/tagPathSelector.js')}"></script>
+	<script type="text/javascript" language="javascript">		
+		$(document).ready(function() {
+			// the UI labelling of this has changed from "Taxonomy parent of filter bar categories" since the filter bar is actually optional
+			$('#useParentPath')
+				// NOTE: tricksy: useParentPath is now connect to a checkbox with a different description and inverse meaning/value (hence false vs. true)
+				.attr('checked', '{!useParentPath}' === 'false')
+				.change(function() {
+					var $this = $(this);
+					if ($this.is(':checked')) {
+						$this.parent().nextAll('.dependent').slideDown();
+					} else {
+						$this.parent().nextAll('.dependent').slideUp();
+					}
+				})
+				.change();
+
+			$('#stopAllLocLoad').attr('checked', '{!stopAllLocLoad}' === 'true');
+			$('#showFeatured').attr('checked', '{!showFeatured}' === 'true');
+			$('#showSearchBar').attr('checked', '{!showSearchBar}' === 'true');
+			$('#showPriorityMessages').attr('checked','{!showPriorityMessages}' === 'true');
+			$('#listView').attr('checked', '{!listView}' === 'true');
+			$('#hideTilesShareAction').attr('checked', '{!hideTilesShareAction}' === 'true');
+			$('#hideTilesLikeAction').attr('checked', '{!hideTilesLikeAction}' === 'true');
+			$('#showAllFilter')
+				.attr('checked', '{!showAllFilter}' === 'true')
+				// disable All label text box when Show All in filter bar checkbox is clear
+				.change(function() {
+					if ($(this).is(':checked')) {
+						$('#allText, #allFilterIsLast').removeAttr('disabled');
+						$('#allfirst').next('span').text('“All”');
+					} else {
+						$('#allText, #allFilterIsLast').attr('disabled', 'disabled');
+						$('#allfirst').next('span').text('First child category');
+					}
+				})
+				.change();
+
+			$('#allFilterIsLast').attr('checked', '{!allFilterIsLast}' === 'true')
+
+			// location filter
+			$('#filter')
+				.val('{!filter}')
+				.change(function() {
+					if ($(this).val() === 'none') {
+						$('#allLocationsText').attr('disabled', 'disabled');
+					} else {
+						$('#allLocationsText').removeAttr('disabled');
+					}
+					console.log($('#allLocationsText').attr('disabled'));
+				})
+				.change();
+
+			// set the proper radio button for content item reverse chronological sorting
+			// the default, and previously only setting, is "originalDate' (as determined within controller)
+			$('#sortOrder').val('{!sortOrder}');
+
+			// select the radio button for initiall selected filter bar category
+			$('#{!initialFilterCat}').attr('checked', true);
+
+			// must wait for the taxonomy drop-downs to be set before adding this change handler
+			$('body').bind('tagPathSelector:getAllTaxonomies', function () {
+				// let’s add at least a little co-dependence between these two drop-down lists
+				$('#parentTaxonomyNode + select').change(function() {
+				    $('#initialFilterChild + select').val($('#parentTaxonomyNode + select').val())
+				});
+				//set initial location selected for location drop-down.
+				 $('#parentTaxonomyNode + select').change(function(){
+				     $('#initialLocLoad + select').val($('#parentTaxonomyNode + select').val())
+				 });
+				console.info('Initial location from SF: ' + '{!initialLocLoad}');
+			});
+
+			var $contentTypeSelect = $("#contentTypeSelect");
+
+
+			// extended styles not appropriate for this CKEditor
+			//CKEDITOR.replace('helperText');
+            CKEDITOR.replace('helperText', $.extend({
+                readOnly: false
+            }, {!CKEditorConfig}));
+			ce.content_editor('registerSaveFunction', function () {
+				return [
+					{type: 'Text', simple: true, name: 'parentTaxonomyNode', value: $('#parentTaxonomyNode').val()},
+					{type: 'Text', simple: true, name: 'title', value: $('#title').val()},
+					{type: 'Text', simple: true, name: 'loadAmount', value: $('#loadAmount').val()},
+					{type: 'Text', simple: true, name: 'filterText', value: $('#filterText').val()},
+					{type: 'Text', simple: true, name: 'allLocationsText', value: $('#allLocationsText').val()},
+					// Adobe Analytics base path; language neutral
+					{type: 'Text', simple: true, name: 'siteMapPath', value: $('#siteMapPath').val(), lang: ''},
+					{type: 'Text', simple: true, name: 'allText', value: $('#allText').val()},
+					{type: 'Text', simple: true, name: 'showAllFilter', value: $('#showAllFilter').is(':checked')},
+					{type: 'Text', simple: true, name: 'stopAllLocLoad', value: $('#stopAllLocLoad').is(':checked')},
+					{type: 'Text', simple: true, name: 'allFilterIsLast', value: $('#allFilterIsLast').is(':checked')},
+					{type: 'Text', simple: true, name: 'showSearchBar', value: $('#showSearchBar').is(':checked')},
+					{type: 'Text', simple: true, name: 'showFeatured', value: $('#showFeatured').is(':checked')},
+					{type: 'Text', simple: true, name: 'listView', value: $('#listView').is(':checked')},
+					{type: 'Text', simple: true, name: 'hideTilesLikeAction', value: $('#hideTilesLikeAction').is(':checked')},
+					{type: 'Text', simple: true, name: 'hideTilesShareAction', value: $('#hideTilesShareAction').is(':checked')},
+					{type: 'Text', simple: true, name: 'contentTypeId', value: $contentTypeSelect.val()},
+					{type: 'Text', simple: true, name: 'contentType', value: $('#contentTypeSelect option:selected').data('contentType')},
+                    {type: 'Text', simple: true, name: 'sortOrder', value: $('#sortOrder').val()},
+                    {type: 'Text', simple: true, name: 'showPriorityMessages', value: $('#showPriorityMessages').is(':checked')},
+                    {type: 'Text', simple: true, name: 'showMaxPriorityItems', value: $('#showMaxPriorityItems').val()},
+
+					// initialFilterCat value will be either 'allfirst' or 'child'
+					// initialFilterChild value will be meaningful only if initialFilterCat is 'child'
+					{type: 'Text', simple: true, name: 'initialFilterCat', value: $('input[name="initialFilterCat"]:checked').attr('id')},
+					{type: 'Text', simple: true, name: 'initialFilterChild', value: $('#initialFilterChild').val()},
+					{type: 'Text', simple: true, name: 'initialLocLoad', value: $('#initialLocLoad').val()},
+
+                    {type: 'Text', simple: true, name: 'viewAllLabel', value: $('#viewAllLabel').val()},
+                    {type: 'Text', name: 'viewAllTargetPage', value: $('#viewAllTargetPage').val()},
+
+					{type: 'Text', simple: true, name: 'helperTitle', value: $('#helperTitle').val()},
+					{type: 'Text', simple: true, name: 'filter', value: $('#filter').val()},
+
+					// note negation: original sense of checkbox has changed; used to be "Use parent path", now "Show filter bar" (filter bar appears iff Use parent path is false)
+					{type: 'Text', simple: true, name: 'useParentPath', value: !$('#useParentPath').is(':checked')},
+					{type: 'Text', name: 'helperText', value: CKEDITOR.instances['helperText'].getData()}
+				];
+			});
+
+			function validateCheckboxes() {
+				if ($('#listView').attr('checked')) {
+					$('#showFeatured')
+						.attr('disabled', true)
+						.attr('checked', false)
+						.next('span').addClass('disabled');
+				} else {
+					$('#showFeatured')
+						.attr('disabled', false)
+						.next('span').removeClass('disabled');
+				}
+			}
+
+			function validatePriorityFields() {
+			    if ($('#showPriorityMessages').attr('checked')){
+			        $('#showMaxPriorityItems')
+                            .attr('disabled', false)
+                            .next('span').removeClass('disabled');
+                } else {
+                    $('#showMaxPriorityItems')
+                            .attr('disabled', true)
+                            .val('0')
+                            .next('span').addClass('disabled');
+                }
+            }
+
+			if (!{!disableAll}) {
+				initializeTagPathSelectors();
+				$('#listView').click(validateCheckboxes);
+				$('#showPriorityMessages').click(validatePriorityFields);
+				validateCheckboxes();
+                validatePriorityFields();
+			}
+					
+			var requestParams = {
+		        action: 'getContentTypes',
+		        contentTemplate: '{!contentTemplate}'
+		    };
+		    
+		    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_ListPage', 
+				requestParams,
+				function (textStatus, json, xhr) {
+				    $.each(json.contentTypes, function(i, value) {
+				   		$contentTypeSelect.append('<option data-content-type="' + value.name + '" value="' + value.id + '">' + value.label + '</option>');
+					});
+					$contentTypeSelect.val("{!contentTypeId}");
+				}
+			);
+
+            function saveLinkWithComma(pageSelectLink) {
+                if (pageSelectLink != undefined && pageSelectLink != '' && pageSelectLink != null) {
+                    var delimiter = ',',
+                            start = 6,
+                            unslicedStr = pageSelectLink.split(delimiter, start),
+                            result = pageSelectLink.split(delimiter).slice(start),
+                            urlToEncode = result.join(delimiter);
+
+                    if (urlToEncode != undefined && urlToEncode != '' && urlToEncode.indexOf(',') != -1) {
+                        var encodedUrl = urlToEncode.replaceAll(',', '%2C');
+                        return unslicedStr + ',' + encodedUrl;
+                    } else {
+                        return pageSelectLink;
+                    }
+                } else {
+                    return '';
+                }
+            }
+		});
+		//# sourceURL="ListPage_Edit.js"
+	</script>
+
+	<style type="text/css">
+		.dependent {
+			margin: 0.6em 0 0.6em 2em !important;
+		}
+
+		/* for Display options checkboxes */
+		label + br + label {
+	    	margin-top: 0.6em;
+		}
+
+		input[type="text"][disabled] {
+			border-color: #ddd white white #ddd !important;
+		}
+
+		span.disabled {
+			color: #999;
+		}
+	</style>
+
+	<apex:outputPanel layout="block">
+		<form>
+			<table class="ocmsContentEditor ocmsContentEditorNested">
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="title">Page title</label>
+						<input class="ocmsTextInputLrg" type="text" name="title" id="title" value="{!title}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="contentName">Item content type</label>
+						<select id="contentTypeSelect"></select>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel">Choose a taxonomy category for matching content items</label><!-- Filter Bar Taxonomy Parent: old text: Taxonomy parent of filter bar categories-->
+						<div class="taxSelect">
+							<input class="ocmsTextInputLrg" type="text" name="parentTaxonomyNode" id="parentTaxonomyNode" value="{!parentTaxonomyNode}"/>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="loadAmount">Number of content items to load per page</label>
+						<input class="ocmsTextInputSml" type="text" name="loadAmount" id="loadAmount" value="{!loadAmount}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+                        <p class="ocmsInstructionText">
+							To track articles with Adobe Analytics, a “site map path” for this page must be provided.
+							The path is composed of <i>Page Sections</i>, where Page Section names are separated by “/”.<br/>
+							For example, “Company<b>/</b>Leadership<b>/</b>Messages from the CEO” (3 Page Sections).
+						</p>
+						<label class="ocmsLabel" for="siteMapPath">Adobe Analytics site map path (optional)</label>
+						<input class="ocmsTextInputLrg" type="text" name="siteMapPath" id="siteMapPath" value="{!siteMapPath}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="filter">Filter drop-down</label>
+						<select id="filter">
+							<option value="none">None</option>
+							<option value="location">Location</option>
+						</select>
+						<div class="dependent">
+							<label class="ocmsLabel" for="helperTitle">“All Locations” text</label>
+							<input class="ocmsTextInputLrg" type="text" name="allLocationsText" id="allLocationsText" value="{!allLocationsText}"/>
+						</div>
+						<div class="dependent">
+							<label><input type="checkbox" id="stopAllLocLoad" name="stopAllLocLoad" />Stop 'All' node from loading all locations (check when location list is very large).</label><br />
+						</div>
+						<div class="dependent">
+							<label class="ocmsLabel">Initial location selected</label>
+						</div>
+						<div class="taxSelect dependent">
+							<input class="ocmsTextInputLrg" type="text" name="initialLocLoad" id="initialLocLoad" value="{!initialLocLoad}"/>
+						</div>						
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel">Filter bar</label>
+
+						<label><input type="checkbox" id="useParentPath" name="useParentPath" />Show filter bar (chosen taxonomy category must have child categories)</label><br />
+
+						<div class="dependent">
+							<label><input type="checkbox" id="showAllFilter" name="showAllFilter" /> Show “All” in filter bar</label><br />
+							<div class="dependent">
+								<label class="ocmsLabel" for="helperTitle">“All” label in filter bar</label>
+								<input class="ocmsTextInputLrg" type="text" name="allText" id="allText" value="{!allText}"/>
+								<br />
+								<br />
+								<label><input type="checkbox" id="allFilterIsLast" name="allFilterIsLast" /> “All” filter category appears last</label>							
+							</div>
+
+							<label class="ocmsLabel">Initially selected filter category</label>
+
+							<label><input type="radio" name="initialFilterCat" id="allfirst" /> <span>“All”</span></label><br />
+							<label><input type="radio" name="initialFilterCat" id="child" /> Child taxonomy category</label>
+							<div class="taxSelect dependent">
+								<input class="ocmsTextInputLrg" type="text" name="initialFilterChild" id="initialFilterChild" value="{!initialFilterChild}"/>
+							</div>
+
+							<label class="ocmsLabel" for="filterText">Mobile filter prefix text</label>
+							<input class="ocmsTextInputLrg" type="filterText" name="filterText" id="filterText" value="{!filterText}"/>
+							<p class="ocmsHelpText">(appears before the current filter name on mobile screen layouts)</p>
+
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="showAllFilter">Display options</label>
+
+						<label><input type="checkbox" id="showSearchBar" name="showSearchBar" /> Show search box</label><br />
+						<label><input type="checkbox" id="listView" name="listView" /> Display items in list format (vs. grid)</label><br />
+						<label><input type="checkbox" id="showFeatured" name="showFeatured" /> <span>Show featured item (only available for grid)</span></label><br />
+						<label><input type="checkbox" id="hideTilesLikeAction" name="hideTilesLikeAction" /> Hide 'like' actions in tiles if present</label><br />
+						<label><input type="checkbox" id="hideTilesShareAction" name="hideTilesShareAction" /> Hide 'share' actions in tiles if present</label><br />
+                        <label><input type="checkbox" id="showPriorityMessages" name="showPriorityMessages" /> <span>Highlight priority messages (used with priority sort order)</span></label><br />
+                        <label class="ocmsLabel" for="showMaxPriorityItems">Maximum Number of priority Items to highlight (mark)</label>
+                        <input class="ocmsTextInputSml" type="showMaxPriorityItems" name="showMaxPriorityItems" id="showMaxPriorityItems" value="{!showMaxPriorityItems}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel">Item order (reverse chronological, by…)</label>
+                        <select id="sortOrder">
+                            <option value="originalDate">Original publish date</option>
+                            <option value="latestDate">Latest publish date</option>
+							<option value="priority_date">Priority, Original publish date</option>
+                        </select>
+						<!--<label for="originalDate"><input type="radio" name="sortOrder" id="originalDate" /> Original publish date</label><br />-->
+						<!--<label for="latestDate"><input type="radio" name="sortOrder" id="latestDate" /> Latest publish date</label>-->
+					</td>
+				</tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="viewAllLabel">View All Label text</label>
+                        <input class="ocmsTextInputLrg" type="text" name="viewAllLabel" id="viewAllLabel" value="{!viewAllLabel}"/>
+					</td>
+                </tr>
+				<tr>
+					<td>
+                        <label class="ocmsLabel" for="viewAllTargetPage">View All Destination Page</label>
+                        <input type="hidden" name="viewAllTargetPage" id="viewAllTargetPage" value="{!viewAllTargetPage}" />
+                        <cms:PageSelector cPassThroughId="viewAllTargetPage" value="{!viewAllTargetPage}"  dialogId="viewAllTargetPageLinkDialog" disabled="{!layout_disabled}" sname="{!content.cms__Site_Name__c}" token="{!token}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="helperTitle">Pop-up help title (optional)</label>
+						<input class="ocmsTextInputLrg" type="text" name="helperTitle" id="helperTitle" value="{!helperTitle}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="helperText">Pop-up help text (optional)</label>
+	                    <textarea  id="helperText" name="helperText">
+	                    	<apex:outputText value="{!helperText}" />
+	                    </textarea>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</apex:outputPanel>
+</apex:page>

@@ -1,0 +1,76 @@
+<apex:page standardController="Case"  extensions="AskHR_CaseCloseController" lightningStylesheets="true">
+    <script>
+    function reloadPage() {
+        console.log('in reload');
+        window.top.location.reload();
+    }
+    </script>
+    <apex:form >
+        <apex:sectionHeader title="Case Close" subtitle="{!Case.CaseNumber}"/>
+        <apex:pageBlock mode="edit" title="Case Close">
+            <apex:pageBlockButtons location="bottom">
+                <apex:commandButton styleClass="slds-button slds-button_brand" oncomplete="reloadPage();" value="Close Case" action="{!doCaseClose}"  />
+                <apex:commandButton action="{!cancel}" immediate="true" value="Cancel"/>
+            </apex:pageBlockButtons>
+            <apex:outputPanel id="pageMessages">
+                <apex:pageMessages />
+            </apex:outputPanel> 
+            
+            <apex:pageBlockSection title="Case Closure Information" collapsible="false" columns="1">
+                
+                
+                <apex:pageBlockSectionItem rendered="{!IF(Case.RecordType.DeveloperName== 'ER_Case',true,false)}">
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.Type.Label}" />
+                    <apex:selectList value="{!caseCloseTopic}" size="1">
+                        <apex:selectOptions value="{!Topics}"  />
+                    </apex:selectList>                    
+                </apex:pageBlockSectionItem>  
+                
+                <apex:pageBlockSectionItem rendered="{!IF(Case.RecordType.DeveloperName== 'ER_Case',true,false)}">
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.Resolution__c.Label}" />
+                    <apex:selectList value="{!resolution}" size="1">
+                        <apex:selectOptions value="{!Resolutions}"  />
+                    </apex:selectList>                    
+                </apex:pageBlockSectionItem>  
+                
+                <apex:pageBlockSectionItem rendered="{!IF(Case.RecordType.DeveloperName== 'ER_Case',true,false)}">
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.Complexity__c.Label}" />
+                    <apex:selectList value="{!complexity}" size="1">
+                        <apex:selectOptions value="{!CaseComplexity}"  />
+                    </apex:selectList>                    
+                </apex:pageBlockSectionItem> 
+                
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.Status.Label}" />
+                     <apex:selectList value="{!caseStatus}" size="1">
+                        <apex:selectOptions value="{!CaseStatusValues}"  />
+                    </apex:selectList>                    
+                </apex:pageBlockSectionItem>  
+                <apex:pageBlockSectionItem rendered="{!IF(AND(Case.RecordType.DeveloperName != 'ER_Case', Case.RecordType.DeveloperName != 'ER_Termination_Documents'),true,false)}" >
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.Reason.Label}" />
+                     <apex:selectList value="{!caseCloseReason}" size="1">
+                        <apex:selectOptions value="{!CaseCloseReasons}"  />
+                    </apex:selectList>                    
+                </apex:pageBlockSectionItem>  
+                
+                <apex:pageBlockSectionItem rendered="{!IF(AND(Case.RecordType.DeveloperName== 'Function', isFunction),true,false)}">
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.PROD_Implementation_Date__c.Label}" />
+                    <apex:inputField value="{!Case.PROD_Implementation_Date__c}"/>   
+                </apex:pageBlockSectionItem>  
+                <apex:pageBlockSectionItem rendered="{!IF(AND(Case.RecordType.DeveloperName== 'Function', isFunction),true,false)}">
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.PROD_Implementer_Name__c.Label}" />
+                    <apex:inputField value="{!Case.PROD_Implementer_Name__c}"/>   
+                </apex:pageBlockSectionItem>  
+                <apex:pageBlockSectionItem rendered="{!IF(AND(Case.RecordType.DeveloperName== 'Function', isFunction),true,false)}">
+                    <apex:outputLabel value="{!$ObjectType.Case.fields.Prod_Validated_By__c.Label}" />
+                    <apex:inputField value="{!Case.Prod_Validated_By__c}"/>   
+                </apex:pageBlockSectionItem>  
+
+
+        
+
+            </apex:pageBlockSection>
+            
+             </apex:pageBlock>        
+    </apex:form>
+</apex:page>

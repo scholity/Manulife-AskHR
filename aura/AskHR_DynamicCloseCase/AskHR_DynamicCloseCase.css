@@ -1,0 +1,6 @@
+.THIS {
+}
+
+.THIS .slds-modal__content {
+    min-height:450px !important;
+}

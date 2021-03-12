@@ -1,0 +1,23 @@
+<apex:page controller="cms.GenerateContent" extensions="ocms_mfc_BookmarkContentServiceLayout" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+<html><head></head><body>{:Start:}
+	<div id="{!cli.id}" class="bookmarks bookmarks-list bookmarks-loading">
+		<div class="bookmark-header">
+			<h2><apex:outputText value="{!BookmarkListTitle}"/></h2>
+			<select name="bookmark-filter" class="bookmark-filter">
+				<option value="{!NumberOfBookmarks}"> <apex:outputText value="{!DefaultLabel}" /> (<apex:outputText value="{!NumberOfBookmarks}"/>) </option>
+				<option value="all"> <apex:outputText value="{!ShowAllLabel}" /> </option>
+			</select>
+		</div>
+		<div class="bookmarks-loader"></div>
+		<div class="bookmarks-container">
+			<ul></ul>
+		</div>
+	</div>
+	<script>
+		LazyLoad.css('{!URLFOR($Resource.ocms_mfc_Bookmark, 'css/styles.css')}');
+		LazyLoad.js('{!URLFOR($Resource.ocms_mfc_Bookmark, 'js/main.js')}', function() {
+			window['{!cli.id}-ctrl'] = new ocmsIntranetBookmarks.List($('#{!cli.id}'));
+		});
+	</script> 
+{:Stop:}</body></html>
+</apex:page>

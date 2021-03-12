@@ -1,0 +1,27 @@
+<apex:page standardController="Private_Notes__c" extensions="ASKHR_HRNotes_Controller" showHeader="false" sidebar="false" > 
+
+<script type="text/javascript">
+ if({!newNote} == true)
+ { window.close();}       
+ else if({!cancellNote} == true)
+ { window.close();}
+</script>
+
+    
+     <apex:sectionHeader title="HR Note" subtitle="New HR Note" />
+     <apex:form >
+          <apex:pageBlock title="HR Note" rendered="{!$ObjectType.Private_Notes__c.accessible}">
+              
+              <apex:pageBlockSection title="Information" columns="1">
+                  <p style="font-size:10px;text-indent:65px;font-family:arial"> CaseNumber : {!$CurrentPage.Parameters.CaseNumber}</p>
+                  <apex:inputfield value="{!Private_Notes__c.Comments__c}" style="width: 360px; height: 100px" required="true"/>
+              </apex:pageBlockSection>
+              
+              <apex:pageBlockButtons location="bottom">
+                  <apex:commandButton value="Save" action="{!save}"/>
+                   <apex:commandButton value="Cancel" action="{!Cancel}"/> 
+              </apex:pageBlockButtons>
+              
+          </apex:pageBlock>
+    </apex:form>    
+</apex:page>

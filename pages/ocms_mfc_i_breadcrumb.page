@@ -1,0 +1,40 @@
+<!-- ocms_mfc_i_breadcrumb -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+	<div id="breadcrumb">
+		<div class="back">
+			<a href="#"><span class="i81n" data-i18n-id="uiLabelBack" id="backLabel">
+				<apex:outputText rendered="{!api.page_mode == 'edit'}">
+					<div class="ocmsHint">
+						<strong>Plain Text</strong> ❧ Back button text <br /> If omitted, the entire enclosing “navigation bar” will not be shown.
+					</div>
+				</apex:outputText> 
+				<cms:Panel panelName="backText" panelController="{!controller}" panelWidth="350px"
+					panelHeight="20px" panelContentLayouts="PlainText" panelLimit="1" />
+			</span></a>
+			<!-- Having a panel inside an <a> tag breaks the markup. We need to force feed the panel 
+					back into the a tag after it attempts to render it -->
+			<apex:outputText rendered="{!api.page_mode == 'edit'}">
+				<script>
+					$('#backLabel').append($('#breadcrumb .back .ocms-content-panel'));
+				</script>
+			</apex:outputText>
+		</div>
+		<div class="breadcrumb-title">
+			<span class="inner" id="pageTitle">
+				<apex:outputText rendered="{!api.page_mode == 'edit'}"><div class="ocmsHint">
+                    <strong>Plain Text</strong> ❧ Page Title
+                </div></apex:outputText>
+				<cms:Panel panelName="pageTitle" panelController="{!controller}" panelWidth="350px"
+                    panelHeight="20px" panelContentLayouts="PlainText" panelLimit="1"
+                />&nbsp;
+            </span>
+		</div>
+	</div>
+
+	<script>
+		if ($('#backLabel').html().trim()) {
+			$('#breadcrumb').show();
+		}
+	</script>
+</apex:page>
+<!-- ocms_mfc_i_breadcrumb -->

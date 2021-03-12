@@ -1,0 +1,253 @@
+<!-- ocms_mfc_i_headerAndSideNav.page -->
+<apex:page showHeader="false" sidebar="false" controller="cms.CoreController" cache="false" standardStylesheets="false">
+    <style>
+        /* Lang sel */
+        #uiLabelLangSel {
+            height: 100%;
+            color: white;
+            position: absolute;
+            margin-right: 5px;
+            right: 3%;
+            z-index: 111;
+            cursor: pointer;
+        }
+        #uiLabelLangSel #lang-sel-dropdown {
+            width: 100%;
+            height: 100%;
+            font-size: 13px;
+        }
+        #uiLabelLangSel #lang-sel-dropdown p {
+            font-size: 15px;
+            font-weight: bold;
+            right: 10%;
+            text-transform: uppercase;
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            -ms-transform: translateY(-50%);
+            transform: translateY(-50%);
+        }
+        /* style the items (options), including the selected item: */
+        #lang-sel-dropdown-items {
+            margin: 70px 0px 0px 0px;
+            float: right;
+            position: relative;
+            text-align: left;
+            font-size: 16px;
+            line-height: 50px;
+            z-index: 99;
+            background-color: rgba(255, 255, 255, 1);
+        }
+        @media all and (max-width: 1024px) {
+            #lang-sel-dropdown-items {
+                margin: 60px 0px 0px 0px;
+                font-size: 15px;
+                line-height: 45px;
+            }
+        }
+        @media all and (max-width: 768px) {
+            #lang-sel-dropdown-items {
+                margin: 50px 0px 0px 0px;
+                font-size: 14px;
+                line-height: 40px;
+            }
+        }
+        #lang-sel-dropdown-items div, .select-selected {
+            color: black;
+            padding: 0px 15px 0px 15px;
+            border: 1px solid #EDEDED;
+            cursor: pointer;
+        }
+        /* Style items (options): */
+        #lang-sel-dropdown-items .current-selected {
+            border-left: 5px solid #00a758;
+            padding-left: 10px;
+        }
+        /* Hide the items when the select box is closed: */
+        #lang-sel-dropdown-items.select-hide {display: none;}
+        #lang-sel-dropdown-items div:hover, .same-as-selected {background-color: rgba(0, 0, 0, 0.1);}
+    </style>
+
+    <script>
+        $(document).ocmsDynamicLoadFinished(function () {
+            // Show the current selected language
+            $('#lang-sel-dropdown p').text(MFC.sitePreferences.renderLanguage.substr(0, 2));
+
+            let allLanguages = [], allLangCodes = [];
+            $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_MyPreferences', {action: 'getAllLanguages'},
+                    function callBack(status, response) {
+                        if (response.success) {
+                            allLanguages = response.allLanguages;
+                            allLangCodes = response.allLangCodes;
+                            // Add all available langs to the drop down selector
+                            for (let i = 0; i < allLanguages.length; i++) {
+                                var languageNative = '';
+                                if (allLanguages[i].indexOf('rench') >= 0)
+                                    languageNative = 'Français';
+                                else if (allLanguages[i].indexOf('donesia') >= 0)
+                                    languageNative = 'Bahasa Indonesia';
+                                else if ((allLanguages[i].indexOf('apanese') >= 0))
+                                    languageNative = '日本語';
+                                else if ((allLanguages[i].indexOf('hinese') >= 0))
+                                    languageNative = '中文（简体）';
+                                else
+                                    languageNative = allLanguages[i];
+
+                                if (allLangCodes[i] === MFC.sitePreferences.renderLanguage)
+                                    $('#lang-sel-dropdown-items').append('<div value="' + allLangCodes[i] + '" class="current-selected">' + languageNative + '</div>');
+                                else
+                                    $('#lang-sel-dropdown-items').append('<div value="' + allLangCodes[i] + '">' + languageNative + '</div>');
+                            }
+
+                            // Attach lang selection functions
+                            $('#lang-sel-dropdown-items div').each(function () {
+                                $(this).click(function () {
+                                    let lang = $(this).attr('value');
+                                    // Fire language change request
+                                    if (lang !== MFC.sitePreferences.renderLanguage) {
+                                        // Update text in selector to reflect the newly selected language
+                                        $('#lang-sel-dropdown p').text(lang.substr(0, 2));
+                                        // Analitics
+                                        clickTracking('lang-sel', lang);
+
+                                        $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_MyPreferences', {
+                                                    action: 'changeLanguage',
+                                                    newLanguage: lang
+                                                },
+                                                function callBack(status, response) {
+                                                    if (response.success) {
+                                                        let urlCategoryName = 'subCategoryIds';
+                                                        var nodeIds = [];
+                                                        $('.newsCheckbox.selected').each(function (i, v) {
+                                                            var nodeId = $(v).parent().parent().children('input').data('mfc-node-id');
+                                                            if (nodeId != undefined)
+                                                                nodeIds.push(nodeId);
+                                                        });
+
+                                                        OCMS.deleteCookie('userNewsPaths');
+
+                                                        var appendUrlObject = {};
+                                                        appendUrlObject[urlCategoryName] = nodeIds.join(',');
+                                                        appendUrlObject["dailyDigest"] = $('.dailyDigestCheckbox').find('.icon.selected').length ? 'true' : 'false';
+                                                        // If we do not have categories in the url just append it to the end
+                                                        if (window.location.href.indexOf(urlCategoryName) == -1) {
+                                                            window.location.href = window.location.href.appendQueryString(appendUrlObject);
+                                                        } else {
+                                                            // If we already have categories in the url then we want to remove our parameters and then replace them
+                                                            var url = window.location.href;
+                                                            url = fMyPreferencesRemoveURLParameter(url, urlCategoryName);
+                                                            url = fMyPreferencesRemoveURLParameter(url, 'dailyDigest');
+                                                            url = url.appendQueryString(appendUrlObject);
+
+                                                            // Weird case... we have a #? in the url at the start, this for some reason breaks page redirection
+                                                            if (url.indexOf('#?') > 0) {
+                                                                url = url.replace('#?', '?');
+                                                            }
+
+                                                            window.location.href = url;
+                                                        }
+                                                        location.reload();
+                                                    }
+                                                });
+                                    }
+
+                                    // Close the dropdown
+                                    $('#uiLabelLangSel #lang-sel-dropdown').removeClass('select-arrow-active');
+                                    $('#uiLabelLangSel #lang-sel-dropdown .logo').removeClass('coral-close-up');
+                                    $('#uiLabelLangSel #lang-sel-dropdown .logo').addClass('white-drop-down');
+                                    $('#lang-sel-dropdown-items').addClass('select-hide');
+
+                                });
+                            });
+
+                            // Add on click listener to the drop down
+                            $('#uiLabelLangSel #lang-sel-dropdown').on('click', function (e) {
+                                // Stop propagation of closing the select box by document
+                                drawer_cl(e);
+                                e.stopPropagation();
+                                // Toggle the box
+                                $('#lang-sel-dropdown-items').toggleClass("select-hide");
+                                $('#uiLabelLangSel #lang-sel-dropdown .logo').toggleClass('white-drop-down');
+                                $('#uiLabelLangSel #lang-sel-dropdown .logo').toggleClass('coral-close-up');
+                                $(this).toggleClass("select-arrow-active");
+
+                                // Analytics
+                                clickTracking('lang-sel', 'open-sel');
+                            });
+                        } else {
+                            console.log("Failed to get all langs!");
+                        }
+                    }, null, true);
+        });
+        // close lang sel when clicking on other parts of the website
+        document.addEventListener('click', function () {
+            $('#uiLabelLangSel #lang-sel-dropdown').removeClass('select-arrow-active');
+            $('#uiLabelLangSel #lang-sel-dropdown .logo').removeClass('coral-close-up');
+            $('#uiLabelLangSel #lang-sel-dropdown .logo').addClass('white-drop-down');
+            $('#lang-sel-dropdown-items').addClass('select-hide');
+        });
+    </script>
+
+    <header id="global-header">
+        <div class="gradient"></div>
+        <div id="uiLabelLangSel" title="Language">
+            <div id="lang-sel-dropdown">
+                <p></p>
+                <div class="logo white-drop-down"></div>
+            </div>
+        </div>
+
+        <div class="repeat l"></div>
+        <div class="repeat r"></div>
+        <a class="inner">
+            <div class="logo manulife"></div>
+            <div class="logo john-hancock"></div>
+        </a>
+        <script>
+            $('#global-header a.inner').attr('href', MFC.sitePreferences.bannerPage);
+        </script>
+    </header>
+    <div id="lang-sel-dropdown-items" class="select-items select-hide"></div>
+    <div class="global-layer-wrap drawer-global-layer">
+        <div class="global-align-center">
+            <div id="mfc-main-content" class="inner">
+                <section id="global-drawer" class="sticky-footer-fix">
+                    <nav id="nav-slider">
+                        <div class="slider">
+                            <header>
+                                <div class="back">
+                                    <a>
+                                        <div class="v-align">
+                                            <div class="inner">
+                                                <span id="drawer-back-title"></span>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </header>
+                            <div class="inner">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>Class Styled Menu</strong> ❧ Main navigation menu (sidebar)
+                                    </div>
+                                </apex:outputText>
+                                <cms:Panel panelName="sidebarMenu" panelController="{!controller}"
+                                           panelHeight="30px" panelContentLayouts="ClassStyledMenu" panelLimit="1"/>
+                            </div>
+                        </div>
+                    </nav>
+                </section>
+            </div>
+        </div>
+    </div><!-- .global-layer-wrap.drawer-global-layer -->
+    <script>
+        if (OCMS.getCookie('fontSize') != undefined) {
+            // Create a fake div so we can re-use k2's text resize function
+            change_size({target: $('<div/>', {"data-mfc-size": OCMS.getCookie('fontSize')})});
+        }
+        document.getElementById("nav-slider").addEventListener('mouseleave', function () {
+            document.getElementById("mfc-main-content").click();
+        });
+    </script>
+</apex:page>
+<!-- ocms_mfc_i_headerAndSideNav.page -->

@@ -1,0 +1,762 @@
+<!-- ocms_mfc_t_Search -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mfc_FavIcon, 'img/favicon.ico')}" type="image/x-icon"/>
+            <apex:include pageName="ocms_mfc_i_headSpace"/>
+        </apex:define>
+
+        <apex:define name="body">
+            <script type="text/javascript">
+                $(document).ocmsDynamicLoadFinished(function () {
+                    // set coveo language
+                    var usrLang = window.CMS ? window.CMS.lang : 'en_US';
+                    usrLang = usrLang == 'en_US' ? usrLang : ('(en_US,' + usrLang + ')');
+                    window.coveo = {'usrLang': '(@sflanguagec==' + usrLang + ')'};
+
+                    //get access token, orgID
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_GSASearchService', {action: 'getCoveoToken'}, function (status, json, xhr) {
+                        if (json.success) {
+                            window.coveo.token = json.message.token.toString();
+                            window.coveo.orgID = json.orgID.toString();
+
+                            //auto load search terms parsed from url
+                            const urlTokens = window.location.search.split('&');
+                            if(urlTokens.length > 1 && urlTokens[1].indexOf('q=') == 0){
+                                $('.CoveoSearchbox input').val(MFC.inputSanitize(urlTokens[1].substring(2, urlTokens[1].length)));
+                                coveoPrepareSearch('searchbox');
+                            }
+                        }
+                    }, null, true);
+
+                    // fill in labels
+                    $('#coveo-input-bar').attr('placeholder', MFC.sitePreferences.uiLabelSearchPlaceholder);
+                    $('#coveo-show-more-label').html(MFC.sitePreferences.uiLabelShowMore);
+                    $('#AllFacet label').html(MFC.sitePreferences.uiLabelSearchFacet1);
+                    $('#NewsFacet label').html(MFC.sitePreferences.uiLabelSearchFacet2);
+                    $('#MCFacet label').html(MFC.sitePreferences.uiLabelSearchFacet3);
+                    $('#CEOMsgFacet label').html(MFC.sitePreferences.uiLabelSearchFacet4);
+                    $('#AskHRFacet label').html(MFC.sitePreferences.uiLabelSearchFacet5);
+                    $('#coveo-no-result-p1').html(MFC.sitePreferences.uiLabelSearchErrorNoResults + ' - ');
+                    $('#coveo-no-result-p2').html(' - ' + MFC.sitePreferences.uiLabelSearchErrorNoResultsP2);
+                    $('#search-feedback-button span').html((window.CMS.lang === 'en_US') ? 'Feedback': 'Vos commentaires');
+
+                    // set up back button url
+                    if(OCMS.getCookie('last_mfc_page'))
+                        $('#search .back a').attr('href', OCMS.getCookie('last_mfc_page'));
+                    else {
+                        $('#search .back a').attr('href', 'cms__Main?name=Home');
+                        $('#uiLabelBack').html(MFC.sitePreferences.uiLabelBackToHome);
+                    }
+
+                    // JS Events
+                    $(".CoveoSearchButton").click(function() {coveoPrepareSearch('searchbox');});
+                    $('#coveo-input-bar').keyup(function(e){
+                        // if enter key hit, handle facets and coveo search results
+                        if (e.keyCode === 13)
+                            coveoPrepareSearch('searchbox');
+                        else if (e.keyCode === 40) {
+                            var index = -1;
+                            if($('.magic-box-suggestion.select').length !== 0)
+                                index = $('.magic-box-suggestions').children('.magic-box-suggestion.select').index();
+
+                            index++;
+                            $('.magic-box-suggestions .magic-box-suggestion.select').removeClass('select');
+                            $('.magic-box-suggestions').children().eq(index).addClass('select');
+                            $('#coveo-input-bar').val($('.magic-box-suggestions .magic-box-suggestion.select').find('span:last-child').html());
+                        } else if (e.keyCode === 38){
+                            var index = $('.magic-box-suggestions').children().length;
+                            if($('.magic-box-suggestion.select').length !== 0)
+                                index = $('.magic-box-suggestions').children('.magic-box-suggestion.select').index();
+
+                            index--;
+                            $('.magic-box-suggestions .magic-box-suggestion.select').removeClass('select');
+                            $('.magic-box-suggestions').children().eq(index).addClass('select');
+                            $('#coveo-input-bar').val($('.magic-box-suggestions .magic-box-suggestion.select').find('span:last-child').html());
+                        }else {
+                            const rawQuery = $('#coveo-input-bar').val();
+                            if(rawQuery === '') {
+                                $('.magic-box-suggestions').html('');
+                                $('.magic-box-suggestions').removeClass('magic-box-hasSuggestion');
+                            }
+                            else
+                                coveoGetSuggestion(rawQuery);
+                        }
+                    });
+                    $(window).click(function(e) {
+                        if(e.target.id === 'coveo-input-bar') {
+                            if($('.magic-box-suggestions').children().length > 0)
+                                $('.magic-box-suggestions').addClass('magic-box-hasSuggestion');
+                            else if($('#coveo-input-bar').val() !== '')
+                                coveoGetSuggestion($('#coveo-input-bar').val());
+                            else
+                                return;
+                        }
+                        else
+                            $('.magic-box-suggestions').removeClass('magic-box-hasSuggestion');
+                    });
+                    // feedback button clicked, trigger survey monkey JS
+                    $('.search-feedback-button-container').click(function(){
+                        if('fr' === window.CMS.lang)
+                            window.open("https://www.surveymonkey.com/r/mfcsearch1?lang=fr_CA", '_blank');
+                        else {
+                            (function (t, e, s, o) {
+                                var n, c, l;
+                                t.SMCX = t.SMCX || [],
+                                e.getElementById(o) || (n = e.getElementsByTagName(s),
+                                        c = n[n.length - 1], l = e.createElement(s),
+                                        l.type = "text/javascript", l.async = !0,
+                                        l.id = o, l.src = ["https:" === location.protocol ? "https://" : "http://", "widget.surveymonkey.com/collect/website/js/tRaiETqnLgj758hTBazgd_2F1mA4BjysSfxn2ZRMwQjkztloNUgWTxP8NI8yJb_2BwOW.js"].join(""),
+                                        c.parentNode.insertBefore(l, c))
+                            })(window, document, "script", "smcx-sdk");
+                        }
+
+                        $('.search-feedback-button-container').hide();
+                        document.cookie = "hide_search_feedback=true";
+                        clickTracking('searchPage', 'feedback_button');
+                    });
+                });
+
+                const handleFacets = function (type) {
+                    if($('#'+type).hasClass("selected"))
+                        return;
+
+                    $(".coveo-facet-column .selected").removeClass("selected");
+                    switch (type) {
+                        case "AskHRFacet": window.coveo.aq = '(@source=="HR") ' + window.coveo.usrLang; break;
+                        case "NewsFacet": window.coveo.aq = '(@sftypec=="News") ' + window.coveo.usrLang; break;
+                        case "CEOMsgFacet": window.coveo.aq = '(@sftypec=="CEOMessage") ' + window.coveo.usrLang; break;
+                        case "MCFacet": window.coveo.aq = '(@sftypec=="Mission Control") ' + window.coveo.usrLang; break;
+                        default: window.coveo.aq = window.coveo.usrLang; //the All facet
+                    }
+                    $('#'+type).addClass('selected');
+
+                    window.coveo.start = 0;
+                    coveoDoSearch(window.coveo.lastQuery, window.coveo.aq, window.coveo.start, false, 'facet');
+                }
+                const loadmore = function() {
+                    window.coveo.start += 10;
+                    coveoDoSearch(window.coveo.lastQuery, window.coveo.aq, window.coveo.start, false, 'getMoreResults');
+                }
+            </script>
+            <script>
+                const coveoGetSuggestion = function(rawQuery) {
+                    const q = MFC.inputSanitize(rawQuery);
+                    if(q === '') return;
+
+                    $.ajax({
+                        method: "GET", url: "https://search.cloud.coveo.com/rest/search/v2/querySuggest", contentType: 'application/json',
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + window.coveo.token);
+                        },
+                        data:{
+                            "organizationId": window.coveo.orgID, "q": q, "language": 'en',
+                            "searchHub": "MFCentralSearch", "pipeline": "MFCentral", "enableWordCompletion": false
+                        },
+                        success: function (data, status) {
+                            $('.magic-box-suggestions').addClass('magic-box-hasSuggestion');
+                            var suggestionResults = '';
+                            data.completions.forEach(function(suggestion){
+                                suggestionResults +=
+                                    '<div class="magic-box-suggestion">' +
+                                        suggestion.highlighted.replace(/[{(]+/gi, '<span class="coveo-highlight">').replace(/[\[]+/gi, '<span>').replace(/[\]})]+/gi, '</span>') +
+                                        '<span style="display: none;">' + suggestion.expression + '</span>' +
+                                    '</div>';
+                            });
+                            $('.magic-box-suggestions').html(suggestionResults);
+                            // bind hover hightlight
+                            $('.magic-box-suggestions .magic-box-suggestion').hover(function(){
+                                $('.magic-box-suggestions .magic-box-suggestion.select').removeClass('select');
+                                $(this).addClass('select');
+                            });
+                            // bind click search
+                            $('.magic-box-suggestions .magic-box-suggestion').click(function(){
+                                $('.CoveoSearchbox input').val($(this).find('span:last-child').html());
+                                coveoPrepareSearch('omnibox');
+                                $('.magic-box-suggestions').html('');
+                            });
+                        }
+                    });
+                };
+                const coveoPrepareSearch = function(from){
+                    var q = MFC.inputSanitize($('.CoveoSearchbox input').val());
+                    if(q === '') return;
+
+                    $("#coveo-no-result-search-term").html(q); //pre-fill search term into no result error message
+
+                    window.coveo.aq = window.coveo.usrLang; window.coveo.start = 0; window.coveo.lastQuery = q;
+                    coveoDoSearch(q,  window.coveo.aq, window.coveo.start, true, from);
+
+                    // reset url
+                    history.pushState({id: 'SearchPage'}, "Search", "?name=Search&q=" + q.replace(/[ ]+/gi, "+"));
+                    // reset selected facet
+                    $(".coveo-facet-column .selected").removeClass("selected");
+                    $('#AllFacet').addClass('selected');
+                };
+                const coveoDoSearch = function(q ,aq, start, updateFacet, from) {
+                    $.ajax({
+                        method: "POST",
+                        url: "https://search.cloud.coveo.com/rest/search/v2?organizationId=" + window.coveo.orgID,
+                        contentType: 'application/json',
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + window.coveo.token);
+                        },
+                        data: JSON.stringify({
+                            "q": q, "aq": aq,
+                            "searchHub": "MFCentralSearch", "tab": "All", "pipeline": "MFCentral",
+                            "language": window.CMS ? window.CMS.lang: 'en_US',
+                            "firstResult": start, "numberOfResults": 10, "excerptLength": 200,
+                            "fieldsToInclude": ["source", "clickableuri", "uri", "thumbnailurl", "contentsource", "urihash", "collection", "author",
+                                "objecttype", "filetype", "outlookformacuri", "outlookuri", "connectortype", "language", "permanentid"],
+                            "enableDidYouMean": false,
+                            "sortCriteria": 'relevancy',
+                            "queryFunctions": [], "rankingFunctions": [],
+                            "groupBy": [
+                                {
+                                    "field": "@sftypec",
+                                    "maximumNumberOfValues": 10, "sortCriteria": "occurrences", "injectionDepth": 1000,
+                                    "completeFacetWithStandardValues": true, "allowedValues": []
+                                },
+                                {
+                                    "field": "@source",
+                                    "maximumNumberOfValues": 6, "sortCriteria": "occurrences", "injectionDepth": 1000,
+                                    "completeFacetWithStandardValues": true, "allowedValues": []
+                                }
+                            ],
+                            "retrieveFirstSentences": true, "disableQuerySyntax": false,
+                            "enableDuplicateFiltering": false, "enableCollaborativeRating": false, "debug": false
+                        }),
+                        success: function (data, status) {
+                            handleSearchResults(data, start);
+                            updateFacet === true? changeFacetsNum(data): '';
+                            $('.magic-box-suggestions').removeClass('magic-box-hasSuggestion');
+
+                            if(data)
+                                sendQueryAnalytics(data.totalCount, q, data.duration, data.searchUid, (start/10 + 1), from);
+                        }
+                    });
+                };
+                const sendQueryAnalytics = function(resultsNum, searchTerm, responseTime, uid, pageNum, from) {
+                    const hrefArray = window.location.href.split("#");
+                    var actionCause;
+                    switch(from){
+                        case 'facet':
+                            actionCause = "facetSelect";
+                            break;
+                        case 'getMoreResults':
+                            actionCause = "loadmore";
+                            break;
+                        case 'omnibox':
+                            actionCause = "omniboxAnalytics";
+                            break;
+                        default:
+                            actionCause = "searchboxSubmit";
+                    }
+
+                    $.ajax({
+                        method: "POST",
+                        url: "https://usageanalytics.coveo.com/rest/v15/analytics/searches" + composeUrlParams(),
+                        contentType: 'application/json',
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + window.coveo.token);
+                        },
+                        data: JSON.stringify([
+                            {
+                                "actionCause": actionCause,
+                                "actionType": from,
+                                "advancedQuery": "",
+                                "anonymous": false,
+                                "contextual": false,
+                                "customData": {"JSUIVersion": "1.2537.57;1.2537.57"},
+                                "didYouMean": false,
+                                "language": window.CMS ? window.CMS.lang: 'en_US',
+                                "mobile": false,
+                                "numberOfResults": resultsNum,
+                                "originContext": "Search",
+                                "originLevel1": "MFCentralSearch",
+                                "originLevel2": "All",
+                                "originLevel3": hrefArray[0],
+                                "pageNumber": pageNum,
+                                "queryPipeline": "MFCentral",
+                                "queryText": searchTerm,
+                                "responseTime": responseTime,
+                                "resultsPerPage": 10,
+                                "searchQueryUid": uid,
+                                "userAgent": navigator.userAgent
+                            }
+                        ]),
+                        success: function (data, status) {
+                            if(window.coveo.visitorID === undefined && data !== undefined)
+                                window.coveo.visitorID =  data.searchEventResponses[0].visitorId.toString();
+                        }
+                    });
+                };
+                const sendClickAnalytics = function(pos, urihash, title, clickUri, uri, uid, sourceName){
+                    $.ajax({
+                        method: "POST",
+                        url: "https://usageanalytics.coveo.com/rest/v15/analytics/click" + composeUrlParams(),
+                        contentType: 'application/json',
+                        beforeSend: function (xhr, settings) {
+                            xhr.setRequestHeader('Authorization', 'Bearer ' + window.coveo.token);
+                        },
+                        data: JSON.stringify({
+                            "actionCause": "documentOpen",
+                            "actionType": "document",
+                            "anonymous": false,
+                            "collectionName": "default",
+                            "customData": {
+                                "JSUIVersion": "1.2537.57;1.2537.57",
+                                "contentIDKey": "urihash",
+                                "contentIDValue": urihash,
+                                "documentTitle": title,
+                                "documentURL": clickUri
+                            },
+                            "device": MFC.checkBrowser(),
+                            "documentCategory": "OCMS_Content_Search_Index__c",
+                            "documentPosition": pos,
+                            "documentTitle": title,
+                            "documentUri": uri,
+                            "documentUriHash": urihash,
+                            "documentUrl": clickUri,
+                            "language": window.CMS ? window.CMS.lang: 'en_US',
+                            "mobile": false,
+                            "originContext": "Search",
+                            "originLevel1": "MFCentralSearch",
+                            "originLevel2": "All",
+                            "originLevel3": clickUri,
+                            "queryPipeline": "MFCentral",
+                            "responseTime": 0,
+                            "searchQueryUid": uid,
+                            "sourceName": sourceName,
+                            "userAgent": navigator.userAgent,
+                            "viewMethod": "documentOpen"
+                        })
+                    });
+                };
+                function composeUrlParams(){
+                    var result = '?org=' + window.coveo.orgID;
+                    if( window.coveo.visitorID !== undefined )
+                        result += "&visitor=" + window.coveo.visitorID;
+                    return result;
+                }
+                function handleSearchResults(data, start){
+                    var searchResults = '';
+                    data = boldSearchTermInResults(data);
+
+                    for(var index = 0; index < data.results.length; index++) {
+                        const result = data.results[index];
+                        searchResults +=
+                            '<div class="coveoResult">' +
+                                '<div class="resultWrapper ' + result.raw.source + '">' +
+                                    '<div class="coveo-result-frame">' +
+                                        '<div class="coveo-result-row-body">' +
+                                        '<div class="coveo-result-row-title">' +
+                                            '<a  tabindex="0" pos=' + (start+index+1) + ' uriHash=' + result.raw.urihash +
+                                            ' uri=' +result.Uri+ ' uid=' + data.searchUid + ' source=' + result.raw.contentsource +
+                                            ' href=' + result.ClickUri + '>' + result.title +
+                                            '</a>';
+                        searchResults +=result.isTopResult  ?
+                                        '<div class="CoveoFieldValue"><span>' + result.ClickUri + '</span></div>' :
+                                        result.raw.thumbnailurl !== undefined ? ('<img src="' + result.raw.thumbnailurl + '" />') : '';
+                        searchResults += 				    '</div>';
+                        searchResults +=    result.raw.contentsource === 'MFCentral' || result.raw.contentsource === 'Mission Control'?
+                                        '<div class="coveo-result-row-summary">' +
+                                            '<span class="CoveoExcerpt">' + result.Excerpt+ '</span>' +
+                                        '</div>' : '';
+                        searchResults += 			    '</div>';
+                        searchResults +=	!result.isTopResult	?
+                                        '<div class="coveo-result-row-footer">' +
+                                            '<table><tbody><tr>' +
+                                                '<th>Location:</th>' +
+                                                '<td><span>' + result.raw.contentsource + '</span></td>' +
+                                                '</tr></tbody></table>' +
+                                        '</div>' : '';
+                        searchResults +=
+                                    '</div>' +
+                                '</div>' +
+                            '</div>';
+                    }
+
+                    if(searchResults === '') {
+                        $('.coveo-show-more').hide();
+                        if(start === 0)
+                            $('.coveo-no-results').show();
+                    }else {
+                        $('.coveo-show-more').show();
+                        $('.coveo-no-results').hide();
+                    }
+
+                    if(start+10 >= data.totalCount)
+                        $('.coveo-show-more').hide();
+
+                    start === 0 ? $('.CoveoResultList').empty() : '';
+                    $('.CoveoResultList').append(searchResults);
+
+                    if(window.CMS && (window.CMS.lang === 'en_US' || window.CMS.lang === 'fr') && OCMS.getCookie('hide_search_feedback') !== 'true')
+                        $('.search-feedback-button-container').css("display", "block");
+
+                    $(".CoveoResultList .coveo-result-row-title a").contextmenu(function(){
+                        sendClickAnalytics(
+                            parseInt($(this).attr('pos')), $(this).attr('uriHash'), $(this).html().replace('<span class="coveo-highlight">','').replace('</span>', ''),
+                            $(this).attr('href'), $(this).attr('uri'), $(this).attr('uid'), $(this).attr('source')
+                        );
+                    });
+                    $(".CoveoResultList .coveo-result-row-title a").click(function(){
+                        sendClickAnalytics(
+                            parseInt($(this).attr('pos')), $(this).attr('uriHash'), $(this).html().replace('<span class="coveo-highlight">','').replace('</span>', ''),
+                            $(this).attr('href'), $(this).attr('uri'), $(this).attr('uid'), $(this).attr('source')
+                        );
+                    });
+                };
+                function boldSearchTermInResults(data){
+                    var searchResults = data;
+                    var termsToHighlight = '';
+
+                    if (Object.keys(searchResults.termsToHighlight).length > 0)
+                        termsToHighlight = Object.keys(searchResults.termsToHighlight).join('|');
+
+                    // Currently this is only for Fr to add back ’
+                    if (Object.keys(searchResults.phrasesToHighlight).length > 0) {
+                        if (termsToHighlight.length != 0)
+                            termsToHighlight += '|';
+
+                        termsToHighlight += Object.keys(searchResults.phrasesToHighlight).join('|').replace(/ /g, '’');
+                    }
+
+                    const searchTerms = termsToHighlight;
+
+                    if(searchTerms !== '') {
+                        const regex = new RegExp('(^|)(' + searchTerms + ')(|$)', "ig");
+                        searchResults.results.forEach(function (result, index) {
+                            searchResults.results[index].Excerpt = result.Excerpt.replace(regex, "$1<span class='coveo-highlight'>$2</span>$3");
+                            searchResults.results[index].title = result.title.replace(regex, "$1<span class='coveo-highlight'>$2</span>$3");
+                        });
+                    }
+                    return searchResults;
+                }
+                function changeFacetsNum(data){
+                    var newsNum = 0, CEOMsgNum = 0, MCNum = 0, askHRNum = 0;
+                    if(data.groupByResults.length > 0){
+                        for(var i = 0; i < data.groupByResults.length; i++){
+                            if(data.groupByResults[i].Field === 'sftypec'){
+                                data.groupByResults[i].values.forEach(function(item){
+                                    item.value === 'News' ? newsNum = item.NumberOfResults: '';
+                                    item.value === 'Mission Control' ? MCNum = item.NumberOfResults: '';
+                                    item.value === 'CEOMessage' ? CEOMsgNum = item.NumberOfResults: '';
+                                });
+                            }
+
+                            if(data.groupByResults[i].Field === 'source'){
+                                data.groupByResults[i].values.forEach(function(item){
+                                    item.value === 'HR' ? askHRNum = item.NumberOfResults: '';
+                                });
+                            }
+                        }
+                    }
+
+                    $("#NewsFacet span").html(newsNum);
+                    $("#MCFacet span").html(MCNum);
+                    $("#CEOMsgFacet span").html(CEOMsgNum);
+                    $("#AskHRFacet span").html(askHRNum);
+
+                    $('.coveo-facet-column').show();
+                };
+            </script>
+            <style>
+                .CoveoSearchInterface .coveo-highlight {  font-family: ManulifeBold, sans-serif;  font-weight: 600;  }
+                /*Search Bar*/
+                .coveo-search-section .magic-box-suggestions{
+                    display: none;  z-index: 200;
+                    clear: both;
+                    position: absolute;  top: 100%;  left: -1px;  right: 50px;
+                    overflow: hidden;
+                    background: #fff;  border: 1px solid #e3e3e3;
+                }
+                .coveo-search-section .magic-box-suggestions.magic-box-hasSuggestion{ display: block;}
+                .coveo-search-section .magic-box-suggestions .magic-box-suggestion {
+                    cursor: pointer;
+                    line-height: 20px;
+                    padding: 12px;
+                    font-size: 16px;
+                    background: #fff;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    border-bottom: 1px solid #fafafa;
+                    color: #212121;
+                }
+                .coveo-search-section .magic-box-suggestions .magic-box-suggestion.select {  background: #ededed;  }
+                /*Search Results*/
+                .coveo-main-section {  font-size: 15px;  color: #202336;  }
+                .coveo-main-section .coveo-facet-column {
+                    display: inline-block;
+                    width: 100%;
+                    margin: 40px 0;
+                    cursor: pointer;
+                    text-align: center;
+                    font-family: ManulifeBold, sans-serif;
+                    color: #b3b3b2;
+                }
+                .coveo-main-section .coveo-facet-column .coveo-facet {
+                    display: inline-block;
+                    border-right: 1px solid #b3b3b2; padding: 0 15px;
+                }
+                .coveo-main-section .coveo-facet-column .coveo-facet:last-child {  border-right: 0;  }
+                .coveo-main-section .coveo-facet-column .coveo-facet.selected {  color: #00a758;  }
+                .coveo-main-section .coveo-facet-column .coveo-facet label{  cursor: pointer;  }
+                .coveo-main-section .coveo-facet-column .coveo-facet span {
+                    font-family: ManulifeLight, sans-serif;
+                    font-size: 12px;
+                    color: #fff;
+                    line-height: 21px;
+                    text-align: center;
+                    position: relative;
+                    top: -1px;
+                    min-width: 15px;
+                    display: inline-block;
+                    margin: 0 0 0 10px;
+                    padding: 0 3px;
+                    background: #b3b3b2;
+                    border-radius: 25px;
+                }
+                /*no results header*/
+                .coveo-main-section .coveo-no-results {
+                    display: inherit;
+                    text-align: center;
+                    font-size: 20px;
+                    line-height: 1;
+                    color: #00673e;
+                }
+                /*Result list*/
+                .coveo-main-section .resultWrapper {
+                    position: relative;
+                    display: block;
+                    background: #ededed;
+                    height: 175px;
+                    box-sizing: border-box;
+                }
+                .coveo-main-section .CoveoResultList > div:nth-child(2n) .resultWrapper{  background: #fafafa;  }
+                .coveo-main-section img {
+                    width: 135px;
+                    position: absolute;
+                    right: 10px;
+                    top: 30px;
+                }
+                .coveo-main-section .CoveoExcerpt{ line-height: 18px; }
+                /*result tile*/
+                .coveo-main-section .coveo-result-frame .coveo-result-row-body {
+                    position: absolute;
+                    top: 20px;
+                    left: 20px;
+                    right: 10px;
+                    padding-left:15px;
+                }
+                .coveo-main-section .coveo-result-frame .coveo-result-row-body .coveo-result-row-title a {
+                    font-size: 18px;
+                    line-height: 24px;
+                    color: #202336;
+                    text-decoration: underline;
+                    text-decoration-color: #00a758;
+                    text-underline-position: under;
+                }
+                .coveo-main-section .coveo-result-frame .coveo-result-row-body .coveo-result-row-title a:hover { color: #00a758; }
+                .coveo-main-section .coveo-result-frame .coveo-result-row-body .coveo-result-row-summary { margin-top: 10px;  width: 80%; }
+                .coveo-main-section .coveo-result-frame .coveo-result-row-footer {
+                    position: absolute;
+                    bottom: 20px;
+                    left: 20px;
+                    right: 18%;
+                    font-size: 15px;
+                    padding-left: 15px;
+                }
+                .coveo-main-section .coveo-result-frame .coveo-result-row-footer table { position: absolute;  bottom: 0; }
+                .coveo-main-section .coveo-result-frame .coveo-result-row-footer th { padding: 0 10px 0 0; }
+                .coveo-main-section .coveo-result-frame .coveo-result-row-footer td { font-weight: 400;  font-family: ManulifeLight, sans-serif; }
+                /*KeyMatch*/
+                .coveo-main-section .External.resultWrapper {
+                    border: 1px solid #B3B3B2;
+                    margin-bottom: 15px;
+                    height: 80px;
+                    background: none;
+                }
+                .coveo-main-section .External .CoveoFieldValue {
+                    display: inherit;
+                    margin-top: 5px;
+                    font-size: 15px;
+                    font-weight: 400;
+                    font-family: ManulifeBold, sans-serif;
+                }
+                /*show more*/
+                .coveo-main-section .coveo-show-more {
+                    display: block;
+                    position: relative;
+                    margin: 30px 0;
+                    background: #fff;
+                    border: 1px solid #ededed;
+                    text-align: center;
+                    padding: 7px 0;
+                    cursor: pointer;
+                }
+                .coveo-main-section .coveo-show-more span {
+                    display: inline-block;
+                    font-size: 14px;
+                    line-height: 20px;
+                    color: #00673e;
+                    vertical-align: middle;
+                    font-family: ManulifeLight,sans-serif;
+                    text-transform: none;
+                }
+                @media all and (max-width: 768px ) {
+                    .CoveoSearchButton {  top: 0;  bottom: 0;  }
+                    .coveo-main-section .resultWrapper {  height: 135px;  }
+                }
+                @media all and (max-width: 480px) {
+                    .coveo-main-section .CoveoExcerpt {  display: none;  }
+                    .coveo-main-section img {  display: none;  }
+                    .coveo-main-section .coveo-result-frame .coveo-result-row-title a {  font-size: 16px;  }
+                }
+                /*feedback button*/
+                .search-feedback-button-container {  display: none;  }
+                #search-feedback-button {
+                    padding: 0px; border: none;
+                    z-index: 200;  position: fixed; right: 0;  top: 50%;  width: 50px;
+                    background-color: #c14a36; color: #fff;
+                    font-family: ManulifeBold;  font-size: 16px;
+                    transform: rotate(180deg);  cursor: pointer;
+                }
+                #search-feedback-button span {  writing-mode: tb-rl; padding: 25px 0;  }
+
+                .smcx-widget.smcx-modal.smcx-modal-survey.smcx-show{
+                    margin-top: -300px !important;
+                }
+
+            </style>
+
+            <div class="pg pgSearch search-open">
+                <apex:include pageName="ocms_mfc_i_headerAndSideNav"/>
+                <div class="global-layer-wrap main-global-layer">
+                    <div class="global-align-center">
+                        <div class="global-drawer-slider">
+                            <div id="search" class="CoveoSearchInterface">
+                                <div id="global-navigation" style="position: fixed;">
+                                    <nav>
+                                        <div class="back">
+                                            <a href="#"><span id="uiLabelBack" class="i18n">Back</span></a>
+                                        </div>
+
+                                        <div class="search-bar">
+                                            <div class="center v-align">
+                                                <div class="inner">
+                                                    <div class="form">
+                                                        <div class="coveo-search-section">
+                                                            <div class="CoveoSearchbox">
+                                                                <a class="CoveoSearchButton"></a>
+                                                                <div class="CoveoOmnibox magic-box">
+                                                                    <div class="magic-box-input">
+                                                                        <input autocomplete="off" id="coveo-input-bar" placeholder="Begin your search..." />
+                                                                    </div>
+                                                                    <div class="magic-box-suggestions"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </nav>
+                                </div>
+                                <!--div class="search-feedback-survey-container">
+                                    <div class="search-feedback-survey">
+                                        <div class="search-feedback-survey-header">
+                                            <div class="search-feedback-survey-title">We Welcome Your Feedback</div>
+                                            <div class="search-feedback-survey-close"></div>
+                                        </div>
+
+                                        <div class="search-feedback-survey-iframe">
+                                            <iframe width="100%" height="100%" frameborder="0" allowtransparency="true"
+                                                    src="https://www.surveymonkey.com/r/X7XQX9H?embedded=1"></iframe>
+                                        </div>
+                                    </div>
+                                </div-->
+                                <div class="content-layer search-layer">
+                                    <div class="content-wrap">
+                                        <div id="global-search">
+                                            <div class="coveo-main-section">
+                                                <div class="coveo-facet-column" style="display: none;">
+                                                    <div id="AllFacet" class="coveo-facet selected" onclick="handleFacets('AllFacet')"><label></label></div>
+                                                    <div id="NewsFacet" class="coveo-facet" onclick="handleFacets('NewsFacet')"><label></label><span>0</span></div>
+                                                    <div id="MCFacet" class="coveo-facet" onclick="handleFacets('MCFacet')"><label></label><span>0</span></div>
+                                                    <div id="CEOMsgFacet" class="coveo-facet" onclick="handleFacets('CEOMsgFacet')"><label></label><span>0</span></div>
+                                                    <div id="AskHRFacet" class="coveo-facet" onclick="handleFacets('AskHRFacet')"><label>AskHR</label><span>0</span></div>
+                                                </div>
+                                                <div class="coveo-results-column">
+                                                    <div class="coveo-no-results" style="display: none;">
+                                                        <span id="coveo-no-result-p1"></span>
+                                                        <span id="coveo-no-result-search-term" class="coveo-highlight"></span>
+                                                        <span id="coveo-no-result-p2"></span>
+                                                    </div>
+                                                    <div class="CoveoResultList"></div>
+                                                </div>
+                                                <a class="coveo-show-more" onClick="loadmore()" style="display: none;">
+                                                    <span id="coveo-show-more-label" class="i18n">Show More</span>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="search-feedback-button-container">
+                                    <button id="search-feedback-button">
+                                        <span></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .global-layer-wrap.main-global-layer -->
+                <a id="back-to-top">
+                    <span class="i18n" id="uiLabelBackToTop">Back to top</span>
+                </a>
+            </div><!-- .pg.pgSearch -->
+            <!--style>
+                .search-feedback-survey-container {
+                    text-align: center;
+                    z-index: 200;
+                    position: fixed;
+                    top: 200px;
+                    left: 0;
+                    width: 100%;
+                    display: none;
+                }
+                .search-feedback-survey-header {
+                    height: 35px; line-height: 35px;
+                    background: #34384b; color: #ffffff;
+                    font-family: ManulifeBold; font-size: 15px; font-weight: 700;
+                    display: flex; justify-content: space-between;
+                }
+                .search-feedback-survey-close {
+                    margin-top: 10px;
+                    width: 16px;  height: 16px;
+                    background: #E8E8E8 url(https://secure.surveymonkey.com/assets/responseweb/responseweb/0.282.0/assets/images/website/x.png) 2px 2px scroll no-repeat;
+                    cursor: pointer;
+                }
+                .search-feedback-survey {
+                    display: inline-block;
+                    width: 50%;
+                    max-width: 512px;
+                    border: 10px solid #34384b;
+                    border-top: none;
+                }
+                .search-feedback-survey-iframe {
+                    height: 450px; padding-top: 15px;
+                }
+            </style>
+            <script>
+                $('.search-feedback-survey-close').click(function(){
+                    $('.search-feedback-survey-container').css('display', 'none');
+                })
+            </script-->
+        </apex:define><!-- body -->
+    </apex:composition>
+</apex:page>
+<!-- ocms_mfc_t_Search -->

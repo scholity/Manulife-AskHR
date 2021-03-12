@@ -1,0 +1,193 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#navigation li.bt7 a,
+#navigation li.bt7 a:hover,
+#navigation li.bt7 a.on{
+width:145px;
+background-position:-815px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+
+}
+
+.fonttitle{
+font-family:Calibri; font-size:24px;color:#00693c;font-weight:bold;
+    }
+    
+.fontbody{
+font-family:Calibri; font-size:16px;color:black;    
+}
+
+.tableborder{
+border-right-color:white;
+border-right-style:solid;
+border-right-width:medium;
+    }
+    
+.deliveryborder{
+border-right-color:#C1DBEA;
+border-right-style:solid;
+border-right-width:medium;
+
+border-left-color:#C1DBEA;
+border-left-style:solid;
+border-left-width:medium;
+
+border-top-color:#C1DBEA;
+border-top-style:solid;
+border-top-width:medium;    
+}
+
+</style>
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+ <div id="content" style="height:100%" >
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr><td colspan="2" height="20px"></td></tr>        
+    <tr>
+        <td  width="10%" valign="top" align="center"> <!--Left Navigation-->
+        
+    <div id="page3">
+            <c:POS_Rollout_Left_Panel src="s2" />    
+    </div>
+        </td>
+
+            <td valign="top" width="90%"><!--content-->
+                <div class="x" id="happening" style="height:100%">
+                    <table style="padding-left:20px" width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+                        <tr><td style="height:50px"></td></tr>
+                        <tr>
+                            <td class="fonttitle">
+                                POSsible is fully aligned with Mission Extraordinary!   
+                            </td>
+                        </tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr>
+                            <td class="fontbody">
+                                <div style="width:770px;text-align:justify">
+                                    This month’s spotlight, our premier issue, focuses on how POSsible fits in with Mission Extraordinary (MX), 
+                                    Manulife Global’s key strategic initiative which focuses on enhancing the 
+                                    experience and value we deliver to our clients.
+                                </div>                          
+                            </td>
+                        </tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr>
+                            <td class="fontbody">
+                                <div style="width:770px;text-align:justify">
+                                    The scope of MX is far broader than POSsible covering everything from 
+                                    recruitment, training and ongoing professional development for Agents, 
+                                    the customer facing sales process with customers, and the ongoing 
+                                    engagement between Agents and existing Customers. POSsible is not required to support all of these activities, but is the key tool to enable to customer facing sales activities.
+                                </div>  
+                            </td>
+                        </tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr>
+                            <td class="fontbody">
+                                <div style="width:770px;text-align:justify">
+                                    MX has three core principles to help drive customer centricity in the sales process:
+                                </div>
+                            </td>
+                        </tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr><td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/connect_customize_grow_diagram.jpg')}" /></td></tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr>
+                            <td class="fontbody">
+                                <div style="width:770px;text-align:justify">
+                                    These principles are applied throughout the end to end sales process: 
+                                </div>
+                            </td>
+                        </tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr><td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/connect_customize_grow_diagram_2.jpg')}" /></td></tr>
+                        <tr><td style="height:40px"></td></tr>
+                        <tr>
+                            <td class="fontbody">
+                                <div style="width:770px;text-align:justify">
+                                    Detailed analysis has been completed to align Meet &amp; Refine Hong Kong to 
+                                    MX Hong Kong. This included introducing a customer centric flow in the 
+                                    tool, and enhancements to enable holistic financial planning. This 
+                                    assessment is specific to Hong Kong, and will also need to be completed 
+                                    by new countries taking on POSsible. The underlying assumption is that 
+                                    the core solution is aligned with MX, but there may be further 
+                                    customizations required in country to add the ‘Extraordinary’ 
+                                    elements required for the specific market.
+                                </div>              
+                            </td>
+                        </tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr>
+                            <td class="fontbody">
+                                <div style="width:770px;text-align:justify">
+                                    An assessment has also been completed by the MX team on the Propose and Apply 
+                                    Regional solutions. The assessment concluded that the existing tool is in line 
+                                    with MX principles, and does not require MX 
+                                    alignment before releasing to countries.
+                                </div>  
+                            </td>
+                        </tr>
+                        <tr><td style="height:20px"></td></tr>
+                        <tr>
+                            <td class="fontbody">
+                                <div style="width:770px;text-align:justify">
+                                    We invite all countries to embrace this initiative 
+                                    and to focus all efforts in ensuring that Manulife delivers
+                                     extraordinary customer experiences!
+                                </div>
+                            </td>
+                        </tr>
+                        <tr><td style="height:50px"></td></tr>
+                    </table>
+                </div>
+            </td> <!--end of content-->
+    </tr>
+</table>
+<div style="height:20px"></div>
+
+ </div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+</script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

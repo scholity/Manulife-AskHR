@@ -1,0 +1,38 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#navigation li.bt7 a,
+#navigation li.bt7 a:hover,
+#navigation li.bt7 a.on{
+width:145px;
+background-position:-815px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+
+}
+
+#Resources {
+min-height:645px;
+background-image:url('{!URLFOR($Resource.pos_images2, 'image/Resources.jpg')}'); 
+height:645px!important;
+background-repeat: no-repeat;
+background-position:center;
+width: 100%;
+} 
+
+</style>
+
+ <div id="Resources" style="height:100%" >
+    <div id="page3">
+        <div style="height:20px"/> 
+            <c:POS_Rollout_Left_Panel src="s4" />    
+    </div>
+ </div>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

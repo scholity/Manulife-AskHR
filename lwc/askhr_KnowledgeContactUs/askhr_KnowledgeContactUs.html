@@ -1,0 +1,65 @@
+<template>
+    <div class="slds-text-align_center slds-p-around_medium">
+        <div class="slds-box slds-box_small">
+            <!-- Show the image and contact info only if there is data -->
+            <template if:false={knowledgeContacttUsArticle}>
+                <div class="slds-text-align_center">
+                    <img src={askhr_contactus_image} />
+                </div>
+            </template>
+            <!-- Show the image and contact info only if there is data -->
+            <template if:true={knowledgeContacttUsArticle}>
+                <div class="slds-text-align_center">
+                    <img src={imageURL} />
+                </div>
+                <div class="slds-text-align_center">
+                    <lightning-formatted-text value={knowledgeContacttUsArticle.Contact_Us_Name__c}></lightning-formatted-text>
+                </div>
+                <div class="slds-text-align_center">
+                    <lightning-formatted-text value={knowledgeContacttUsArticle.Contact_Us_Phone__c}></lightning-formatted-text>
+                </div>
+                <!-- Added Extension field also - 07-07-2020 -->
+                <div class="slds-text-align_center">
+                    <lightning-formatted-text value={knowledgeContacttUsArticle.Contact_Us_Internal_Extension__c}></lightning-formatted-text>
+                </div>
+                <div class="slds-text-align_center">
+                    <lightning-formatted-text value={knowledgeContacttUsArticle.Contact_Us_Hours__c}></lightning-formatted-text>
+                </div>
+            </template>
+    
+            <div class="slds-text-align_center">
+                <!-- 08/16/2020 Use custom labels-->
+                <lightning-button variant="base" label={label.globalContactListLabel} title={label.globalContactListLabel} onclick={openGlobalContacts} class="slds-m-left_x-small"></lightning-button>
+            </div>
+        </div>
+    </div>
+    <!-- Show Modal popup with Global Contact Us -->
+    <template if:true={showGlobalContactUs}>
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <header class="slds-modal__header">
+                    <!-- 08/16/2020 Use custom labels-->
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title={label.closeLabel} onclick={closeGlobalContacts}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text={label.closeLabel}
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">{label.closeLabel}</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{knowledgeGlobalContacttUsArticle.data.Contact_Us_Name__c}</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-formatted-rich-text value={knowledgeGlobalContacttUsArticle.data.Image__c}></lightning-formatted-rich-text>
+                    <lightning-formatted-rich-text value={knowledgeGlobalContacttUsArticle.data.General_Purpose_Content__c}></lightning-formatted-rich-text>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <!-- 08/16/2020 Use custom labels-->
+                    <button class="slds-button slds-button_neutral" onclick={closeGlobalContacts} title={label.closeLabel}>{label.closeLabel}</button>
+                </footer>
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

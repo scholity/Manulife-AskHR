@@ -1,0 +1,15 @@
+<apex:page tabstyle="Custom_Case_Tab__tab" controller="ASKHR_CustomCaseViewController">
+
+    <apex:outputpanel rendered="{!isRenderedStyle}">
+        <style>
+            input[name="askhr_accept"],
+            input[name="askhr_case_send_to_list"] {
+                display: none;
+            }
+        </style>
+    </apex:outputpanel>
+    <div style="width: 100%; ">
+        <apex:enhancedlist id="caseList" type="Case" height="750" rowsperpage="25" />
+    </div>
+
+</apex:page>

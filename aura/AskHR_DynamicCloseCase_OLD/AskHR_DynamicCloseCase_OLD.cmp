@@ -1,0 +1,9 @@
+<aura:component implements="flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction" access="global" controller="AskHR_DynamicCloseCaseController" >
+	<aura:attribute name="recordId" type="Id" /> 
+    <aura:attribute name="closeCaseLayoutFields" type="String[]" />
+    
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    
+	<lightning:recordForm objectApiName="Case" mode="edit" recordId="{!v.recordId}" 
+                          fields="{!v.closeCaseLayoutFields}" columns="1" onsuccess="{!c.handleSuccess}"/>
+</aura:component>

@@ -1,0 +1,69 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_HeroCarouselControl" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script type="text/javascript" language="javascript">
+
+        $(document).ready(function(){
+
+            $('#strDuration').bind('keypress', function(e){
+                var regex = new RegExp("^[0-9]+$");
+                var key = String.fromCharCode(!event.charCode ? event.which : event.charCode);
+
+                if( !regex.test(key) ){
+                    event.preventDefault();
+                    return false;
+                }
+            });
+
+            $('#strDuration').bind('paste', function(e){
+                e.preventDefault();
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+                
+                attributes.push({"name":"strAccessibleStopCarousel", "value": $('#strAccessibleStopCarousel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessiblePrevSlide", "value": $('#strAccessiblePrevSlide').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessibleNextSlide", "value": $('#strAccessibleNextSlide').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strDuration", "value": $('#strDuration').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+        
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strDuration">Display duration (in seconds, whole numbers only)</label>
+                        <input id="strDuration" name="strDuration" type="number" value="{!strDuration}" min="0"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessibleStopCarousel">Stop carousel message</label>
+                        <input class="ocmsTextInputLrg" id="strAccessibleStopCarousel" name="strAccessibleStopCarousel" type="text" value="{!strAccessibleStopCarousel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessiblePrevSlide">Previous slide message</label>
+                        <input class="ocmsTextInputLrg" id="strAccessiblePrevSlide" name="strAccessiblePrevSlide" type="text" value="{!strAccessiblePrevSlide}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessibleNextSlide">Next slide message</label>
+                        <input class="ocmsTextInputLrg" id="strAccessibleNextSlide" name="strAccessibleNextSlide" type="text" value="{!strAccessibleNextSlide}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

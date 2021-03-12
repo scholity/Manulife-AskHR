@@ -1,0 +1,248 @@
+<!-- ocms_mfc_t_MultipleTabs -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mfc_FavIcon, 'img/favicon.ico')}" type="image/x-icon"/>
+            <apex:include pageName="ocms_mfc_i_headSpace"/>
+
+            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                <style type="text/css">
+                    /* ideally, make this class-styled menu or CTC markup, but for now, we build it from plain text
+                        #tabTitles is the final DOM element
+                        #tabTitleText is our container for the plain text content we turn into list items
+                    */
+                    #tabTitles {
+                        display: none;
+                    }
+
+                    #tabTitleText {
+                        display: block !important;
+                    }
+                </style>
+            </apex:outputText>
+        </apex:define><!-- header -->
+
+        <apex:define name="body">
+            <div class="pg pgMultipleTabs">
+
+                <apex:include pageName="ocms_mfc_i_headerAndSideNav"/>
+
+                <div class="global-layer-wrap main-global-layer">
+                    <div class="global-align-center">
+                        <div class="global-drawer-slider">
+
+                            <apex:include pageName="ocms_mfc_i_globalNavTools"/>
+
+                            <div class="content-layer main-layer sticky-footer-fix">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>TextBlock</strong> ❧ critical alerts section
+                                    </div>
+
+                                </apex:outputText>
+                                <div class='critical-alerts'>
+                                    <cms:Panel panelName="criticalAlerts" panelController="{!controller}"
+                                               panelWidth="550px" panelHeight="30px"/>
+                                </div>
+
+                                <main class="content-wrap main-article">
+                                    <apex:include pageName="ocms_mfc_i_breadcrumb"/>
+
+                                    <!-- TEMPLATE CONTENT -->
+                                    <div class="article-content location-page content-page">
+
+                                        <div class="article-banner">
+                                            <div class="img-wrapper newClass1">
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                    <div class="ocmsHint">
+                                                        <strong>Image</strong> ❧ banner image; 860 px x 160 px
+                                                    </div>
+                                                </apex:outputText>
+                                                <cms:Panel panelName="bannerImage" panelController="{!controller}"
+                                                           panelWidth="370px" panelHeight="32px"
+                                                           panelContentLayouts="Image"/>
+                                            </div>
+                                        </div>
+                                        <script>
+                                            // Hiding the article-banner class if we don't have an image present.
+                                            if (!$('.img-wrapper').html().trim()) {
+                                                $('.article-banner').hide();
+                                            }
+                                        </script>
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">Content that will be visible
+                                                across all panels
+                                            </div>
+                                        </apex:outputText>
+                                        <div>
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>”Build your own” article content templates ❧ many
+                                                        varieties</strong><br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="noTabbedContent" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="300px"/>
+                                        </div>
+
+                                        <div class="global-content-filter">
+                                            <div class="title">
+                                                Filter: <span class="selected-filter">select tab name goes here</span>
+                                                <div class="arrow"></div>
+                                            </div>
+
+                                            <!-- this div visible only within page editor -->
+                                            <div id="tabTitleText" style="display: none;">
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                    <div class="ocmsHint">
+                                                        <strong>Plain Text</strong> ❧ up to six tab titles<br/>
+                                                        - Add a '|' character between each tab item i.e. tab1|tab2|tab3
+                                                        <br/>
+                                                        - remember to provide content in the corresponding tab content
+                                                        panels below<br/>
+                                                        - make sure the number tab titles entered here match the number
+                                                        of content panels that have content items
+                                                    </div>
+                                                </apex:outputText>
+                                                <cms:Panel panelName="tabTitleText" panelController="{!controller}"
+                                                           panelWidth="350px"
+                                                           panelHeight="32px" panelContentLayouts="PlainText"/>
+                                            </div>
+
+                                            <ul id="tabTitles">
+                                            </ul>
+                                        </div>
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                Put content for the first tab in the content panel below
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content selected tab-1'>
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>”Build your own” article content templates ❧ many
+                                                        varieties</strong> ❧ content for the page’s 1st tab<br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="tab1Content" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="300px" panelDynamic="true" panelDynamicGroup="1"/>
+
+                                        </div><!-- .tab-content.tab-1 -->
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                Second tab’s content goes below
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content selected tab-2'>
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>”Build your own” article content templates ❧ many
+                                                        varieties</strong> ❧ content for the page’s 2nd tab<br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="tab2Content" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="300px" panelDynamic="true" panelDynamicGroup="2"/>
+                                        </div><!-- .tab-content.tab-2 -->
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                3rd tab’s content panel (optional)
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content selected tab-3'>
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>”Build your own” article content templates ❧ many
+                                                        varieties</strong> ❧ content for the page’s 3rd tab <span>(optional)</span><br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="tab3Content" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="300px" panelDynamic="true" panelDynamicGroup="3"/>
+
+                                        </div><!-- .tab-content.tab-3 -->
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                4th tab’s content panel (optional)
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content selected tab-4'>
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>”Build your own” article content templates ❧ many
+                                                        varieties</strong> ❧ content for the page’s 4th tab <span>(optional)</span><br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="tab4Content" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="300px" panelDynamic="true" panelDynamicGroup="4"/>
+                                        </div><!-- .tab-content.tab-4 -->
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                5th tab’s content panel (optional)
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content selected tab-5'>
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>”Build your own” article content templates ❧ many
+                                                        varieties</strong> ❧ content for the page’s 5th tab <span>(optional)</span><br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="tab5Content" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="300px" panelDynamic="true" panelDynamicGroup="5"/>
+                                        </div><!-- .tab-content.tab-5 -->
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                6th tab’s content panel (optional)
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content selected tab-6'>
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>”Build your own” article content templates ❧ many
+                                                        varieties</strong> ❧ content for the page’s 6th tab <span>(optional)</span><br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="tab6Content" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="300px" panelDynamic="true" panelDynamicGroup="6"/>
+                                        </div><!-- .tab-content.tab-6 -->
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint">
+                                                <strong>Bookmark bar, Bookmark Control </strong><br/>
+                                            </div>
+                                        </apex:outputText>
+                                        <cms:Panel panelName="postArticle" panelController="{!controller}"
+                                                   panelWidth="350px"
+                                                   panelHeight="60px" panelLimit="2"
+                                                   panelContentLayouts="BookmarkBar, BookmarkControl"/>
+                                        <!-- TEMPLATE CONTENT -->
+                                    </div><!-- .article-content.location-page.content-page -->
+                                </main>
+
+                                <apex:include pageName="ocms_mfc_i_pageFooter"/>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .global-layer-wrap.main-global-layer -->
+                <a id="back-to-top">
+                    <span class="i18n" id="uiLabelBackToTop">Back to top</span>
+                </a>
+            </div><!-- .pg.pgMultipleTabs -->
+            <!--script type="text/javascript">_satellite.pageBottom();</script-->
+        </apex:define><!-- body -->
+    </apex:composition>
+</apex:page>
+<!-- ocms_mfc_t_MultipleTabs -->

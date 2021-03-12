@@ -1,0 +1,291 @@
+<!-- VF component used in ASKHR Feedback Notify Owner New Comment and ASKHR New Feedback Email Template-->
+<apex:component access="global" controller="ASKHR_ArticleFeedbackEmailController" >
+    <apex:attribute name="articleFeedbackId" access="global" description="Attribute for article feedback Id" type="String" required="required" assignTo="{!mArticleFeedbackId}" />
+    <apex:attribute name="recipientName" access="global" description="Attribute for recipient name" type="String" required="required" assignTo="{!mRecipientName}" />
+    <apex:attribute name="articleFeedbackName" access="global" description="Attribute for article feedback name" type="String" required="required" assignTo="{!mArticleFeedbackName}" />
+    <apex:attribute name="newFeedback" access="global" description="flag for new comment or feedback" type="Boolean" required="required" assignTo="{!mNewFeedback}" />
+    <html>
+        <head>
+            <meta name="viewport" content="width=device-width"/>
+            <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+            <title>Really Simple HTML Email Template</title>
+            <style>       
+                * {
+                font-family: "Helvetica Neue", "Helvetica", Helvetica, Arial, sans-serif;
+                font-size: 100%;
+                line-height: 1.6em;
+                margin: 0;
+                padding: 0;
+                }
+                
+                img {
+                max-width: 600px;
+                width: auto;
+                }
+                
+                body {
+                -webkit-font-smoothing: antialiased;
+                height: 100%;
+                -webkit-text-size-adjust: none;
+                width: 100% !important;
+                }
+                /* -------------------------------------
+                ELEMENTS
+                ------------------------------------- */
+                
+                a {
+                color: #348eda;
+                }
+                
+                .btn-primary {
+                Margin-bottom: 10px;
+                width: auto !important;
+                }
+                
+                .btn-primary td {
+                background-color: #348eda;
+                border-radius: 25px;
+                font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+                font-size: 14px;
+                text-align: center;
+                vertical-align: top;
+                }
+                
+                .btn-primary td a {
+                background-color: #348eda;
+                border: solid 1px #348eda;
+                border-radius: 5px;
+                border-width: 10px 20px;
+                display: inline-block;
+                color: #ffffff;
+                cursor: pointer;
+                font-weight: bold;
+                line-height: 2;
+                text-decoration: none;
+                }
+                
+                .last {
+                margin-bottom: 0;
+                }
+                
+                .first {
+                margin-top: 0;
+                }
+                
+                .padding {
+                padding: 10px 0;
+                }
+                /* -------------------------------------
+                BODY
+                ------------------------------------- */
+                
+                table.body-wrap {
+                padding: 20px;
+                width: 100%;
+                }
+                
+                table.body-wrap .container {
+                border: 1px solid #f0f0f0;
+                }
+                
+                .title-container {
+                border: 1px solid #f0f0f0;
+                }
+                /* -------------------------------------
+                FOOTER
+                ------------------------------------- */
+                
+                table.footer-wrap {
+                clear: both !important;
+                width: 100%;
+                }
+                
+                .footer-wrap .container p {
+                color: #666666;
+                font-size: 12px;
+                }
+                
+                table.footer-wrap a {
+                color: #999999;
+                }
+                /* -------------------------------------
+                TYPOGRAPHY
+                ------------------------------------- */
+                
+                h1,
+                h2,
+                h3 {
+                color: #111111;
+                font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+                font-weight: 200;
+                line-height: 1.2em;
+                margin: 40px 0 10px;
+                }
+                
+                h1 {
+                font-size: 36px;
+                }
+                
+                h2 {
+                font-size: 28px;
+                }
+                
+                h3 {
+                font-size: 22px;
+                }
+                
+                p,
+                ul,
+                ol {
+                font-size: 14px;
+                font-weight: normal;
+                margin-bottom: 10px;
+                }
+                
+                ul li,
+                ol li {
+                margin-left: 5px;
+                list-style-position: inside;
+                }
+                /* ---------------------------------------------------
+                RESPONSIVENESS
+                ------------------------------------------------------ */
+                /* Set a max-width, and make it display as block so it will automatically stretch to that width, but will also shrink down on a phone or something */
+                
+                .container {
+                clear: both !important;
+                display: block !important;
+                Margin: 0 auto !important;
+                max-width: 600px !important;
+                }
+                /* Set the padding on the td rather than the div for Outlook compatibility */
+                
+                .body-wrap .container {
+                padding: 20px;
+                }
+                /* This should also be a block element, so that it will fill 100% of the .container */
+                
+                .content {
+                display: block;
+                margin: 0 auto;
+                max-width: 600px;
+                }
+                /* Lets make sure tables in the content area are 100% wide */
+                
+                .content table {
+                width: 100%;
+                }
+                
+                .title {
+                margin-left: 5px;
+                display: flex;
+                justify-content: flex-start;
+                /* align horizontal */
+                /*align-items: center;  align vertical */
+                text-align: left;
+                line-height: normal;
+                overflow: auto;
+                font-size: 25px;
+                font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+                margin-right: 120px;
+                width: 100%;
+                }
+                
+                .clearfix {
+                height: auto;
+                min-height: 50px;
+                text-align: center;
+                }
+                
+                .left {
+                float: left;
+                }
+                
+                .right {
+                float: right;
+                }
+                
+                .img {}
+            </style>
+        </head>
+        
+        <body bgcolor="#f6f6f6">
+            <!-- body -->
+            <table class="body-wrap" bgcolor="#f6f6f6">
+                <tr>
+                    <td></td>
+                    <td>
+                        <table class="body-wrap container" bgcolor="#f6f6f6">
+                            <tr>
+                                <td><img class="left img" src="data:image/png;base64,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" height="40" alt="AskHR Logo" />
+                                         </td>
+                                         </tr>
+                                </table>
+                        </td>
+                    </tr>
+                <tr>
+                    <td></td>
+                    <td class="container" bgcolor="#FFFFFF">
+                        
+                        <!-- content -->
+                        <div class="content">
+                            <table>
+                                <tr>
+                                    <td>
+                                        <div style="{!IF(mNewFeedback == true,  'display:none', '')}">
+                                            <p>Hi {!mRecipientName},</p>
+                                        	<p>A comment has been added to the feedback that you are reviewing, {!mArticleFeedbackName} </p>
+                                        	<p>Click the link to view and reply to their comments.</p>
+                                        </div>
+                                        <div style="{!IF(mNewFeedback == false,  'display:none', '')}">
+                                            <p>Hi Knowledge Team,</p>
+                                            <p>A new article feedback has been posted.</p>
+                                            <p>Click the link to view the feedback details.</p>
+                                        </div>
+                                        
+                                        <br />
+                                        <!-- button -->
+                                        <table class="btn-primary" cellpadding="0" cellspacing="0" border="0">
+                                            <tr>
+                                                <td>
+                                                    <a href="{!mSurveyLink}/{!mArticleFeedbackId}" style="{!IF(mNewFeedback == true,  'display:none', '')}">View Response</a>
+                                                    <a href="{!mSurveyLink}/{!mArticleFeedbackId}" style="{!IF(mNewFeedback == false,  'display:none', '')}">View Feedback</a>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                
+                            </table>
+                        </div>
+                        <!-- /content -->
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+            <!-- /body -->
+            <table class="footer-wrap">
+                <tr>
+                    <td></td>
+                    <td class="container">
+                        
+                        <!-- content -->
+                        <div class="content">
+                            <table>
+                                <tr>
+                                    <td align="center">
+                                        <p>This is a system generated email. Please do not reply.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <!-- /content -->
+                        
+                    </td>
+                    <td></td>
+                </tr>
+            </table>
+        </body>
+    </html>
+</apex:component>

@@ -1,0 +1,51 @@
+<!-- ocms_mfc_AppLauncher_Edit.page -->
+<!--
+    This is the OrchestraCMS content editor page for "App Launcher" custom content
+    
+    2015-Apr-21 Wilder
+        - original
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_AppLauncher"
+	showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+	
+	<link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+
+	<apex:outputPanel layout="block">
+
+	<script id="ocms_application_Edit">
+		$(document).ready(function() {
+			ce.content_editor('registerSaveFunction', function() {			   
+				return [
+					{type: 'text', name: 'tutorialheader',		value: $('#tutorialheader').val()},
+					{type: 'text', name: 'launchpadAdd', 		value: $('#launchpadAdd').val()},
+					{type: 'text', name: 'launchApp', 			value: $('#launchApp').val()},
+					{type: 'text', name: 'alreadySubscribed', 	value: $('#alreadySubscribed').val()}
+				];
+			});
+		});
+	</script>
+
+	<table class="ocmsContentEditor ocmsContentEditorNested">
+            <tr><td>
+            	<label class="ocmsLabel" for="tutorialheader" title="Tutortial header">Tutorial Header</label>
+                <input type='text' id="tutorialheader" placeholder="Tutorial" value="{!tutorialheader}"/>
+			</td></tr>
+            <tr><td>
+            	<label class="ocmsLabel" for="launchpadAdd" title="Add to launchpad">Add to Launchpad</label>
+                <input type='text' id="launchpadAdd" placeholder="Add to launchpad text" value="{!launchpadAdd}"/>
+			</td></tr>
+            <tr><td>
+            	<label class="ocmsLabel" for="launchApp" title="Launch app">Launch App</label>
+                <input type='text' id="launchApp" placeholder="Launch app" value="{!launchApp}"/>
+			</td></tr>												
+            <tr><td>
+            	<label class="ocmsLabel" for="alreadySubscribed" title="Already subscribed to app lalel">Already subscribed to app label</label>
+                <input type='text' id="alreadySubscribed" value="{!alreadySubscribed}"/>
+			</td></tr>
+	</table>
+
+	</apex:outputPanel>
+	
+</apex:page>
+<!-- ocms_mfc_AppLauncher_Edit.page -->

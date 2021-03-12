@@ -1,0 +1,67 @@
+<apex:page standardController="Case" extensions="ASKHR_CustomChangeCaseOwnerExtension" showHeader="true" sidebar="false" >
+    <apex:pageMessages ></apex:pageMessages>
+    <apex:includeScript value="/support/console/20.0/integration.js"/>
+    <script type="text/javascript">
+        function setTabTitle() {
+            
+            sforce.console.setTabTitle('{!Case.CaseNumber}');
+            var currentOwner = document.getElementById("newOwn");
+            currentOwner.value = '{!selectedUser}';
+        }
+        var pageLoad = window.onload;
+          window.onload = function() {
+                if (pageLoad) {
+                        pageLoad();
+                }
+                  setTabTitle();
+          }
+        
+    </script>
+    <apex:sectionHeader title="Send To" description="This screen allows you to send cases from one user or queue to another. When you transfer ownership, the new owner will own:<ul><li>all open activities (tasks and events) for this case that are assigned to the current owner</li></ul>
+    Note that completed activities will not be transferred. Open activities will not be transferred when assigning this case to a queue." help="https://help.salesforce.com/htviewhelpdoc?id=cases_assign.htm&siteLang=en_US#ChangeOneOwner"/>
+    <apex:form >
+        <apex:pageblock mode="edit">            
+            <apex:pageblocksection title="Select new owner" columns="1">
+            <br />
+                <apex:pageblocksectionitem > 
+                    <apex:outputlabel for="id">Transfer this case</apex:outputlabel>
+                    <apex:inputfield id="id" value="{!Case.CaseNumber}"/>
+                </apex:pageblocksectionitem>
+                <!-- <apex:pageblocksectionitem > 
+                    <apex:outputlabel for="id">Current Owner</apex:outputlabel>
+                    <apex:outputLink id="link" value="/p/own/Queue/d?id={!Case.OwnerId}" target="_self">Learning</apex:outputLink>
+                </apex:pageblocksectionitem> -->
+                <apex:pageblocksectionitem > 
+                <apex:outputlabel for="owner">Owner</apex:outputlabel>
+                <apex:outputPanel id="selectionPanel" styleClass="requiredInput" layout="block">
+                <apex:outputPanel styleClass="requiredBlock" layout="block"/>
+                <apex:selectList value="{!selectedUserType}" size="1" required="true"> 
+                    <apex:selectOptions value="{!userTypeList }" />  
+                    <apex:actionSupport event="onchange" action="{!hideQueueInputOnChange}" reRender="selectionPanel"/>
+                </apex:selectList> 
+                   <apex:selectList value="{!selectedGroup}" size="1"  rendered="{!IsShowQueue}"> 
+                    <apex:selectOptions value="{!queueList}" />  
+                </apex:selectList>               
+                <input type="hidden" name="newOwn_lkid" id="newOwn_lkid" value="000000000000000"/>
+                <input type="hidden" name="newOwn_lkold" id="newOwn_lkold" value="null"/>
+                <input type="hidden" name="newOwn_lktp" id="newOwn_lktp" value="StandardUserLookup"/>
+                <input type="hidden" name="newOwn_lspf" id="newOwn_lspf" value="0"/>
+                <input type="hidden" name="newOwn_lspfsub" id="newOwn_lspfsub" value="0"/>
+                <input type="hidden" name="newOwn_mod" id="newOwn_mod" value="0"/>
+                <span class="lookupInput">
+                <input style="display:{!IsShowUser};" id="newOwn" maxlength="255" name="newOwn" onchange="getElementByIdCS('newOwn_lkid').value='';getElementByIdCS('newOwn_mod').value='1';" size="20" title="Owner name" type="text"/>
+                <a href="javascript:%20openLookup%28%27%2F_ui%2Fcommon%2Fdata%2FLookupPage%3Flkfm%3DeditPage%26lknm%3DnewOwn%26lktp%3D%27%20%2B%20getElementByIdCS%28%27newOwn_lktp%27%29.value%2C670%2C%271%27%2C%27%26lksrch%3D%27%20%2B%20escapeUTF%28getElementByIdCS%28%27newOwn%27%29.value.substring%280%2C%2080%29%29%29" id="newOwn_lkwgt" onclick="setLastMousePosition(event)" secid="newOwn_mlbtn" title="Owner name">
+                <img style="display:{!IsShowUser};"  src="/s.gif" alt="Owner Lookup (New Window)" class="lookupIcon" onblur="this.className = 'lookupIcon';" onfocus="this.className = 'lookupIconOn';" onmouseout="this.className = 'lookupIcon';this.className = 'lookupIcon';" onmouseover="this.className = 'lookupIconOn';this.className = 'lookupIconOn';" title="Owner Lookup (New Window)"/>
+                </a>
+                <div class="errorMsg" style="display:{!IsShowError};"><strong>Error:</strong>&nbsp;{!errorMessage}</div>
+                </span>
+                 </apex:outputPanel> 
+                </apex:pageblocksectionitem>
+            </apex:pageblocksection>
+            <apex:pageblockbuttons location="bottom">
+            <apex:commandbutton value="Send" action="{!doChangeOwner}" />
+            <apex:commandbutton value="Cancel" immediate="true"  action="{!cancel}"/>
+            </apex:pageblockbuttons>
+        </apex:pageblock>
+    </apex:form>
+</apex:page>

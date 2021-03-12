@@ -1,0 +1,84 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_CountryMenu" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script type="text/javascript" language="javascript">
+
+        $(document).ready(function(){
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"lblCloseButton", "value": $('#lblCloseButton').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accTitle", "value": $('#accTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accDescription", "value": $('#accDescription').val(), "type": "Text", "simple": false});
+                //  removed as per STI-7198
+                //attributes.push({"name":"accSkipLink", "value": $('#accSkipLink').val(), "type": "Text", "simple": false});
+                //attributes.push({"name":"accSkipLinkTarget", "value": $('#accSkipLinkTarget').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accPopupMsg", "value": $('#accPopupMsg').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accNewWindowMsg", "value": $('#accNewWindowMsg').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accSameWindowMsg", "value": $('#accSameWindowMsg').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accTitle">Text Label</label>
+                        <input class="ocmsTextInputLrg" id="accTitle" name="accTitle" type="text" value="{!accTitle}"></input>
+                    </td>
+                </tr>                
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="lblCloseButton">Back button</label>
+                        <input class="ocmsTextInputLrg" id="lblCloseButton" name="lblCloseButton" type="text" value="{!lblCloseButton}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accDescription">Description</label>
+                        <input class="ocmsTextInputLrg" id="accDescription" name="accDescription" type="text" value="{!accDescription}"></input>
+                    </td>
+                </tr>
+                <!-- removed as per STI-7198 -->
+                <!-- <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accSkipLink">Skip link</label>
+                        <input class="ocmsTextInputLrg" id="accSkipLink" name="accSkipLink" type="text" value="{!accSkipLink}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accSkipLinkTarget">ID of element to skip to</label>
+                        <input class="ocmsTextInputLrg" id="accSkipLinkTarget" name="accSkipLinkTarget" type="text" value="{!accSkipLinkTarget}"></input>
+                    </td>
+                </tr> -->
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accPopupMsg">Popup link message</label>
+                        <input class="ocmsTextInputLrg" id="accPopupMsg" name="accPopupMsg" type="text" value="{!accPopupMsg}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accNewWindowMsg">Links that open in a new window message</label>
+                        <input class="ocmsTextInputLrg" id="accNewWindowMsg" name="accNewWindowMsg" type="text" value="{!accNewWindowMsg}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accSameWindowMsg">Links that open in the same window message</label>
+                        <input class="ocmsTextInputLrg" id="accSameWindowMsg" name="accSameWindowMsg" type="text" value="{!accSameWindowMsg}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

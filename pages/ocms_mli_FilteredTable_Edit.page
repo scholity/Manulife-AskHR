@@ -1,0 +1,211 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_FilteredTable" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+	<apex:outputPanel layout="block">
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+        <script type="text/javascript" language="javascript">
+			$(document).ready(function() {
+
+                ce.content_editor('registerSaveFunction', function() {
+                    return [
+                        {type: 'string', name: 'sTableTitle', value: $('#sTableTitle').val()},
+                        {type: 'string', name: 'sTableIcon', value: $('#sTableIcon').val()},
+
+                        {type: 'string', name: 'sStartingYear', value: $('#sStartingYear').val()},
+                        {type: 'string', name: 'sYearFilterLabel', value: $('#sYearFilterLabel').val()},
+                        {type: 'string', name: 'sQuarterFilterLabel', value: $('#sQuarterFilterLabel').val()},
+                        {type: 'string', name: 'sReportTypeFilterLabel', value: $('#sReportTypeFilterLabel').val()},
+
+                        {type: 'string', name: 'sDocumentTitle', value: $('#sDocumentTitle').val()},
+                        {type: 'string', name: 'sReportType', value: $('#sReportType').val()},
+                        {type: 'string', name: 'sFileType', value: $('#sFileType').val()},
+                        {type: 'string', name: 'sDate', value: $('#sDate').val()},
+                        {type: 'string', name: 'sQuarter', value: $('#sQuarter').val()},
+                        {type: 'string', name: 'sDescription', value: $('#sDescription').val()},
+                        {type: 'string', name: 'sEmail', value: $('#sEmail').val()},
+
+                        {type: 'string', name: 'sYearFilterLabelAccessible', value: $('#sYearFilterLabelAccessible').val()},
+                        {type: 'string', name: 'sQuarterFilterLabelAccessible', value: $('#sQuarterFilterLabelAccessible').val()},
+                        {type: 'string', name: 'sReportTypeFilterLabelAccessible', value: $('#sReportTypeFilterLabelAccessible').val()},
+                        {type: 'string', name: 'sDownloadLabelAccessible', value: $('#sDownloadLabelAccessible').val()},
+                        //{type: 'string', name: 'sShareHasPopupLabelAccessible', value: $('#sShareHasPopupLabelAccessible').val()},
+                        //{type: 'string', name: 'sShareFacebookLabelAccessible', value: $('#sShareFacebookLabelAccessible').val()},
+                        //{type: 'string', name: 'sShareTwitterLabelAccessible', value: $('#sShareTwitterLabelAccessible').val()},
+                        //{type: 'string', name: 'sShareLinkedInLabelAccessible', value: $('#sShareLinkedInLabelAccessible').val()},
+                        {type: 'string', name: 'sEmailLabelAccessible', value: $('#sEmailLabelAccessible').val()},
+                        {type: 'string', name: 'sPageLeftAccessible', value: $('#sPageLeftAccessible').val()},
+                        {type: 'string', name: 'sPageRightAccessible', value: $('#sPageRightAccessible').val()}
+                    ];
+                });
+            });
+        </script>
+
+        <table class="ocmsContentEditor ocmsContentEditorNested">
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Table Header Values - Optional </strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTableTitle">Table Title (Optional)</label>
+                        <input class="ocmsTextInputLrg" id="sTableTitle" name="sTableTitle" type="text" value="{!sTableTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTableIcon">Table Icon (Optional)</label>
+                        <input type="hidden" name="sTableIcon" id="sTableIcon" value="{!sTableIcon}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sTableIcon" cPassThroughId="sTableIcon" cImage="{!sTableIcon}" type="Image" disabled="{!disableAll}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Table Filter Labels - These values are used for the initial state of each dropdown filter</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sStartingYear">Starting Year - This is the earliest year value that we will filter files on</label>
+                        <input class="ocmsTextInputLrg" id="sStartingYear" name="sStartingYear" type="text" value="{!sStartingYear}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sYearFilterLabel">Year Filter Label - value of the initial Year Filter label</label>
+                        <input class="ocmsTextInputLrg" id="sYearFilterLabel" name="sYearFilterLabel" type="text" value="{!sYearFilterLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sQuarterFilterLabel">Quarter Filter Label - value of the initial Quarter Filter label</label>
+                        <input class="ocmsTextInputLrg" id="sQuarterFilterLabel" name="sQuarterFilterLabel" type="text" value="{!sQuarterFilterLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sReportTypeFilterLabel">Report Type Filter Label - value of the initial Report Type Filter label</label>
+                        <input class="ocmsTextInputLrg" id="sReportTypeFilterLabel" name="sReportTypeFilterLabel" type="text" value="{!sReportTypeFilterLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Table Column Headings</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sDocumentTitle">Document Title column heading</label>
+                        <input class="ocmsTextInputLrg" id="sDocumentTitle" name="sDocumentTitle" type="text" value="{!sDocumentTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sReportType">Report Type column heading</label>
+                        <input class="ocmsTextInputLrg" id="sReportType" name="sReportType" type="text" value="{!sReportType}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFileType">File Type column heading</label>
+                        <input class="ocmsTextInputLrg" id="sFileType" name="sFileType" type="text" value="{!sFileType}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sDate">Report Date column heading</label>
+                        <input class="ocmsTextInputLrg" id="sDate" name="sDate" type="text" value="{!sDate}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sQuarter">Report Quarter column heading</label>
+                        <input class="ocmsTextInputLrg" id="sQuarter" name="sQuarter" type="text" value="{!sQuarter}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sEmail">Report Email column heading</label>
+                        <input class="ocmsTextInputLrg" id="sEmail" name="sEmail" type="text" value="{!sEmail}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility Labels</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sYearFilterLabelAccessible">Year Filter Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sYearFilterLabelAccessible" name="sYearFilterLabelAccessible" type="text" value="{!sYearFilterLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sQuarterFilterLabelAccessible">Quarter Filter Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sQuarterFilterLabelAccessible" name="sQuarterFilterLabelAccessible" type="text" value="{!sQuarterFilterLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sReportTypeFilterLabelAccessible">Report Type Filter Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sReportTypeFilterLabelAccessible" name="sReportTypeFilterLabelAccessible" type="text" value="{!sReportTypeFilterLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sDownloadLabelAccessible">Download Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sDownloadLabelAccessible" name="sDownloadLabelAccessible" type="text" value="{!sDownloadLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <!-- <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sShareHasPopupLabelAccessible">Share Pop-up Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sShareHasPopupLabelAccessible" name="sShareHasPopupLabelAccessible" type="text" value="{!sShareHasPopupLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sShareFacebookLabelAccessible">Share Facebook Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sShareFacebookLabelAccessible" name="sShareFacebookLabelAccessible" type="text" value="{!sShareFacebookLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sShareTwitterLabelAccessible">Share Twitter Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sShareTwitterLabelAccessible" name="sShareTwitterLabelAccessible" type="text" value="{!sShareTwitterLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sShareLinkedInLabelAccessible">Share LinkedIn Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sShareLinkedInLabelAccessible" name="sShareLinkedInLabelAccessible" type="text" value="{!sShareLinkedInLabelAccessible}"></input>
+                    </td>
+                </tr> -->
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sEmailLabelAccessible">Email Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sEmailLabelAccessible" name="sEmailLabelAccessible" type="text" value="{!sEmailLabelAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sPageLeftAccessible">Page Left Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sPageLeftAccessible" name="sPageLeftAccessible" type="text" value="{!sPageLeftAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sPageRightAccessible">Page Right Accessibility Label</label>
+                        <input class="ocmsTextInputLrg" id="sPageRightAccessible" name="sPageRightAccessible" type="text" value="{!sPageRightAccessible}"></input>
+                    </td>
+                </tr>
+			</tbody>
+		</table>
+	</apex:outputPanel>
+
+</apex:page>

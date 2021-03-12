@@ -1,0 +1,127 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_PollVote" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+	<!-- This is an experiment in progress that means to slightly improve the standard appearance of an OrchestraCMS content edit page. -->
+	<apex:stylesheet value="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"/>
+
+	<apex:outputPanel layout="block">
+		<script type="text/javascript" language="javascript">
+
+			$(document).ready(function() {
+
+				CKEDITOR.replace('title',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('option1',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('option2',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('option3',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('option4',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('option5',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('option6',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('option7',{height: '150px'}, {!CKEditorConfig});
+				CKEDITOR.replace('submitText',{height: '150px'}, {!CKEditorConfig});
+
+                ce.content_editor('registerSaveFunction', function () {
+					/* the below commented out code was implemented to "bump up" values on the edit page, for example, if they enter a value in the first and fourth fields,
+						this would "bump up" the value of the fourth field to the second field when they hit save and before saving the attribute values
+						this is on hold because of the question of how this works with multilingual. It works right now in the split screen view for both languages, but
+						what if there is a third language? It would be presumed this would only "bump up" the values on whatever was displayed on the split screen, so what if they
+						enter values for two languages in split screen, then change one of the languages to the third, then hit save? It would likely "bump up" values for the first and
+						third languages, but not for the second language which is no longer displayed. This could create problems when translating. Additionally, it would corrupt the results.
+						An answer in one langugae could have a different vote index than the answer in another language. Given these challenges, the notion that
+						if they want to enter a value in the first and fourth fields and leave 2 and 3 blank then that is their choice seems very reasonable
+					*/
+
+					return [
+						{type: 'text', name: 'title', value: CKEDITOR.instances.title.getData()},
+						{type: 'Text', name: 'option1', value: CKEDITOR.instances.option1.getData()},
+						{type: 'Text', name: 'option2', value: CKEDITOR.instances.option2.getData()},
+						{type: 'Text', name: 'option3', value: CKEDITOR.instances.option3.getData()},
+						{type: 'Text', name: 'option4', value: CKEDITOR.instances.option4.getData()},
+						{type: 'Text', name: 'option5', value: CKEDITOR.instances.option5.getData()},
+						{type: 'Text', name: 'option6', value: CKEDITOR.instances.option6.getData()},
+						{type: 'Text', name: 'option7', value: CKEDITOR.instances.option7.getData()},
+						{type: 'Text', name: 'submitText', value: CKEDITOR.instances.submitText.getData()},
+						{type: 'Text', name: 'showVoteCount', value: $('#showVoteCount').attr('checked')}
+					];
+				});
+				$('#showVoteCount').attr('checked', '{!showVoteCount}' === 'true' || '{!showVoteCount}' === 'checked');
+				$.orchestracmsRestProxy.doAjaxServiceRequest("ocms_mfc_PollVote", {action: "getResults", thisContentId: "{!thisContentId}", title: "{!title}", option1: "{!option1}", option2: "{!option2}", option3: "{!option3}",
+					option4: "{!option4}", option5: "{!option5}", option6: "{!option6}", option7: "{!option7}", showVoteCount:"{!showVoteCount}"},
+					function callBack (status, response) {
+						$('.poll').html(response.results);
+					}
+				);
+
+			});
+		</script>
+
+		<form>
+			<table class="ocmsContentEditor ocmsContentEditorNested">
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="title">Question</label>
+						<textarea class="ocmsTextInputLrg" id="title" name="title"><apex:outputText value="{!title}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="option1">Response 1</label>
+						<textarea  class="validatearticleinput" name="option1" id="option1" ><apex:outputText value="{!option1}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="option2">Response 2</label>
+						<textarea  class="validatearticleinput" name="option2" id="option2" ><apex:outputText value="{!option2}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="option3">Response 3</label>
+						<textarea  class="validatearticleinput" name="option3" id="option3" ><apex:outputText value="{!option3}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="option4">Response 4</label>
+						<textarea  class="validatearticleinput" name="option4" id="option4" ><apex:outputText value="{!option4}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="option5">Response 5</label>
+						<textarea  class="validatearticleinput" name="option5" id="option5" ><apex:outputText value="{!option5}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="option6">Response 6</label>
+						<textarea  class="validatearticleinput" name="option6" id="option6" ><apex:outputText value="{!option6}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="option7">Response 7</label>
+						<textarea  class="validatearticleinput" name="option7" id="option7" ><apex:outputText value="{!option7}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="submitText">Submit answer button text</label>
+						<textarea  class="validatearticleinput" name="submitText" id="submitText" ><apex:outputText value="{!submitText}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label><input type="checkbox" id="showVoteCount" value="{!showVoteCount}" name="showVoteCount" />ShowVoteCount</label>
+					</td>
+				</tr>
+			</table>
+			<p><strong>Results</strong></p>
+			<div class="poll">
+			</div>
+		</form>
+	</apex:outputPanel>
+</apex:page>

@@ -1,0 +1,142 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#navigation li.bt7 a,
+#navigation li.bt7 a:hover,
+#navigation li.bt7 a.on{
+width:145px;
+background-position:-815px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+
+}
+
+</style>
+
+ <div id="ManagingChange" style="height:100%" >
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr><td colspan="2" height="20px"></td></tr>        
+    <tr>
+        <td  width="10%" valign="top" align="center"> <!--Left Navigation-->
+        
+    <div id="page3">
+            <c:POS_Rollout_Left_Panel src="s3" />    
+    </div>
+        </td>
+        <td align="center" valign="top" width="90%"> <!--Content-->
+             <div class="x" id="ChangeMana"  style="height:100%;width:100%" align="center">
+
+<table align="center" cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr><td colspan="2" height="50px"></td></tr>        
+    <tr>
+        <td align="center" style="height: 50px">
+            <img src="{!URLFOR($Resource.pos_images, 'image/change-management-title.png')}" alt="" />
+        </td>
+    </tr>
+    <tr><td colspan="2" style="height:10px"></td></tr>
+</table>
+
+ <div align="center" style="font-family:Calibri!important;font-size:16px!important;line-height:150%;letter-spacing:1px;color:black;width:700px!important;text-align:justify!important">
+ The POSsible program is not just about implementing new technology - it's a transformation program
+ that involves a new way of working. To make sure that everyone understands the change, and can play
+ a part in supporting it, Change Management will have an important role in the program.
+ </div>
+  <div style="height:20px;"></div>
+ <div align="center">
+ <img align="middle" src="{!URLFOR($Resource.pos_images, 'image/areas-of-change-mgmt-illus.png')}" width="650px" alt="Illustration" />
+ </div>
+
+
+<table border="0" width="100%" cellpadding="0" cellspacing="0" align="left" style="padding-right:50px">
+<tr><td height="10px" colspan="3"></td></tr>
+<tr><td align="center"  colspan="3" style="font-family:Arial, Helvetica, sans-serif!important;font-size:16px!important;line-height:150%;letter-spacing:1px;font-style:italic!important">
+For more information click on the links below.
+</td></tr> 
+<tr><td colspan="3" style="height: 10px"></td></tr>
+
+ <tr>
+
+  <td style="text-align:right!important"  valign="top" align="right">
+  
+    <a title="Change Management VS. Project Management" href="{!$Site.Prefix}/apex/POS_CM_vs_PM" 
+      onmouseover="document.getElementById('r1').src=pic12.src;"
+      onmouseout="document.getElementById('r1').src=pic11.src;">
+ 
+    <img align="right" src="{!URLFOR($Resource.pos_images, 'image/change-mgmt-vs-proj-mgmt-button.png')}" alt="" id="r1" /></a>
+   
+  </td>
+  <td style="width:10px"></td>
+  <td style="text-align:left!important"  valign="top" align="left">
+
+    <a href="{!$Site.Prefix}/apex/POS_Need_To_Do" 
+      onmouseover="document.getElementById('r2').src=pic14.src;"
+      onmouseout="document.getElementById('r2').src=pic13.src;">
+      <img src="{!URLFOR($Resource.pos_images, 'image/what-you-need-to-do-button.png')}" alt="" id="r2" /></a>
+
+
+  </td>
+ </tr>
+<tr></tr> 
+</table>
+
+
+
+</div>
+        </td> <!--End of Content-->
+    </tr>
+</table>
+<div style="height:20px"></div>
+
+ </div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+   pic11 = new Image();
+   pic11.src = '{!URLFOR($Resource.pos_images, 'image/change-mgmt-vs-proj-mgmt-button.png')}';
+   pic12 = new Image();
+   pic12.src = '{!URLFOR($Resource.pos_images, 'image/change-mgmt-vs-proj-mgmt-button-(hover).png')}';
+   pic13 = new Image();
+   pic13.src = '{!URLFOR($Resource.pos_images, 'image/what-you-need-to-do-button.png')}';
+   pic14 = new Image();
+   pic14.src = '{!URLFOR($Resource.pos_images, 'image/what-you-need-to-do-button-(hover).png')}';
+ </script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

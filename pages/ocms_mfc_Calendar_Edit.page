@@ -1,0 +1,76 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_Calendar" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+	<!-- This is an experiment in progress that means to slightly improve the standard appearance of an OrchestraCMS content edit page. -->
+	<apex:stylesheet value="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"/>
+
+	<apex:outputPanel layout="block">
+		<script type="text/javascript" language="javascript">
+
+			$(document).ready(function() {
+
+				ce.content_editor('registerSaveFunction', function () {
+					return [
+						{type: 'Text', simple: true, name: 'todayText', value: $('#todayText').val()},
+						{type: 'Text', simple: true, name: 'eventsText', value: $('#eventsText').val()},
+						{type: 'Text', simple: true, name: 'calendarText', value: $('#calendarText').val()},
+						{type: 'Text', simple: true, name: 'createEventText', value: $('#createEventText').val()},
+						{type: 'Text', simple: true, name: 'pluralHourText', value: $('#pluralHourText').val()},
+						{type: 'Text', simple: true, name: 'singularHourText', value: $('#singularHourText').val()},
+						{type: 'Text', simple: true, name: 'pluralMinuteText', value: $('#pluralMinuteText').val()}
+					];
+				});
+			});
+		</script>
+
+		<form>
+			<table class="ocmsContentEditor ocmsContentEditorNested">
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="eventsText">Events Text (example: 'Events')</label>
+						<textarea class="validatearticleinput" id="eventsText" name="eventsText"><apex:outputText value="{!eventsText}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="todayText">Today Text (example: 'Today')</label>
+						<textarea class="validatearticleinput" id="todayText" name="todayText"><apex:outputText value="{!todayText}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="calendarText">Calendar Text (example: 'Calendar')</label>
+						<textarea class="validatearticleinput" id="calendarText" name="calendarText"><apex:outputText value="{!calendarText}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="createEventText">Create Event Text (example: 'Create Event')</label>
+						<textarea class="validatearticleinput" id="createEventText" name="createEventText"><apex:outputText value="{!createEventText}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="pluralHourText">Plural Hour Text (example: 'Hrs')</label>
+						<textarea class="validatearticleinput" id="pluralHourText" name="pluralHourText"><apex:outputText value="{!pluralHourText}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="singularHourText">Singular Hour Text (example: 'Hr')</label>
+						<textarea class="validatearticleinput" id="singularHourText" name="singularHourText"><apex:outputText value="{!singularHourText}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="pluralMinuteText">Plural Minute Text (example: 'Mins')</label>
+						<textarea class="validatearticleinput" id="pluralMinuteText" name="pluralMinuteText"><apex:outputText value="{!pluralMinuteText}"/></textarea>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</apex:outputPanel>
+</apex:page>

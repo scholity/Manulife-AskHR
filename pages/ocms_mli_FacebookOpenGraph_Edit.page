@@ -1,0 +1,36 @@
+<!--
+OrchestraCMS Edit Page
+######################
+
+Auhtor:     Devender Thareja
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_FacebookOpenGraph" showHeader="false"
+    sidebar="false" cache="false" title="Manulife.com FacebookOpenGraph Edit" standardStylesheets="false">
+
+	<apex:outputPanel layout="block">
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+        <script type="text/javascript" language="javascript">
+
+        $(document).ready(function() {
+                ce.content_editor('registerSaveFunction', function() {
+                    return [
+                        {type: 'string', name: 'sManulifeBaseUrl', value: $('#sManulifeBaseUrl').val()}
+                    ];
+                });
+            });
+        
+        </script>
+
+        <table class="ocmsContentEditor ocmsContentEditorNested">
+            <tbody>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sManulifeBaseUrl">Manulife base URL</label>
+                        <input class="ocmsTextInputLrg" id="sManulifeBaseUrl" name="sManulifeBaseUrl" type="text" value="{!sManulifeBaseUrl}"></input>
+                    </td>
+                </tr>
+			</tbody>
+		</table>
+	</apex:outputPanel>
+
+</apex:page>

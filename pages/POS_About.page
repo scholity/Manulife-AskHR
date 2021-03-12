@@ -1,0 +1,139 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+
+    <apex:define name="body">
+
+        <style type="text/css">
+
+        #navigation li.bt2 a,
+        #navigation li.bt2 a:hover,
+        #navigation li.bt2 a.on{
+        width:146px;
+        background-position:-90px -90px;
+        background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+        }
+
+        </style>
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+        <div class="section sTop" style="left: 0px; top: 0px;">
+
+        <br class="clear" />
+        <br class="clear" />
+
+          <div class="guided" style="height:600px;">
+
+            <p align="center"><img src="{!URLFOR($Resource.pos_images, 'image/about-the-program-title.png')}" alt="" /></p>
+            <div style="height:40px"></div>
+                <table style="width:100%">
+                    <tr>
+                        <td>
+                            <table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
+                             <tr>
+                                <td style="font-size: 0; line-height: 0;" width="300">
+                               &nbsp;
+                                </td>
+
+                              <td width="290px" valign="top" align="center">
+                               
+                               <a href="{!$Site.Prefix}/apex/POS_About_POS"
+                                onmouseover="document.getElementById('r1').src=pic2.src;"
+                                onmouseout="document.getElementById('r1').src=pic1.src;">
+                                <img src="{!URLFOR($Resource.pos_images, 'image/about_possible.png')}" alt="" id="r1" /></a>
+                               
+                              </td>
+                              
+                              <td style="font-size: 0; line-height: 0;" width="10">
+                               &nbsp;
+                              </td>
+
+                              <td width="290px" valign="top" align="center">
+                               
+                               <a href="{!$Site.Prefix}/apex/POS_Roadmap?src=main"
+                                onmouseover="document.getElementById('r2').src=pic4.src;"
+                                onmouseout="document.getElementById('r2').src=pic3.src;">
+                                <img src="{!URLFOR($Resource.pos_images2, 'image/roadmap.png')}" alt="" id="r2" /></a>
+                               
+                              </td>
+                              
+                              <td style="font-size: 0; line-height: 0;" width="10">
+                               &nbsp;
+                              </td>
+                              <td width="290px" valign="top" align="center">
+
+                                 <a href="#" onclick="window.open('http://bcove.me/1prelnwn', 'newwindow', 'height=405px,width=720px');return false;"
+                                  onmouseover="document.getElementById('r3').src=pic6.src;"
+                                  onmouseout="document.getElementById('r3').src=pic5.src;">
+                                  <img src="{!URLFOR($Resource.pos_images, 'image/program_video.png')}" alt="" id="r3" /></a>
+
+                              </td>
+                                <td style="font-size: 0; line-height: 0;" width="300">
+                               &nbsp;
+                              </td>
+
+                             </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        </div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+          pic1 = new Image();
+           pic1.src = '{!URLFOR($Resource.pos_images, 'image/about_possible.png')}';
+
+           pic2 = new Image();
+           pic2.src = '{!URLFOR($Resource.pos_images, 'image/about_possible_(hover).png')}';
+
+           pic3 = new Image();
+           pic3.src = '{!URLFOR($Resource.pos_images2, 'image/roadmap.png')}';
+
+           pic4 = new Image();
+           pic4.src = '{!URLFOR($Resource.pos_images2, 'image/roadmap_(hover).png')}';
+
+           pic5 = new Image();
+           pic5.src = '{!URLFOR($Resource.pos_images, 'image/program_video.png')}';
+
+           pic6 = new Image();
+           pic6.src = '{!URLFOR($Resource.pos_images, 'image/program_video_(hover).png')}';
+        </script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

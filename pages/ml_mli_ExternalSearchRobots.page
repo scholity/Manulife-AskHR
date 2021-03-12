@@ -1,0 +1,9 @@
+<apex:page contentType="text/plain" showHeader="false" sidebar="false" standardStylesheets="false">
+User-agent: *
+Disallow: /public/
+
+Sitemap: http://www.manulife.com/ml_sitemap
+Sitemap: http://www.manuvie.com/ml_sitemap
+
+
+</apex:page>

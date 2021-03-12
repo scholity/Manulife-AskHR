@@ -1,0 +1,93 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_MyPreferences" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+	<!-- This is an experiment in progress that means to slightly improve the standard appearance of an OrchestraCMS content edit page. -->
+	<apex:stylesheet value="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"/>
+
+	<apex:outputPanel layout="block">
+		<script type="text/javascript" language="javascript">
+
+			$(document).ready(function() {
+
+				ce.content_editor('registerSaveFunction', function () {
+
+					return [
+						{type: 'Text', simple: true, name: 'labelLanguage', value: $('#labelLanguage').val()},
+						{type: 'Text', simple: true, name: 'labelEmail', value: $('#labelEmail').val()},
+						{type: 'Text', simple: true, name: 'labelFontSize', value: $('#labelFontSize').val()},
+						{type: 'Text', simple: true, name: 'labelDailyDigestOn', value: $('#labelDailyDigestOn').val()},
+						{type: 'Text', simple: true, name: 'labelDailyDigestOff', value: $('#labelDailyDigestOff').val()},
+						{type: 'Text', simple: true, name: 'labelDefaultNews', value: $('#labelDefaultNews').val()},
+						//{type: 'Text', simple: true, name: 'labelOtherNews', value: $('#labelOtherNews').val()},
+						{type: 'Text', simple: true, name: 'labelSubmit', value: $('#labelSubmit').val()},
+						{type: 'Text', simple: true, name: 'link', value: $('#link').val()},
+					];
+				});
+
+			});
+		</script>
+
+		<form>
+			<table class="ocmsContentEditor ocmsContentEditorNested">
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="labelLanguage">Primary language label</label>
+						<textarea class="validatearticleinput" id="labelLanguage" name="labelLanguage"><apex:outputText value="{!labelLanguage}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="labelEmail">Daily digest email label</label>
+						<textarea  class="validatearticleinput" name="labelEmail" id="labelEmail" ><apex:outputText value="{!labelEmail}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="labelDailyDigestOn">Daily digest "ON" label</label>
+						<textarea  class="validatearticleinput" name="labelDailyDigestOn" id="labelDailyDigestOn" ><apex:outputText value="{!labelDailyDigestOn}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="labelDailyDigestOff">Daily digest "OFF" label</label>
+						<textarea  class="validatearticleinput" name="labelDailyDigestOff" id="labelDailyDigestOff" ><apex:outputText value="{!labelDailyDigestOff}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="labelFontSize">Font Size label</label>
+						<textarea  class="validatearticleinput" name="labelFontSize" id="labelFontSize" ><apex:outputText value="{!labelFontSize}"/></textarea>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="labelDefaultNews">Default news streams label</label>
+						<textarea  class="validatearticleinput" name="labelDefaultNews" id="labelDefaultNews" ><apex:outputText value="{!labelDefaultNews}"/></textarea>
+					</td>
+				</tr>
+				<!-- tr>
+					<td>
+						<label class="ocmsLabel" for="labelOtherNews">Other news streams label</label>
+						<textarea  class="validatearticleinput" name="labelOtherNews" id="labelOtherNews" ><apex:outputText value="{!labelOtherNews}"/></textarea>
+					</td>
+				</tr -->
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="labelSubmit">Submit answer button text</label>
+						<textarea  class="validatearticleinput" name="labelSubmit" id="labelSubmit" ><apex:outputText value="{!labelSubmit}"/></textarea>
+					</td>
+				</tr>
+	     		<tr>
+					<td>
+						<label class="ocmsLabel" for="link">Page to redirect to after saving</label>
+						<cms:PageSelector cPassThroughId="link" value="{!link}"  dialogId="linkTarget" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+						<input type="hidden" id="link" name="link" value="{!link}" />
+					</td>
+				</tr>
+			</table>
+		</form>
+	</apex:outputPanel>
+</apex:page>

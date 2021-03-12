@@ -1,0 +1,171 @@
+<!-- ocms_mfc_t_TwinTabs -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mfc_FavIcon, 'img/favicon.ico')}" type="image/x-icon"/>
+            <apex:include pageName="ocms_mfc_i_headSpace"/>
+        </apex:define><!-- header -->
+
+        <apex:define name="body">
+            <div class="pg pgTwinTabs"><!-- originally known as the (Explore Our) Company page template -->
+
+                <apex:include pageName="ocms_mfc_i_headerAndSideNav"/>
+
+                <div class="global-layer-wrap main-global-layer">
+
+                    <div class="global-align-center">
+                        <div class="global-drawer-slider">
+
+                            <apex:include pageName="ocms_mfc_i_globalNavTools"/>
+
+                            <div class="content-layer main-layer sticky-footer-fix">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>TextBlock</strong> ❧ critical alerts section
+                                    </div>
+
+                                </apex:outputText>
+                                <div class='critical-alerts'>
+                                    <cms:Panel panelName="criticalAlerts" panelController="{!controller}"
+                                               panelWidth="550px" panelHeight="30px"/>
+                                </div>
+
+                                <main class="content-wrap main-article">
+                                    <!-- K2 had non-semantic article element here -->
+                                    <apex:include pageName="ocms_mfc_i_breadcrumb"/>
+
+                                    <div id='company-content'><!-- K2 speak; TwinTabs is STG’s genericized term -->
+                                        <div class='tab-block'>
+                                            <div class='inner'>
+                                                <div class="global-content-tabs">
+                                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                        <div class="ocmsHint">
+                                                            <strong>Custom HTML</strong> Expand for instructions on
+                                                            creating the two page tab titles<br/>
+                                                            <div class="ocmsInstructions expandy">
+                                                                <ol>
+                                                                    <li>Copy the two lines below</li>
+                                                                    <li>Paste in to the Custom HTML text editor</li>
+                                                                    <li>Edit the tab names as required</li>
+                                                                </ol>
+					                            <pre style="margin-left: 3em;">
+                                                    <code>
+                                                        &lt;a class="tab" href="#"&gt;Manulife Divisions&lt;/a&gt;
+                                                        &lt;a class="tab" href="#"&gt;Management&lt;/a&gt;
+					                                </code>
+                                                </pre>
+                                                            </div>
+                                                        </div>
+                                                    </apex:outputText>
+                                                    <cms:Panel panelName="pageTabTitles" panelController="{!controller}"
+                                                               panelWidth="325px"
+                                                               panelHeight="22px" panelContentLayouts="CustomHtml"
+                                                               panelLimit="1"/>
+                                                    <!-- <a class="tab" href="#">Manulife Divisions</a>
+                                                    <a class="tab" href="#">Management</a>-->
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                Put content for the first of two main page tabs in the content panel
+                                                below…
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content selected'>
+                                            <h2>
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                    <div class="ocmsHint">
+                                                        <strong>PlainText</strong> ❧ header text in the page’s first tab
+                                                    </div>
+                                                </apex:outputText>
+                                                <cms:Panel panelName="tab1Header" panelController="{!controller}"
+                                                           panelWidth="325px"
+                                                           panelHeight="22px" panelContentLayouts="PlainText"
+                                                           panelLimit="1"/>
+                                            </h2
+                                            ><!-- h2 -->
+
+                                            <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                <div class="ocmsHint">
+                                                    <strong>List Page</strong> ❧ content for the page’s first tab<br/>
+                                                    - featured item<br/>
+                                                    - horizontal filters of Divisions<br/>
+                                                    - no search bar<br/>
+                                                </div>
+                                            </apex:outputText>
+                                            <cms:Panel panelName="tab1Content" panelController="{!controller}"
+                                                       panelWidth="350px"
+                                                       panelHeight="160px" panelContentLayouts="ListPage"
+                                                       panelLimit="1"/>
+                                            <!--panelContentLayouts="TextBlock, CustomHtml, Image" /-->
+                                        </div><!-- tab-content -->
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint ocmsInstructions outdent">
+                                                Second tab content goes below…
+                                            </div>
+                                        </apex:outputText>
+                                        <div class='tab-content'>
+                                            <h2>
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                    <div class="ocmsHint">
+                                                        <strong>PlainText</strong> ❧ header text in the page’s second
+                                                        tab
+                                                    </div>
+                                                </apex:outputText>
+                                                <cms:Panel panelName="tab2Header" panelController="{!controller}"
+                                                           panelWidth="325px"
+                                                           panelHeight="22px" panelContentLayouts="PlainText"
+                                                           panelLimit="1"/>
+                                            </h2
+                                            ><!-- h2 -->
+
+                                            <div class="company-tile-wrapper">
+                                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                    <div class="ocmsHint">
+                                                        <strong>List Page</strong> ❧ content for the page’s second
+                                                        tab<br/>
+                                                        - no horizontal filter bar<br/>
+                                                        - no location drop-down<br/>
+                                                        - no search bar<br/>
+                                                        - likely no personalization filtering!<br/>
+                                                    </div>
+                                                </apex:outputText>
+                                                <cms:Panel panelName="tab2Content" panelController="{!controller}"
+                                                           panelWidth="350px"
+                                                           panelHeight="160px" panelContentLayouts="ListPage"
+                                                           panelLimit="1"/>
+                                                <!--panelContentLayouts="TextBlock, CustomHtml, Image" /-->
+                                            </div><!-- company-tile-wrapper -->
+                                        </div><!-- tab-content -->
+                                    </div>
+
+                                    <!-- BOOKMARK CONTENT-->
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Bookmark bar, Bookmark Control </strong><br/>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelName="postArticle" panelController="{!controller}"
+                                               panelWidth="350px"
+                                               panelHeight="60px" panelLimit="2"
+                                               panelContentLayouts="BookmarkBar, BookmarkControl"/>
+
+                                </main>
+
+                                <apex:include pageName="ocms_mfc_i_pageFooter"/>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .global-layer-wrap.main-global-layer -->
+                <a id="back-to-top">
+                    <span id="uiLabelBackToTop">Back to top</span>
+                </a>
+            </div><!-- .pg.pgTwinTabs -->
+            <!-- script type="text/javascript">_satellite.pageBottom();</script -->
+        </apex:define><!-- body -->
+    </apex:composition>
+</apex:page>
+<!-- ocms_mfc_t_TwinTabs -->

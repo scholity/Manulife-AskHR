@@ -1,0 +1,42 @@
+<!-- ocms_mfc_ArticleMeta_Edit.page -->
+<!--
+    This is the OrchestraCMS content editor page for "Artice Meta" custom content
+    This content piece is to supply analytic data for articles for the 'Content' pages.
+    
+    2015-Sep-17 - Wilder
+        - original
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_ArticleMeta"
+	showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+	
+	<link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+
+	<apex:outputPanel layout="block">
+
+	<script id="ocms_application_Edit">
+		$(document).ready(function() {
+			ce.content_editor('registerSaveFunction', function() {			   
+				return [
+					{type: 'text', name: 'articleAuthor',		value: $('#articleAuthor').val()},
+					{type: 'text', name: 'articleTitle',		value: $('#articleTitle').val()}
+				];
+			});
+		});
+	</script>
+
+	<table class="ocmsContentEditor ocmsContentEditorNested">
+           <tr><td>
+            	<label class="ocmsLabel" for="articleTitle" title="The article title">Page Title</label>
+                <input type='text' id="articleTitle" placeholder="" value="{!articleTitle}"/>
+			</td></tr>
+	        <tr><td>
+            	<label class="ocmsLabel" for="articleAuthor" title="The article author's name">Author Name</label>
+                <input type='text' id="articleAuthor" placeholder="" value="{!articleAuthor}"/>
+			</td></tr>
+	</table>
+
+	</apex:outputPanel>
+	
+</apex:page>
+<!-- ocms_mfc_ArticleMeta_Edit.page -->

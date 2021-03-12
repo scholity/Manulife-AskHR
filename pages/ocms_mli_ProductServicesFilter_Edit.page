@@ -1,0 +1,400 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_ProductServicesFilter" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+
+        var selectBox = $('<select class="fullWidth tableInputs cntryCode" />');
+        $('<option />', {value: 'None', text: 'Select country'}).appendTo(selectBox);
+        $('<option />', {value: 'CA', text: 'Canada'}).appendTo(selectBox);
+        $('<option />', {value: 'US', text: 'United States'}).appendTo(selectBox);
+        $('<option />', {value: 'KH', text: 'Cambodia'}).appendTo(selectBox);
+        $('<option />', {value: 'CN', text: 'China'}).appendTo(selectBox);
+        $('<option />', {value: 'HK', text: 'Hong Kong'}).appendTo(selectBox);
+        $('<option />', {value: 'ID', text: 'Indonesia'}).appendTo(selectBox);
+        $('<option />', {value: 'JP', text: 'Japan'}).appendTo(selectBox);
+        $('<option />', {value: 'MY', text: 'Malaysia'}).appendTo(selectBox);
+        $('<option />', {value: 'PH', text: 'Philippines'}).appendTo(selectBox);
+        $('<option />', {value: 'SG', text: 'Singapore'}).appendTo(selectBox);
+        $('<option />', {value: 'TW', text: 'Taiwan'}).appendTo(selectBox);
+        $('<option />', {value: 'TH', text: 'Thailand'}).appendTo(selectBox);
+        $('<option />', {value: 'VN', text: 'Vietnam'}).appendTo(selectBox);
+
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if ($('#sSelectedCountry').val() == null || $('#sDroplistTitle').val() == '' || $('#sDroplistTitle').val() == 'None') {
+                    $ele = $('#sSelectedCountry');
+                    errorField($ele, languageUsed + 'Active country selector must be provided.');
+                    return false;
+                }
+                if ($('#sMobileImage').val() == null || $('#sMobileImage').val() == '') {
+                    $ele = $('#sMobileImage');
+                    errorField($ele, languageUsed + 'Banner Image (for mobile) must be provided.');
+                    return false;
+                }
+                if ($('#sTabletImage').val() == null || $('#sTabletImage').val() == '') {
+                    $ele = $('#sTabletImage');
+                    errorField($ele, languageUsed + 'Banner Image (for tablet) must be provided.');
+                    return false;
+                }
+                if ($('#sDesktopImage').val() == null || $('#sDesktopImage').val() == '') {
+                    $ele = $('#sDesktopImage');
+                    errorField($ele, languageUsed + 'Banner Image (for desktop) must be provided.');
+                    return false;
+                }
+                if ($('#sProdServFiltTitle').val() == null || $('#sProdServFiltTitle').val() == '') {
+                    $ele = $('#sProdServFiltTitle');
+                    errorField($ele, languageUsed + 'Product & Services Filter Title must be provided.');
+                    return false;
+                }
+                if (fCreateCountryArray().length === 0) {
+                    $ele = $('#countryTable');
+                    errorField($ele, languageUsed + 'Country search box must be provided.');
+                    return false;
+                }
+                if ($('#sButtonLabel').val() == null || $('#sButtonLabel').val() == '') {
+                    $ele = $('#sButtonLabel');
+                    errorField($ele, languageUsed + 'Button Label must be provided.');
+                    return false;
+                }
+                if ($('#sProdServPageTitle').val() == null || $('#sProdServPageTitle').val() == '') {
+                    $ele = $('#sProdServPageTitle');
+                    errorField($ele, languageUsed + 'Product & Services Page Title must be provided.');
+                    return false;
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        function initCountryTable(){
+            var countryInfo = '{!jsnProdServFiltSelect}';
+            if(countryInfo != ''){
+                countryInfo = JSON.parse('{!jsnProdServFiltSelect}');
+            } else {
+                countryInfo = {};
+            }
+
+            if (!$.isEmptyObject(countryInfo)){
+                for (var key in countryInfo){
+                    if (countryInfo.hasOwnProperty(key)){
+                        var sFilterCode = countryInfo[key].sFilterCode;
+                        var sFilterText = countryInfo[key].sFilterText;
+                        var sFilterLink = countryInfo[key].sFilterLink;
+                        addRow(sFilterCode, sFilterText, sFilterLink);
+                    }
+                }
+            } else {
+                addBlankRow();
+            }
+
+            if({!disableAll}){
+                $('#countryTable tr td input').attr('readonly',true);
+                $('.remove').remove();
+            } else {
+                $('#addRowButton').click(addBlankRow);
+                $('.removeButton').click(removeRow);
+                $('.upButton, .downButton').click(moveRow);
+            }
+        }
+
+        function addBlankRow(){
+            if ($('.newSelectBox').length) {
+                $('#countryTable td').removeClass('newSelectBox');
+            }
+            var rowString = '<tr>' +
+                                '<td class="countryDropdown newSelectBox">' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs cntryFilterText" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<input class="fullWidth tableInputs cntryFilterLink" type="text"></input>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<a class="removeButton">' +
+                                        '<img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" />' +
+                                    '</a>' +
+                                '</td>' +
+                                '<td>' +
+                                    '<a class="upButton" title="Up">' +
+                                        '<img class="up" src="{!URLFOR($Resource.cms__CmsImages, 'order-asc.gif')}" />' +
+                                    '</a>' +
+                                    '<a class="downButton" title="Down">' +
+                                        '<img class="down" src="{!URLFOR($Resource.cms__CmsImages, 'order-desc.gif')}" />' +
+                                    '</a>' +
+                                '</td>' +
+                            '</tr>';
+            $('#countryTable tbody').append(rowString);
+            $(selectBox).clone().appendTo('.countryDropdown.newSelectBox');
+            $('.removeButton').unbind();
+            $('.removeButton').click(removeRow);
+            $('.upButton, .downButton').unbind();
+            $('.upButton, .downButton').click(moveRow);
+        }
+
+        function addRow(sFilterCode, sFilterText, sFilterLink){
+
+            var row = $('<tr></tr>');
+            var countryField = $('<td></td>');
+            var filterTextField = $('<td><input class="fullWidth tableInputs cntryFilterText" type="text" value="' + sFilterText + '"></input></td>');
+            var filterLinkField = $('<td><input class="fullWidth tableInputs cntryFilterLink" type="text" value="' + sFilterLink + '"></input></td>');
+            var buttonField = $('<td><a class="removeButton"><img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}" /></a></td>"');
+            var moveRowField = $('<td><a class="upButton" title="Up"><img class="up" src="{!URLFOR($Resource.cms__CmsImages, 'order-asc.gif')}" /></a><a class="downButton" title="Down"><img class="down" src="{!URLFOR($Resource.cms__CmsImages, 'order-desc.gif')}" /></a></td>');
+
+            $(selectBox).clone().appendTo(countryField).val(sFilterCode);
+            row.append(countryField);
+            row.append(filterTextField);
+            row.append(filterLinkField);
+            row.append(buttonField);
+            row.append(moveRowField);
+
+            $('#countryTable tbody').append(row);
+        }
+
+        function removeRow(){
+            if($('#countryTable tbody tr').length -1 > 0){
+                $(this).parent().parent().remove();
+            } else {
+                $(this).parent().parent().find('.cntryCode').val('');
+                $(this).parent().parent().find('.cntryFilterText').val('');
+                $(this).parent().parent().find('.cntryFilterLink').val('');
+            }
+        }
+
+        function moveRow(){
+            var row = $(this).parent().parent();
+            if ($(this).is('.upButton')) {
+                row.insertBefore(row.prev());
+            } else {
+                row.insertAfter(row.next());
+            }
+        }
+
+        function fCreateCountryArray() {
+            var countryInfo = [];
+
+            $('#countryTable tbody tr').each(function(index){
+                var sFilterCode = $(this).find('.cntryCode').val();
+                var sFilterText = $(this).find('.cntryFilterText').val();
+                if ((sFilterCode != null && sFilterText != null) && (sFilterCode != undefined && sFilterText != undefined) && sFilterText != '') {
+                    countryInfo.push({
+                        sFilterCode: $(this).find('.cntryCode').val(),
+                        sFilterText: $(this).find('.cntryFilterText').val(),
+                        sFilterLink: $(this).find('.cntryFilterLink').val()
+                    });
+                }
+             });
+             return countryInfo;
+        }
+
+         $(document).ready(function(){
+
+            initCountryTable();
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                var countryJSON = JSON.stringify(fCreateCountryArray());
+
+                attributes.push({"name":"sSelectedCountry", "value": $('#sSelectedCountry').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sMobileImage", "value": $('#sMobileImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTabletImage", "value": $('#sTabletImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sDesktopImage", "value": $('#sDesktopImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sBannerImageAlt", "value": $('#sBannerImageAlt').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sProdServFiltTitle", "value": $('#sProdServFiltTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sProdServFiltLinkText", "value": $('#sProdServFiltLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sProdServFiltCountry", "value": $('#sProdServFiltCountry').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sButtonLabel", "value": $('#sButtonLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sProdServFiltLink", "value": $('#sProdServFiltLink').val(), "type": "cms.Link", "simple": false});
+                attributes.push({"name":"sProdServPageTitle", "value": $('#sProdServPageTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAddScriptForGeolocation", "value":$('#sAddScriptForGeolocation:checked').length != 0, "type":"Text"});
+                attributes.push({"name":"jsnProdServFiltSelect", "value": countryJSON, "type": "Text", "simple": false});
+
+                return attributes;
+            });
+
+            if('{!sAddScriptForGeolocation}' == 'true') {
+                $('#sAddScriptForGeolocation').attr('checked','checked');
+            }
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td><label class="ocmsLabel ocmsRequiredLabel" for="sSelectedCountry" title="">Active country selector</label>
+                        <select name="sSelectedCountry" id="sSelectedCountry">
+                            <option value="None">Please select a country</option>
+                            <option value="CA">Canada</option>
+                            <option value="US">United States</option>
+                            <option value="KH">Cambodia</option>
+                            <option value="CN">China</option>
+                            <option value="HK">Hong Kong</option>
+                            <option value="ID">Indonesia</option>
+                            <option value="JP">Japan</option>
+                            <option value="MY">Malaysia</option>
+                            <option value="PH">Philippines</option>
+                            <option value="SG">Singapore</option>
+                            <option value="TW">Taiwan</option>
+                            <option value="TH">Thailand</option>
+                            <option value="VN">Vietnam</option>
+                        </select>
+                        <p class="ocmsHelpText">This is used for displaying the selected country in the drop-down.</p>
+                    </td>
+                </tr>
+                <tr class="ocmsCheckForm">
+                    <td>
+                        <ul>
+                            <li>
+                                <label><input type="checkbox" id="sAddScriptForGeolocation" name="sAddScriptForGeolocation" />Default Products &amp; Services page content</label>
+                                <p class="ocmsHelpText">Check if this product filter content will be dropped on a default Products &amp; Services page</p>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sMobileImage">Banner Image (for mobile)</label>
+                        <input type="hidden" name="sMobileImage" id="sMobileImage" value="{!sMobileImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sMobileImage" cPassThroughId="sMobileImage" cImage="{!sMobileImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W320 X H201 pixel (72ppi)<br/>
+                        Retina: W640 X H402 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sTabletImage">Banner Image (for tablet)</label>
+                        <input type="hidden" name="sTabletImage" id="sTabletImage" value="{!sTabletImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sTabletImage" cPassThroughId="sTabletImage" cImage="{!sTabletImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W768 X H367 pixel (72ppi)<br/>
+                        Retina: W1536 X H734 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sDesktopImage">Banner Image (for desktop)</label>
+                        <input type="hidden" name="sDesktopImage" id="sDesktopImage" value="{!sDesktopImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sDesktopImage" cPassThroughId="sDesktopImage" cImage="{!sDesktopImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W1200 X H420 pixel (72ppi)<br/>
+                        Retina: W2400 X H840 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sBannerImageAlt">Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sBannerImageAlt" name="sBannerImageAlt" type="text" value="{!sBannerImageAlt}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sProdServFiltTitle">Product &amp; Services Filter Title</label>
+                        <input class="ocmsTextInputLrg" id="sProdServFiltTitle" name="sProdServFiltTitle" type="text" value="{!sProdServFiltTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fullWidth">
+                        <label class="ocmsLabel ocmsRequiredLabel" for="countryTable">Country Search Box</label>
+                        <apex:outputText escape="false" rendered="{!disableAll}">
+                            <table id="countryTable" style="border:1px dashed #cdcdcd;" class="disabled">
+                                <thead>
+                                    <tr>
+                                        <th width="20%">
+                                            Country
+                                        </th>
+                                        <th width="30%">
+                                            Filter text
+                                        </th>
+                                        <th width="50%" colspan="3">
+                                            Filter link
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </apex:outputText>
+                        <apex:outputText escape="false" rendered="{!!disableAll}">
+                            <table id="countryTable" style="border:1px solid black;" class="">
+                                <thead>
+                                    <tr>
+                                        <th width="20%">
+                                            Country
+                                        </th>
+                                        <th width="30%">
+                                            Filter text
+                                        </th>
+                                        <th width="50%" colspan="3">
+                                            Filter link
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <br/>
+                            <button id="addRowButton" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Add a new row</span></button>
+                        </apex:outputText>
+                        <p class="ocmsHelpText">Select country, add country name in Filter text field that should appear on the page in drop-down and add its associated products and services page url in Filter link field.<br/>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sButtonLabel">Button Label</label>
+                        <input class="ocmsTextInputLrg" id="sButtonLabel" name="sButtonLabel" type="text" value="{!sButtonLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sProdServFiltLinkText">Geo-targeted Link Text (e.g. Visit)</label>
+                        <input class="ocmsTextInputLrg" id="sProdServFiltLinkText" name="sProdServFiltLinkText" type="text" value="{!sProdServFiltLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sProdServFiltCountry">Geo-targeted Link Country (e.g. Manulife Canada)</label>
+                        <input class="ocmsTextInputLrg" id="sProdServFiltCountry" name="sProdServFiltCountry" type="text" value="{!sProdServFiltCountry}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sProdServFiltLink">Geo-targeted Country Link</label>
+                        <input type="hidden" name="sProdServFiltLink" id="sProdServFiltLink" value="{!sProdServFiltLink}" />
+                        <cms:PageSelector cPassThroughId="sProdServFiltLink" value="{!sProdServFiltLink}"  dialogId="sProdServFiltLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sProdServPageTitle">Product &amp; Services Page Title</label>
+                        <input class="ocmsTextInputLrg" id="sProdServPageTitle" name="sProdServPageTitle" type="text" value="{!sProdServPageTitle}"></input>
+                    </td>
+                </tr>
+            </table>
+            <script>
+                // Initialize picklist values here - populate picklist with values from their last save
+                var sSelectedCountry =  "{!sSelectedCountry}";
+                $('select#sSelectedCountry').val(sSelectedCountry);
+            </script>
+        </form>
+    </apex:outputPanel>
+</apex:page>

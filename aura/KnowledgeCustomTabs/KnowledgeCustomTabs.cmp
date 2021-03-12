@@ -1,0 +1,146 @@
+<aura:component implements="flexipage:availableForAllPageTypes,force:hasRecordId" access="global" controller="AskHR_KnowledgeCustomTabs">    
+    <aura:attribute name="recordId" type="Id" />
+    <aura:attribute name="Article"  type="Knowledge__kav" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}"/>
+    
+    <lightning:tabset>
+        <lightning:tab label="Information">
+		<aura:if isTrue="{!v.Article.AskHR_Article_Question__c != null}" >            
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleQuestion}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="questionSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="questionSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">Question</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="questionSection" class="slds-show slds-p-around--medium">        
+            <ui:outputRichText value="{!v.Article.AskHR_Article_Question__c}" />
+        </div>
+        </aura:if>
+		<aura:if isTrue="{!v.Article.AskHR_Article_Answer__c != null}" >             
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleAnswer}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="answerSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="answerSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">Answer</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="answerSection" class="slds-show slds-p-around--medium">        
+            <ui:outputRichText value="{!v.Article.AskHR_Article_Answer__c}" />
+        </div>  
+        </aura:if>
+        <aura:if isTrue="{!v.Article.Related_Links__c != null}" >
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleLinks}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="LinksSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="LinksSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">Related Links</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="LinksSection" class="slds-show slds-p-around--medium" >        
+            <ui:outputRichText value="{!v.Article.Related_Links__c}" />
+        </div>
+		</aura:if> 
+        <aura:if isTrue="{!v.Article.Review_Date__c != null}" >
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleReviewDate}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="ReviewDateSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="ReviewDateSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">Review Date</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="ReviewDateSection" class="slds-show slds-p-around--medium" >        
+            <ui:outputRichText value="{!v.Article.Review_Date__c}" />
+        </div>
+		</aura:if>             
+        <aura:if isTrue="{!v.Article.Title != null}" >
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleTitle}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="titleSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="titleSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">Title</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="titleSection" class="slds-show slds-p-around--medium" >        
+            <ui:outputRichText value="{!v.Article.Title}" />
+        </div>
+		</aura:if>             
+		<aura:if isTrue="{!v.Article.UrlName != null}" >             
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleUrlName}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="urlNameSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="urlNameSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">UrlName</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="urlNameSection" class="slds-show slds-p-around--medium">        
+            <ui:outputRichText value="{!v.Article.UrlName}" />
+        </div>     
+        </aura:if>             
+        </lightning:tab>
+        
+        <lightning:tab label="Q&amp;A">
+        <aura:if isTrue="{!v.Article.AskHR_Article_Question_and_Answe15__c != null}" >
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleQA}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="QASection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="QASection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">Question and Answer</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="QASection" class="slds-show slds-p-around--medium" >        
+            <ui:outputRichText value="{!v.Article.AskHR_Article_Question_and_Answe15__c}" />
+        </div>
+		</aura:if> 
+        </lightning:tab>
+        
+        <lightning:tab label="CSR">
+        <aura:if isTrue="{!v.Article.AskHR_Article_CSR_Content__c != null}" >
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleCsr}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="CsrSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="CsrSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">CSR Content</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="CsrSection" class="slds-show slds-p-around--medium" >        
+            <ui:outputRichText value="{!v.Article.AskHR_Article_CSR_Content__c}" />
+        </div>
+		</aura:if> 
+        </lightning:tab>
+        
+        <lightning:tab label="Manager">
+        <aura:if isTrue="{!v.Article.AskHR_Article_Manager_Content__c != null}" >
+        <div class="slds-page-header"  style="cursor: pointer;" onclick="{!c.toggleMgr}">
+            <section class="slds-clearfix">
+                <div class="slds-float--left"> 
+                    <lightning:icon class="slds-show" aura:id="MgrSection" iconName="utility:add" size="x-small" alternativeText="Indicates add"/>
+                    <lightning:icon class="slds-hide" aura:id="MgrSection" iconName="utility:dash" size="x-small" alternativeText="Indicates dash"/>
+                	<div class="slds-m-left--large">Manager Content</div>
+                </div>
+            </section>
+        </div>        
+        <div aura:id="MgrSection" class="slds-show slds-p-around--medium" >        
+            <ui:outputRichText value="{!v.Article.AskHR_Article_Manager_Content__c}" />
+        </div>
+		</aura:if>            
+        </lightning:tab>        
+    </lightning:tabset>
+</aura:component>

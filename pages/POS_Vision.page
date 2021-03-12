@@ -1,0 +1,213 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#endstatebody{
+font-family:Calibri;
+color:black;
+line-height:150%;
+
+    }
+
+#navigation li.bt4 a,
+#navigation li.bt4 a:hover,
+#navigation li.bt4 a.on{
+width:146px;
+background-position:-380px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+}
+
+</style>
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<table width="100%">
+    <tr><td style="height:10px"></td></tr>
+</table>
+
+<div id="rolling1" align="center" style="height:100%">
+<div style="height:25px"></div>
+<div align="center"><img src="{!URLFOR($Resource.pos_images, 'image/end-state-vision-title.png')}" alt="" /></div>
+<div style="height:30px"></div>
+
+<div class="x" id="endstatebody" style="height:100%">
+
+<!--Defining our End-State Vision-->
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+  <tr>
+    <td valign="top" style="height:39px;padding-left:30px;width:49px!important"><img src="{!URLFOR($Resource.pos_images, 'image/End_State_Vision_1.png')}" alt="" /></td>
+    <td valign="middle" height="39px" width="100%">
+        <span class="fonttitle" style="padding-left:10px">Defining our end-state vision</span>
+    </td>
+    <th valign="top" rowspan="2" width="274px" ><img alt="" src="{!URLFOR($Resource.pos_images, 'image/defining-ESV.png')}" /></th>
+  </tr>
+  <tr>
+    <td colspan="2" class="fontbody" valign="top">
+<div id="text" style="padding-left:30px">
+<div>    
+Digitization will play a big role in Manulife’s strategy to become more customer-
+centric. Our vision is to see our digital solutions serve all kinds of different audiences and their various needs. All of Manulife’s digital systems should work together to 
+provide a seamless and engaging customer experience. In the future, our Manulife ecosystem should provide a unified customer experience across touch points, allowing customers to engage Manulife as they see fit – whether that is:
+</div>
+<br>
+<div>• Relying on a trusted advisor;</div>
+<div>• Being fully self-directed and empowered to customize, purchase, and manage their 
+   financial plans; or</div>
+<div>• Something in between</div>
+<div>
+Defining our end-state vision has been an ongoing process involving a wide range of stakeholders. We have held multiple workshops in order to shape the Manulife end-state vision and create the foundations for future support: these workshops have involved key regional teams – Customer Website, Wealth &amp; Asset Management,
+Product and Technology. 
+</div>
+</br>
+</div>
+    </td>
+  </tr>
+</table>  
+
+<!--Where are we Now-->
+
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+  
+  <tr>
+    <td rowspan="3" style="width: 284px">
+        <img alt="" src="{!URLFOR($Resource.pos_images, 'image/where-are-we-now.png')}" />    
+    </td>
+    <td colspan="2"></td>
+  </tr>
+  <tr>
+    <td valign="middle" style="height:49px;width:39px;padding-left:30px">
+        <img alt="" src="{!URLFOR($Resource.pos_images, 'image/End_State_Vision_2.png')}" />
+    </td>
+        <td valign="middle" height="39px" width="100%">
+        <span class="fonttitle" style="padding-left:10px">Where are we now?</span>
+    </td>
+
+  </tr>
+  <tr>
+    <td colspan="2" valign="top" class="fontbody" style="padding-left:30px;padding-right:20px">
+        <div style="font-size:16px;letter-spacing:1px;line-height:150%;padding-left:30px">
+Manulife teams are concurrently building various digital solutions in order to 
+realize the end-state vision. The regional and country teams building the 
+POSsible solution are currently working towards delivering a viable product for 
+a point-of-sale solution; support for an end-to-end, cross-channel, agent-led sales journey – from initial understanding of customer needs to 
+policy issuance for insurance products.     
+        </div>
+    </td>
+  </tr>
+
+</table>
+<!--Our End State Vision-->
+<table cellpadding="0" cellspacing="0" border="0" width="100%">
+    <tr>
+        <td valign="top" width="49px" style="padding-left:30px"><img src="{!URLFOR($Resource.pos_images, 'image/End_State_Vision_3.png')}" /></td>
+        <td valign="middle" height="39px" width="100%">
+        <span class="fonttitle" style="padding-left:10px">Our end-state vision</span>
+    </td>
+    </tr>
+    <tr>
+        <td colspan="2" class="fontbody" style="padding-left:30px;padding-right:20px;padding-top:20px">
+        Manulife’s end-state vision is to provide an industry recognized multi-channel 
+        customer journey for insurance, wealth and asset management, which is supported by 
+        a fully connected experience (both digital and offline). Our goal is for all 
+        Manulife’s systems to work together to provide a seamless customer experience. 
+        </td>
+    </tr>
+    
+</table>
+<div style="height:20px"></div>
+
+    <div id="chart">
+        <img alt="" src="{!URLFOR($Resource.pos_images, 'image/ESV_chart_newest-2.jpg')}" usemap="#flowchart" id="r1" />
+    <map name="flowchart">
+        <area shape="circ" title="Social Media" coords="64,126,24"
+        onmouseover="document.getElementById('r1').src=pic2.src;"
+        onmouseout="document.getElementById('r1').src=pic1.src;" />
+
+        <area shape="circ" title="Customer Apps" coords="143,126,23"
+        onmouseover="document.getElementById('r1').src=pic3.src;"
+        onmouseout="document.getElementById('r1').src=pic1.src;" />
+
+        <area shape="circ" title="Public Website" coords="65,227,24"
+        onmouseover="document.getElementById('r1').src=pic4.src;"
+        onmouseout="document.getElementById('r1').src=pic1.src;" />
+
+        <area shape="circ" title="Customer Website" coords="140,227,27"
+        onmouseover="document.getElementById('r1').src=pic5.src;"
+        onmouseout="document.getElementById('r1').src=pic1.src;" />
+--
+        <area shape="circ" title="3rd Party" coords="105,355,24"
+        onmouseover="document.getElementById('r1').src=pic6.src;"
+        onmouseout="document.getElementById('r1').src=pic1.src;" />
+
+        <area shape="circ" title="Agent Website" coords="106,448,24"
+        onmouseover="document.getElementById('r1').src=pic7.src;"
+        onmouseout="document.getElementById('r1').src=pic1.src;" />
+
+        <area shape="circ" title="Point-of-Sale Solution" coords="102,549,26"
+        onmouseover="document.getElementById('r1').src=pic8.src;"
+        onmouseout="document.getElementById('r1').src=pic1.src;" />
+        
+    </map>
+    </div>
+    <div style="height:20px"></div>
+</div>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+   pic1 = new Image();
+   pic1.src = '{!URLFOR($Resource.pos_images, 'image/ESV_chart_newest-2.jpg')}';
+   pic2 = new Image();
+   pic2.src = '{!URLFOR($Resource.pos_images, 'image/social-media_hover.jpg')}';
+   pic3 = new Image();
+   pic3.src = '{!URLFOR($Resource.pos_images, 'image/customer-apps_hover.jpg')}';
+   pic4 = new Image();
+   pic4.src = '{!URLFOR($Resource.pos_images, 'image/public-web_hover.jpg')}';
+   pic5 = new Image();
+   pic5.src = '{!URLFOR($Resource.pos_images, 'image/customer-web_hover.jpg')}';
+   pic6 = new Image();
+   pic6.src = '{!URLFOR($Resource.pos_images, 'image/3rd-party_hover.jpg')}';
+   pic7 = new Image();
+   pic7.src = '{!URLFOR($Resource.pos_images, 'image/agent-web_hover.jpg')}';
+   pic8 = new Image();
+   pic8.src = '{!URLFOR($Resource.pos_images, 'image/POS-solution_hover.jpg')}';
+    
+ </script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

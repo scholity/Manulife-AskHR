@@ -1,0 +1,701 @@
+<apex:page sidebar="false" title="Article List" controller="ASKHR_ArticleSearchController" applybodytag="false" cache="true" doctype="html-5.0" tabstyle="ASKHR_CustomArticleSearch__tab">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <head>
+        <meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1" />
+        <apex:stylesheet value="{!URLFOR($Resource.SLDS_0122,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        <apex:stylesheet value="{!URLFOR($Resource.ASKHR_ArticleAssets, 'css/style.css')}" />
+        <apex:includescript value="https://code.jquery.com/jquery-1.12.1.min.js" />
+    </head>
+    <apex:remoteobjects >
+        <apex:remoteobjectmodel jsshorthand="articleFeedback" name="ASKHR_ArticleFeedback__c" fields="ArticleId__c,CreatedDate,Article_Feedback_User_Name__c,Description__c,Answer__c,Public__c,Status__c">
+        </apex:remoteobjectmodel>
+    </apex:remoteobjects>
+    <body>
+        <div class="slds">
+            <!-- page specific ALJS Plugin -->
+            <script src="{!URLFOR($Resource.SLDS_0122,'/aljs/jquery.aljs-init.min.js')}"></script>
+            <script src="{!URLFOR($Resource.SLDS_0122,'/aljs/jquery.aljs-picklist.min.js')}"></script>
+            <apex:form >
+                <div class="slds-grid slds-wrap">
+                    <search class="slds-col slds-size--1-of-1">
+                        <div class="slds-form-element slds-grid slds-p-around--medium">
+                            <div class="slds-form-element__control slds-col--padded slds-size--1-of-2 slds-container--small"> 
+                                <apex:inputtext html-placeholder="{!$Label.ASKHR_Article_SearchPlaceholder}" html-class="slds-input theSearchString" value="{!searchstring}" id="theSearchstring" maxlength="200" size="110" onkeypress="if (event.keyCode == 13) {refreshSearchResult();return false;}" />
+                            </div>
+                            <div id="help-container" class="askhr_articleHelpBackground slds-grid  slds-align-middle slds-nowrap">
+                                <span id="article-help-text" class="askhr_articleHelpText">{!$Label.ASKHR_Article_List_Need_Help}</span>
+                                <span id="article-help" aria-describedby="help-popover" class="askhr_knowledgeSearchHelp slds-grid-col"></span>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-p-around--small slds-wrap">
+                            <div class="slds-picklist slds-m-left--medium" data-aljs="picklist-lang" aria-expanded="true">
+                                <button class="slds-button slds-button--neutral slds-picklist__label" aria-haspopup="true">
+                                    <span id="picklist-btn-title-lang" class="slds-truncate">English</span>
+                                    <img class="slds-icon" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/utility/down_60.png')}" />
+                                </button>
+                                <div class="slds-dropdown slds-dropdown--left slds-dropdown--menu">
+                                    <ul id="article-filter-lang" class="slds-dropdown__list" role="menu"></ul>
+                                </div>
+                            </div>
+                            <div class="slds-picklist slds-m-left--medium" data-aljs="picklist-topic" aria-expanded="true">
+                                <button class="slds-button slds-button--neutral slds-picklist__label" aria-haspopup="true">
+                                    <span id="picklist-btn-title-topic" class="slds-truncate">Topic</span>
+                                    <img class="slds-icon" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/utility/down_60.png')}" />
+                                </button>
+                                <div class="slds-dropdown slds-dropdown--left slds-dropdown--menu">
+                                    <ul id="article-filter-topic" class="slds-dropdown__list slds-dropdown--length-with-icon-10" role="menu">
+                                        <li id="menu-1-0" href="#" class="slds-dropdown__item slds-is-selected">
+                                            <a href="javascript:void(0)" role="menuitemradio">
+                                                <p class="slds-truncate">
+                                                    <img class="slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--x-small" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/utility/check_60.png')}" />
+                                                    {!$Label.ASKHR_Article_NoFilter}
+                                                </p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="slds-picklist slds-m-left--medium" data-aljs="picklist-geo" aria-expanded="true">
+                                <button class="slds-button slds-button--neutral slds-picklist__label" aria-haspopup="true">
+                                    <span id="picklist-btn-title-geo" class="slds-truncate">Geography</span>
+                                    <img class="slds-icon" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/utility/down_60.png')}" />
+                                </button>
+                                <div class="slds-dropdown slds-dropdown--left slds-dropdown--menu">
+                                    <ul id="article-filter-geo" class="slds-dropdown__list slds-dropdown--length-with-icon-10" role="menu">
+                                        <li id="menu-0-0" href="#" class="slds-dropdown__item slds-is-selected">
+                                            <a href="javascript:void(0)" role="menuitemradio">
+                                                <p class="slds-truncate">
+                                                    <img class="slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--x-small" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/utility/check_60.png')}" />
+                                                    {!$Label.ASKHR_Article_NoFilter}
+                                                </p>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <span class="slds-m-left--small slds-m-top--small slds-m-bottom--small" onclick="resetFilter();"><a href="">{!$Label.ASKHR_Article_Reset_Filter}</a></span>
+                        </div>
+                    </search>
+                    <main class="slds-col slds-size--1-of-10" style="min-height: 400px;">
+                        <div id="article-list-spinner" class="slds-spinner_container" style="margin-top:140px;display:none;">
+                            <div class="slds-spinner slds-spinner--medium" aria-hidden="false" role="alert">
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                        <!--<apex:messages /> -->
+                        <apex:panelgroup id="theSearchResults">
+                            <div class="">
+                                <apex:panelgrid width="100%">
+                                    <knowledge:articlelist articlevar="article" categories="{!categoryKeyword}"
+                                                           keyword="{!searchstring}" pagenumber="{!currentPageNumber}" pagesize="{!mPageSize}" language="{!selectedLanguage}">
+                                        <div class="slds-p-around--medium askhr_knowledgeArticleListItem" onclick="location.href='{!URLFOR($Action.KnowledgeArticle.View, article.id, ['popup' = 'false'])}'">
+                                                <div class="slds-text-heading--small slds-truncate"><apex:outputlink target="_self" value="{!URLFOR($Action.KnowledgeArticle.View, article.id, ['popup' = 'false'])}">{!article.title}</apex:outputlink></div>
+                                                <p id="summary"><apex:outputtext >{!article.abstract}</apex:outputtext></p>
+                                                <ul class="slds-list--horizontal slds-has-dividers--right slds-text-body--small slds-has-inline-block-links">
+                                                    <li class="slds-list__item"><apex:outputtext >{!article.articleNumber}</apex:outputtext></li>
+                                                    <li class="slds-list__item"><apex:outputtext >{!article.articleTypeLabel}</apex:outputtext></li>
+                                                    <li class="slds-list__item"><apex:outputtext value="{0,date, dd'/'MM'/'yyyy}">{!$Label.ASKHR_Article_DateText} <apex:param value="{!article.LastPublishedDate}" /></apex:outputtext></li>
+                                                </ul>
+                                            </div>
+                                    </knowledge:articlelist>
+                                </apex:panelgrid>
+                            </div>
+                            <div class="slds-grid slds-grid--align-center slds-p-around--medium">
+                                <apex:actionstatus id="show-more-article-status" onstart="toggleShowMoreArticleLoading(true,true);" onstop="toggleShowMoreArticleLoading(false,{!nextRequired});" />
+                                <div id="article-more-spinner" class="slds-hide">
+                                    <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </div>
+                                <!--<apex:commandlink action="{!previous}" value="Previous" style="{!IF(prevRequired =
+                                                                   true,'display:block','display:none')}" rerender="theSearchResults" /> -->
+                                <apex:commandlink id="show-more-link" action="{!next}" value="{!$Label.ASKHR_Article_ShowMoreArticle}" style="{!IF(nextRequired =
+                                                                                           true,'display:block','display:none')}" status="show-more-article-status" rerender="theSearchResults" />
+                            </div>
+                            <div style="{!IF(isShowNoResultFound = true, 'display:block;', 'display:none;')}max-width:50em;" class="slds-p-around--large">
+                                <p id="askhr_knowledgeNotFoundTitle" class="slds-text-heading--medium" style="word-wrap: break-word;">
+                                    {!IF(searchString!=null,searchString + ' - ' + $Label.ASKHR_ArticleNotFoundKeyword,$Label.ASKHR_ArticleNotFoundFilter)}
+                                </p>
+                                <br />
+                                <div style="word-wrap: break-word;">
+                                    <apex:outputtext value="{!notFoundMessage}" html-class="slds-text-body--regular" escape="false"></apex:outputtext>
+                                </div>
+                            </div>
+                        </apex:panelgroup>
+                        <apex:actionfunction action="{!refreshSearchResult}" name="refreshSearchResult"
+                                             rerender="theSearchResults" status="filter-article-status">
+                        </apex:actionfunction>
+                    </main>
+                    <aside class="slds-col slds-size--1-of-2 slds-medium-size--1-of-6 slds-large-size--4-of-12">
+                    </aside>
+                    <div id="help-popover" style="z-index: 999;width:300px; display:none;" class="slds-popover slds-popover--panel slds-nubbin--top" role="tooltip">
+                        <div class="slds-popover__body-list slds-p-around--medium askhr_articleHelp" onclick="window.open('/employee/500/e?retURL=%2Femployee%2Fapex%2FASKHR_CustomArticleList&RecordType=01250000000E51ZAAS')">
+                            <div class="slds-col--padded slds-p-around--x-small">
+                                <dl>
+                                    <dd>
+                                        <p class="slds-text-heading--medium"><a href="javascript:void(0)">{!$Label.ASKHR_Article_NeedHelp_1}</a></p>
+                                        <p class="slds-text-body--small">{!$Label.ASKHR_Article_NeedHelp_2}</p>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="slds-popover__body-list slds-p-around--medium askhr_articleHelp" onclick="toggleFeedbackDock(true);">
+                            <div class="slds-col--padded slds-p-around--x-small">
+                                <dl>
+                                    <dd>
+                                        <p class="slds-text-heading--medium"><a href="javascript:void(0)" onclick="toggleFeedbackDock(true);">{!$Label.ASKHR_Article_NeedHelp_3}</a></p>
+                                        <p class="slds-text-body--small">{!$Label.ASKHR_Article_NeedHelp_4}</p>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="slds-popover__body-list slds-p-around--medium askhr_articleHelp" onclick="toggleFAQDock(true);">
+                            <div class="slds-col--padded slds-p-around--x-small">
+                                <dl>
+                                    <dd>
+                                        <p class="slds-text-heading--medium"><a href="javascript:void(0)" onclick="toggleFAQDock(true);">{!$Label.ASKHR_Article_NeedHelp_5}</a></p>
+                                        <p class="slds-text-body--small">{!$Label.ASKHR_Article_NeedHelp_6}</p>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                        <div class="slds-popover__body-list slds-p-around--medium askhr_articleHelp" onclick="showGlobalNumber()">
+                            <div class="slds-col--padded slds-p-around--x-small">
+                                <dl>
+                                    <dd>
+                                        <p class="slds-text-heading--medium"><a href="javascript:void(0)" onclick="showGlobalNumber()">{!$Label.ASKHR_Article_NeedHelp_7}</a></p>
+                                        <p class="slds-text-body--small">{!$Label.ASKHR_Article_NeedHelp_8}</p>
+                                    </dd>
+                                </dl>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <apex:actionstatus id="filter-article-status" onstart="toggleLoading();" onstop="toggleLoading();" />
+                <apex:actionfunction action="{!refreshSearchResult}" name="updateLangFilter"
+                                     rerender="theSearchResults" status="filter-article-status">
+                    <apex:param name="langFilter" assignto="{!selectedLanguage}" value="{!selectedLanguage}" />
+                </apex:actionfunction>
+                <apex:actionfunction action="{!refreshSearchResult}" name="updateTopicFilter"
+                                     rerender="theSearchResults" status="filter-article-status">
+                    <apex:param name="topicFilter" assignto="{!selectedTopic}" value="{!selectedTopic}" />
+                </apex:actionfunction>
+                <apex:actionfunction action="{!refreshSearchResult}" name="updateGeoFilter"
+                                     rerender="theSearchResults" status="filter-article-status">
+                    <apex:param name="geoFilter" assignto="{!selectedGeography}" value="{!selectedGeography}" />
+                </apex:actionfunction>
+                <apex:actionfunction action="{!refreshSearchResult}" name="resetAllFilter"
+                                     rerender="theSearchResults" status="filter-article-status">
+                    <apex:param name="geoFilter" assignto="{!selectedGeography}" value="{!selectedGeography}" />
+                    <apex:param name="topicFilter" assignto="{!selectedTopic}" value="{!selectedTopic}" />
+                    <apex:param name="langFilter" assignto="{!selectedLanguage}" value="{!selectedLanguage}" />
+                    <apex:param name="searchStringfilter" assignto="{!searchstring}" value="{!searchstring}" />
+                </apex:actionfunction>
+            </apex:form>
+            <div id="article-list-feedbackdock" class="slds-docked_container" style="z-index:999;">
+                <div id="knowledgeFeedback" class="slds-docked-composer slds-grid slds-grid--vertical slds-nowrap slds-hide">
+                    <div class="slds-docked-composer__header slds-grid slds-grid--align-spread slds-shrink-none">
+                        <div class="slds-media slds-media--center">
+                            <div><span id="article-feedback-label">Feedback</span></div>
+                        </div>
+                        <div class="slds-docked-composer__actions" onclick="toggleFeedbackDock(false);">
+                            <button class="slds-button slds-button--icon-bare slds-button--icon-inverse">
+                                <img class="slds-button__icon" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/action/close_60.png')}" />
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slds-docked-composer__body slds-grid slds-grid--vertical slds-nowrap slds-size--1-of-1">
+                        <div id="feedback-submission-spinner" class="slds-spinner_container slds-hide slds-grow">
+                            <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                        <div id="feedback-submit-successful" class="slds-grid slds-grid--vertical slds-grid--vertical-align-center slds-grid--align-center slds-grow">
+                            <span class="slds-icon__container--circle slds-icon-standard-solution slds-p-around--large">
+                                <img class="slds-icon slds-icon--large" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/action/check_60.png')}" />
+                                <span class="slds-assistive-text">Thanks</span>
+                            </span>
+                            <h2 class="slds-text-heading--medium slds-m-top--large">{!$Label.ASKHR_Article_Feedback_TQ_Text}</h2>
+                        </div>
+                        <textarea id="feedback-input" class="slds-docked-composer__input slds-input--bare slds-text-longform slds-grow" placeholder="{!$Label.ASKHR_Article_Feedback_Content_Text}"></textarea>
+                    </div>
+                    <div class="slds-docked-composer__footer slds-shrink-none">
+                        <div class="slds-float--right slds-grid slds-grid--align-end slds-size--1-of-2 slds-text-align--right">
+                            <button id="feedback-submit-btn" class="slds-button slds-button--brand" onclick="newFeedback();">{!$Label.ASKHR_Article_Feedback_Submit_Text}</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="faqContainer" class="slds-docked-composer slds-grid slds-grid--vertical slds-nowrap slds-hide">
+                    <div class="slds-docked-composer__header slds-grid slds-grid--align-spread slds-shrink-none">
+                        <div class="slds-media slds-media--center">
+                            <div><span id="article-faq-label">Frequently Asked Question</span></div>
+                        </div>
+                        <div class="slds-docked-composer__actions" onclick="toggleFAQDock(false);">
+                            <button class="slds-button slds-button--icon-bare slds-button--icon-inverse">
+                                <img class="slds-button__icon" src="{!URLFOR($Resource.SLDS_0122,'assets/icons/action/close_60.png')}" />
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="slds-docked-composer__body slds-col slds-grid slds-grid--vertical slds-nowrap slds-size--1-of-1 slds-scrollable--y">
+                        <div id="faq-loading-spinner" class="slds-spinner_container slds-grow">
+                            <div class="slds-spinner slds-spinner--small" aria-hidden="false" role="alert">
+                                <div class="slds-spinner__dot-a"></div>
+                                <div class="slds-spinner__dot-b"></div>
+                            </div>
+                        </div>
+                        <apex:form >
+                            <apex:panelgroup id="general-faq">
+                                <ul id="article-list-faq" class="slds-list--vertical slds-has-dividers--bottom-space slds-has-selection">
+                                    <apex:repeat value="{!GeneralFeedbacks}" var="faq">
+                                        <li class="slds-list__item askhr_faq_item" id="{!faq.Id}" onclick="toggleAnswer(this);" style="">
+                                            <div class="slds-tile slds-p-around--medium">
+                                                <p class="slds-tile__title"><a href="javascript:void(0)"><apex:outputtext value="{!faq.Description__c}" escape="false" /></a></p>
+                                                <p id="answer-{!faq.Id}" style="display:none;"><apex:outputtext value="{!faq.Answer__c}" escape="false" /></p>
+                                            </div>
+                                        </li>
+                                    </apex:repeat>
+                                </ul>
+                                <div class="slds-text-heading--small slds-grid slds-grid--vertical-align-center slds-grid--align-center" style="{!IF(mHasFAQ, 'display:none;','')}height:400px;" id="feedback-faq-not-available">
+                                    <p>No FAQ available at this moment</p>
+                                </div>
+                            </apex:panelgroup>
+                            <apex:actionfunction action="{!refreshGeneralFaq}" name="refreshGeneralFaq"
+                                                 rerender="general-faq" status="generalfaq-status">
+                                <apex:param name="generalfaqparam" assignto="{!initFeedback}" value="{!initFeedback}" />
+                            </apex:actionfunction>
+                            <apex:actionstatus id="generalfaq-status" onstart="toggleFAQProgress(true);" onstop="toggleFAQProgress(false);" />
+                        </apex:form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script type="text/javascript">
+        j$ = jQuery.noConflict();
+        var selectedTopicPicklistId = null;
+        var labelGeo = 'Geography';
+        var labelTopic = 'Topic';
+        var labelNoFilter = '{!$Label.ASKHR_Article_NoFilter}';
+            var userLocale = '{!mUserLanguage}';
+            var labelUserLanguage; 
+        j$.aljsInit({
+            assetsLocation: "{!URLFOR($Resource.SLDS_0122,'assets/')}",
+            scoped: true
+
+        });
+        j$(document).ready(function () {
+
+            //Get the Data Category for populating the Topic and Geo filter
+            var dataCat = {!DataCategoryGroupInfoAsJSON};
+
+            //TODO: for testing uncomment this
+            for(i = 0; i < dataCat.length; i++){
+
+                if(dataCat[i].name == 'Geography'){
+                    labelGeo = dataCat[i].label;
+                    j$('#picklist-btn-title-geo').text(labelGeo);
+                    populateGeoFilter(dataCat[i]);
+                }else if(dataCat[i].name == 'Topic'){
+                    labelTopic = dataCat[i].label;
+                    j$('#picklist-btn-title-topic').text(labelTopic);
+                    populateTopicFilter(dataCat[i]);
+                }
+            }
+
+            j$('[data-aljs="picklist-geo"]').picklist({
+                    onChange:function(obj){
+                        if(obj.value.trim() == labelNoFilter){
+                            j$('#picklist-btn-title-geo').text(labelGeo);
+                        }
+
+                        var value = obj.valueId.trim().split('___');
+                        if(value.length > 0)
+                            updateGeoFilter(value[1]);
+                        else
+                            updateGeoFilter(obj.value.trim());
+                    }
+
+                });
+
+             j$('[data-aljs="picklist-topic"]').picklist({
+                    onChange:function(obj){
+                        if(obj.value.trim() == labelNoFilter){
+                            j$('#picklist-btn-title-topic').text(labelTopic);
+                        }
+
+                        var value = obj.valueId.trim().split('___');
+                        if(value.length > 1){
+                            updateTopicFilter(value[1]);
+                        }else{
+                            updateTopicFilter("{!$Label.ASKHR_Article_NoFilter}");
+						}
+                    },
+                 	 
+                });
+  
+            if(selectedTopicPicklistId != null){
+            	j$('[data-aljs="picklist-topic"]').picklist('setValue', selectedTopicPicklistId, true);
+            }else{
+                j$('[data-aljs="picklist-topic"]').picklist('setValue', "menu-1-0", true);
+			}
+            
+            populateLangFilter();
+
+        });
+
+        //to ensure the Help popover is close when clicking the page
+        j$(document).click(function(){
+            if( j$('#help-popover').css('display') == "block"){
+                j$('#help-popover').css('display','none');
+                // j$('#article-help-text').hide('fast');
+            }
+        });
+
+        /**********************Feedback Component********************/
+
+        var feedback = new SObjectModel.articleFeedback();
+
+        j$('#feedback-submit-successful').hide();
+        j$('#feedback-submit-btn').attr('disabled', true);
+
+        j$('#feedback-input').keyup(function() {
+            if(j$(this).val() != '') {
+                j$('#feedback-submit-btn').attr('disabled' , false);
+            }else{
+                j$('#feedback-submit-btn').attr('disabled' , true);
+            }
+        });
+        
+        function newFeedback(){
+            j$('#feedback-submission-spinner').addClass('slds-show')
+            j$('#feedback-submission-spinner').removeClass('slds-hide');
+            j$('#feedback-submit-btn').attr('disabled' , true);
+            var commentDetails = document.getElementById("feedback-input").value;
+            var newCommentFields = {
+                Article_Feedback__c : null,
+                Article_Feedback_User__c : '{!$User.Id}',
+                Description__c  : commentDetails,
+                RecordTypeId : '{!mFeedbackRecordTypeId}'
+            };
+            feedback.create(newCommentFields, function(error, results){
+                j$('#feedback-submission-spinner').removeClass('slds-show').addClass('slds-hide');
+
+                if(error){
+                    console.log(error.message);
+                }else{
+                    j$('#feedback-submit-successful').show();
+                    j$('#feedback-input').addClass('slds-hide');
+                    j$('#feedback-submit-btn').attr('disabled' , true);
+                    document.getElementById("feedback-input").value = '';
+
+                    //console.log(JSON.stringify(results));
+
+                    setTimeout(function () {
+                        toggleFeedbackDock(false);
+                    }, 2000);
+                }
+            });
+        }
+
+        function toggleAnswer(element){
+            var id = element.id;
+            if(j$('#answer-'+id).is(':visible')){
+                j$('#answer-'+id).hide();
+            }
+            else{
+                j$('#answer-'+id).show();
+            }
+        }
+
+        function showGlobalNumber() {
+        var el = document.getElementById("askhr_community_call-centers-dialog");
+        var $html = j$(document.documentElement);
+
+            $html.css('overflow', 'hidden');
+            el.style.visibility = "visible";
+            el.style.opacity = 1;
+
+    }
+        function toggleFAQProgress(show){
+            if(show){
+                j$('#faq-loading-spinner').addClass('slds-show');
+                j$('#faq-loading-spinner').removeClass('slds-hide');
+            }else{
+                j$('#faq-loading-spinner').addClass('slds-hide');
+                j$('#faq-loading-spinner').removeClass('slds-show');
+            }
+        }
+
+        function toggleFeedbackDock(show){
+            if(show){
+             var text = ('{!$Label.ASKHR_Article_NeedHelp_9}').split(';');
+              j$('#article-feedback-label').text(text[0]);
+                j$('#knowledgeFeedback').removeClass('slds-hide');
+                j$('#knowledgeFeedback').addClass('slds-is-open');
+            }else{
+                j$('#knowledgeFeedback').addClass('slds-hide');
+                j$('#knowledgeFeedback').removeClass('slds-is-open');
+                j$('#feedback-submit-successful').hide();
+                j$('#feedback-input').removeClass('slds-hide');
+            }
+        }
+
+        function toggleFAQDock(show){
+
+            if(show){
+                var text = ('{!$Label.ASKHR_Article_NeedHelp_9}').split(';');
+                j$('#article-faq-label').text(text[1]);
+                j$('#faqContainer').removeClass('slds-hide');
+                j$('#faqContainer').addClass('slds-is-open');
+                refreshGeneralFaq(true);
+            }else{
+                j$('#faqContainer').addClass('slds-hide');
+                j$('#faqContainer').removeClass('slds-is-open');
+            }
+        }
+        /**********************End feedback component****************/
+        /*********************Help Components************************/
+        j$('#article-help-text').click(
+            function(e) {
+                e.stopPropagation();
+                if( j$('#help-popover').css('display') == "none"){
+                    var topOffset = j$('#article-help').offset().top- 65.5;
+                    var leftOffset = j$('#article-help').offset().left - 198.5625;
+                    if(j$('#globalHeaderBar').length){
+                        topOffset = j$('#article-help').offset().top- 100.5;
+                        leftOffset = j$('#article-help').offset().left - 198.5625;
+                    }
+
+                    j$('#help-popover').css({
+                        display: 'block',
+                        position: 'absolute',
+                        top:  topOffset,
+                        left: leftOffset
+                    });
+                }else{
+                    j$('#help-popover').css('display','none');
+                }
+
+            });
+
+        /*TODO: uncomment if user wants to implement on hover show Help Text
+            j$('#help-container').hover(
+            function(){
+                j$('#article-help-text').show('fast');
+                //        j$('#article-help-text').animate({opacity: 1, 500});
+            },function(){
+                if( j$('#help-popover').css('display') == "none"){
+                    j$('#article-help-text').hide('fast');
+                }
+            });
+        */
+
+        /*****************End Help Components************************/
+        /****************Article Filter Components********************/
+        function populateGeoFilter(geography){
+            try{
+                for(geoIndex = 0; geoIndex < geography.groupStructure.length; geoIndex++){
+                    var li = document.createElement('li');
+                    li.setAttribute('id','menu-0-'+ (geoIndex+1) +'___'+ geography.groupStructure[geoIndex].name);
+                    li.setAttribute('href','#');
+                    li.setAttribute('class','slds-dropdown__item');
+
+                    var a = document.createElement('a');
+                    a.setAttribute('href','javascript:void(0)');
+                    a.setAttribute('role','menuitemradio');
+
+                    var p = document.createElement('p');
+                    var img = document.createElement('img');
+                    img.setAttribute('class','slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--x-small');
+                    img.setAttribute('src','{!URLFOR($Resource.SLDS_0122,"assets/icons/utility/check_60.png")}');
+                    var htmlText = geography.groupStructure[geoIndex].displayName;
+                    var text = htmlText.replace(/&nbsp;/g, ' ');
+                    var textNode = document.createElement('span');
+                    textNode.innerHTML = text;
+                    p.appendChild(img);
+                    p.appendChild(textNode);
+                    a.appendChild(p);
+                    li.appendChild(a);
+
+                    j$('#article-filter-geo').append(li);
+                }
+
+            }catch(err){console.log(err);}
+        }
+
+        function populateTopicFilter(topics){
+            try{
+                for(topixIndex = 0; topixIndex < topics.groupStructure.length; topixIndex++){
+                    var li = document.createElement('li');
+                    var picklistItemId = 'menu-1-'+ (topixIndex+1) + '___' + topics.groupStructure[topixIndex].name;
+                    var topicParam = "{!mTopicParam}";
+                    var picklistTopicName = topics.groupStructure[topixIndex].name.toUpperCase();
+                    picklistTopicName = replaceAll(picklistTopicName,"_", " ");
+                    if(topicParam != null && topicParam != '' && picklistTopicName.includes(topicParam.toUpperCase())){
+                        selectedTopicPicklistId = picklistItemId;
+                    }
+                        
+                    li.setAttribute('id',picklistItemId);
+                    li.setAttribute('href','#');
+                    li.setAttribute('class','slds-dropdown__item');
+
+                    var a = document.createElement('a');
+                    a.setAttribute('href','javascript:void(0)');
+                    a.setAttribute('role','menuitemradio');
+
+                    var p = document.createElement('p');
+                    var img = document.createElement('img');
+                    img.setAttribute('class','slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--x-small');
+                    img.setAttribute('src','{!URLFOR($Resource.SLDS_0122,"assets/icons/utility/check_60.png")}');
+
+                    var htmlText = topics.groupStructure[topixIndex].displayName;
+                    var text = htmlText.replace(/&nbsp;/g, ' ');
+                    var textNode = document.createElement('span');
+                    textNode.innerHTML = text;
+                    p.appendChild(img);
+                    p.appendChild(textNode);
+                    a.appendChild(p);
+                    li.appendChild(a);
+
+                    j$('#article-filter-topic').append(li);
+                }
+
+            }catch(err){
+                console.log(err);
+            }
+        }
+
+        function replaceAll(str, find, replace) {
+          return str.replace(new RegExp(find, 'g'), replace);
+        }
+                
+        function populateLangFilter(){
+
+            var langData={'language':[  {'title':'Chinese (Simplified)', 'locale' : 'zh_CN'},
+                                      {'title':'Chinese (Traditional)', 'locale' : 'zh_TW'},
+                                      {'title':'English', 'locale' : 'en_US'},
+                                      {'title':'French', 'locale' : 'fr'},
+                                      {'title':'Indonesian', 'locale' : 'in'},
+                                      {'title':'Japanese', 'locale' : 'ja'},
+                                      {'title':'Thai', 'locale' : 'th'},
+                                      {'title':'Vietnamese', 'locale' : 'vi'}
+                                     ]};
+
+            for(i = 0; i < langData.language.length; i++){
+                var li = document.createElement('li');
+
+                li.setAttribute('href','#');
+
+                if(langData.language[i].locale == userLocale){
+                    li.setAttribute('class','slds-dropdown__item slds-is-selected');
+                    li.setAttribute('id','menu-2-userlocale');
+                    labelUserLanguage = langData.language[i].title;
+                    j$('#picklist-btn-title-lang').text(labelUserLanguage);
+                }else{
+                    li.setAttribute('class','slds-dropdown__item');
+                    li.setAttribute('id','menu-2-'+ i);
+                }
+
+                var a = document.createElement('a');
+                a.setAttribute('href','javascript:void(0)');
+                a.setAttribute('role','menuitemradio');
+
+                var p = document.createElement('p');
+                p.setAttribute('class','slds-truncate');
+
+                /*IE11 does not support SVG
+                var svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
+                svg.setAttribute('aria-hidden','true');
+                svg.setAttribute('class','slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--x-small');
+
+                var use = document.createElementNS('http://www.w3.org/2000/svg','use');
+                use.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',"{!URLFOR($Resource.SLDS_0122,'/assets/icons/utility-sprite/svg/symbols.svg#check')}");
+
+                svg.appendChild(use);
+                p.appendChild(svg);*/
+                var img = document.createElement('img');
+                    img.setAttribute('class','slds-icon slds-icon--selected slds-icon--x-small slds-icon-text-default slds-m-right--x-small');
+                    img.setAttribute('src','{!URLFOR($Resource.SLDS_0122,"assets/icons/utility/check_60.png")}');
+                p.appendChild(img);
+                p.appendChild(document.createTextNode(langData.language[i].title));
+                a.appendChild(p);
+                li.appendChild(a);
+
+                j$('#article-filter-lang').append(li);
+            }
+
+            j$('[data-aljs="picklist-lang"]').picklist({
+                onChange:function(obj){
+                    var selLang  = '';
+                    if(obj.value.trim() == 'English'){
+                        selLang = 'en_US';
+                    }else if(obj.value.trim() == 'Chinese (Simplified)'){
+                        selLang = 'zh_CN';
+                    }else if(obj.value.trim() == 'Chinese (Traditional)'){
+                        selLang = 'zh_TW';
+                    }else if(obj.value.trim() == 'French'){
+                        selLang = 'fr';
+                    }else if(obj.value.trim() == 'Indonesian'){
+                        selLang = 'in';
+                    }else if(obj.value.trim() == 'Japanese'){
+                        selLang = 'ja';
+                    }else if(obj.value.trim() == 'Thai'){
+                        selLang = 'th';
+                    }else if(obj.value.trim() == 'Vietnamese'){
+                        selLang = 'vi';
+                    }
+
+                    updateLangFilter(selLang);
+                }
+
+            });
+        }
+
+        function resetFilter(){
+
+            j$("li[id^='menu-1-']").removeClass('slds-is-selected');
+            j$("#menu-1-0").addClass('slds-is-selected');
+
+            j$("li[id^='menu-0-']").removeClass('slds-is-selected');
+            j$("#menu-0-0").addClass('slds-is-selected');
+
+            j$("li[id^='menu-2-']").removeClass('slds-is-selected');
+            j$("#menu-2-userlocale").addClass('slds-is-selected');
+
+            j$('#picklist-btn-title-topic').text(labelTopic);
+            j$('#picklist-btn-title-geo').text(labelGeo);
+            j$('#picklist-btn-title-lang').text(labelUserLanguage);
+
+            document.getElementsByClassName("theSearchString")[0].value = "";
+            resetAllFilter("{!$Label.ASKHR_Article_NoFilter}","{!$Label.ASKHR_Article_NoFilter}",userLocale,"");
+            
+        }
+
+        function toggleLoading(){
+            if(!j$('#article-list-spinner').is(':visible')){
+                j$('#article-list-spinner').show();
+            }else{
+                j$('#article-list-spinner').hide();
+            }
+        }
+
+        function toggleShowMoreArticleLoading(show, showMoreLink){
+            if(show){
+                j$('#article-more-spinner').addClass('slds-show');
+                j$('[id$="show-more-link"]').hide();
+            }else{
+                j$('#article-more-spinner').addClass('slds-hide');
+                if(showMoreLink) j$('[id$="show-more-link"]').show();
+            }
+        }
+
+    /**************End Article Filter components*******************/
+    </script>
+</html>
+</apex:page>

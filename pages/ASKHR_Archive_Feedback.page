@@ -1,0 +1,2 @@
+<apex:page standardController="ASKHR_ArticleFeedback__c" extensions="ASKHR_ArticleFeedbackExt" action="{!doArchive}">   
+</apex:page>

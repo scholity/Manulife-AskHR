@@ -1,0 +1,143 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_HighlightBlockHorizontal" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if (CKEDITOR.instances.sBlockDescription.getData() == null || CKEDITOR.instances.sBlockDescription.getData() == '') {
+                    $ele = $('#sBlockDescription');
+                    errorField($ele, languageUsed + 'Content body must be provided.');
+                    return false;
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            CKEDITOR.replace('sBlockDescription', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            var textMax = 1000;
+            var textLength;
+            var textRemaining;
+
+            /* *****
+               * Initialize the remaining character count in the summary text boxes
+               * Character limit is set to 1000
+             * *****/
+            textLength = $('#sBlockTitle').val().length;
+            textRemaining = textMax - textLength;
+            $('#charSummaryCount').html(textRemaining + ' characters remaining');
+
+            /* *****
+               * Update the character count as characters are entered
+             * *****/
+            $('#sBlockTitle').keyup(function() {
+                textLength = $('#sBlockTitle').val().length;
+                textRemaining = textMax - textLength;
+                $('#charSummaryCount').html(textRemaining + ' characters remaining');
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"blockImage", "value": $('#blockImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sBlockImageAlt", "value": $('#sBlockImageAlt').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sImagePosition", "value": $('#sImagePosition').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sBlockTitle", "value": $('#sBlockTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sBlockDescription", "value": CKEDITOR.instances.sBlockDescription.getData(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLinkText", "value": $('#sLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"blockLink", "value": $('#blockLink').val(), "type": "cms.Link", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="blockImage">Content Image</label>
+                        <input type="hidden" name="blockImage" id="blockImage" value="{!blockImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="blockImage" cPassThroughId="blockImage" cImage="{!blockImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W650 X H425 pixel (72ppi)<br/>
+                        Retina: W1300 X H850 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sBlockImageAlt">Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sBlockImageAlt" name="sBlockImageAlt" type="text" value="{!sBlockImageAlt}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel" for="sImagePosition">Image Position selector</label>
+                        <select name="sImagePosition" id="sImagePosition">
+                            <option value="left">Position image on left</option>
+                            <option value="right">Position image on right</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sBlockTitle">Content Title</label>
+                        <textarea  id="sBlockTitle" name="sBlockTitle" style="width: 600px; height: 150px;" maxlength="1000"><apex:outputText value="{!sBlockTitle}" /></textarea>
+                        <p class="ocmsHelpText">
+                            (<span id="charSummaryCount"></span>)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sBlockDescription">Content Body</label>
+                        <textarea  id="sBlockDescription" name="sBlockDescription">
+                            <apex:outputText value="{!sBlockDescription}" />
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLinkText">'Call to Action' Button Label</label>
+                        <input class="ocmsTextInputLrg" id="sLinkText" name="sLinkText" type="text" value="{!sLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="blockLink">'Call to Action' Button Link</label>
+                        <input type="hidden" name="blockLink" id="blockLink" value="{!blockLink}" />
+                        <cms:PageSelector cPassThroughId="blockLink" value="{!blockLink}"  dialogId="blockLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+            </table>
+            <script>
+                // Initialize picklist values here - populate picklist with values from their last save
+                var sImagePosition =  "{!sImagePosition}";
+                $('select#sImagePosition').val(sImagePosition);
+            </script>
+        </form>
+    </apex:outputPanel>
+</apex:page>

@@ -1,0 +1,10 @@
+<aura:component implements="force:appHostable,lightning:isUrlAddressable" >
+	<aura:attribute name="recordId"
+                    	type="String"
+                    	description="ID of the record."/>
+ 
+    	<aura:handler name="init"
+		      value="this"
+                      action="{!c.doInit}"/>
+    <lightning:textarea name="input3" label="Textarea field with a placeholder" placeholder="type here..."/>
+</aura:component>

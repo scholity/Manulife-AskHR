@@ -1,0 +1,307 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#posvideo
+{
+    color: #999;
+    position:relative;
+    background-image:url('{!URLFOR($Resource.pos_images, 'image/phases_within_POS.jpg')}');
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 1550px;
+    width:960px;   
+}
+
+video {
+  width: 100%    !important;
+  height: auto   !important;
+}
+
+    .black_overlay{
+            display: none;
+            position: absolute;
+            top: 0%;
+            left: 0%;
+            width: 100%;
+            height: 100%;
+            max-height:100%;
+            background-color: black;
+            z-index:1001;
+            -moz-opacity: 0.8;
+            opacity:.80;
+            filter: alpha(opacity=80);
+        }
+        .white_content {
+            display: none;
+            position: absolute;
+            top: 25%;
+            left: 25%;
+            width: 50%;
+            height: 45%;
+            padding: 16px;
+            border: thin #0C592E dotted;
+            background-color: white;
+            z-index:1002;
+            overflow: auto;
+        }
+        
+        .white_content1 {
+            display: none;
+            position: absolute;
+            top: 2%;
+            left: 20%;
+            width: 50%;
+            height: 62%;
+            padding: 16px;
+            border: thin #0C592E dotted;
+            background-color: white;
+            z-index:1002;
+            overflow: auto;
+            margin:10px;
+        }
+
+#AboutPOS{
+position:relative;
+    background-image:url('{!URLFOR($Resource.pos_images, 'image/pos-offers.gif')}');
+    background-repeat: no-repeat;
+    background-position: center;
+    width:706px;
+    height:783px;
+}
+
+#navigation li.bt2 a,
+#navigation li.bt2 a:hover,
+#navigation li.bt2 a.on{
+width:146px;
+background-position:-90px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+}
+
+</style>
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="content">
+    <table align="center" cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr><td colspan="2" height="20px"></td></tr>
+        <tr>
+            <td width="10%" valign="top">
+              <c:POS_About_Left_Panel src="s1" />    
+            </td>
+
+            <td width="90%" valign="top"> <!--content navigation--->
+                <div id="aboutpossible" align="center" style="height:100%">
+<div style="height:20px"></div>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%">
+        <tr>
+            <td align="center"><img alt="POS OFFERS" src="{!URLFOR($Resource.pos_images, 'image/about-possible-title.png')}" /></td>
+        </tr>
+    </table>
+<div></div>
+<div style="height:20px"></div>
+<div class="x fontbody" align="center" style="width:770px;text-align:justify">
+POSsible is a fully integrated and seamless point-of-sale solution for Manulife's distribution workforce.
+With the objective to create a unique experience in the selling process, POSsible provides a digital solution that supports the end-to-end sales cycle and enables
+advisors to sell more effectively in a customer needs-centric manner. This direction we are taking is in the line with Manulife's strategy
+to move from products-based selling to needs-based and solution-oriented selling.
+</div>
+<div style="height:20px"></div>
+<div>
+<table border="0" align="center">
+    <tr>
+        <td>
+        <a
+            onmouseover="document.getElementById('p1').src=pic2.src;"
+            onmouseout="document.getElementById('p1').src=pic1.src;"        
+        >       
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/1.jpg')}" id="p1" />
+        </a>
+        </td>
+        
+        <td>
+        <a
+            onmouseover="document.getElementById('p2').src=pic4.src;"
+            onmouseout="document.getElementById('p2').src=pic3.src;"        
+        >               
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/2.jpg')}" id="p2" />
+        </a>        
+        </td>
+        <td>
+        <a
+            onmouseover="document.getElementById('p3').src=pic6.src;"
+            onmouseout="document.getElementById('p3').src=pic5.src;"        
+        >       
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/3.jpg')}" id="p3" />
+        </a>        
+            
+        </td>
+        <td>
+        <a
+            onmouseover="document.getElementById('p4').src=pic8.src;"
+            onmouseout="document.getElementById('p4').src=pic7.src;"        
+        >       
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/4.jpg')}" id="p4" />
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <td>
+        <a
+            onmouseover="document.getElementById('p5').src=pic10.src;"
+            onmouseout="document.getElementById('p5').src=pic9.src;"        
+        >       
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/5.jpg')}" id="p5" />
+        </a>        
+        </td>
+        
+        <td>
+        <a
+            onmouseover="document.getElementById('p6').src=pic12.src;"
+            onmouseout="document.getElementById('p6').src=pic11.src;"       
+        >       
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/6.jpg')}" id="p6" />
+        </a>        
+        </td>
+        
+        <td>
+        <a
+            onmouseover="document.getElementById('p7').src=pic14.src;"
+            onmouseout="document.getElementById('p7').src=pic13.src;"       
+        >       
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/7.jpg')}" id="p7" />
+        </a>    
+        </td>
+        <td>
+        <a
+            onmouseover="document.getElementById('p8').src=pic16.src;"
+            onmouseout="document.getElementById('p8').src=pic15.src;"               
+        >
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/8.jpg')}" id="p8" />                               
+        </a>
+        </td>
+    </tr>
+    <tr><td colspan="4" style="height:10px"></td></tr>
+    <tr>
+        <td>
+            <!--a href="{!$Site.Prefix}/apex/POS_Roadmap"-->
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/dashboard.jpg')}" />
+            <!--/a-->
+        </td>
+        <td>
+            <!--a href="{!$Site.Prefix}/apex/POS_Roadmap"-->
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/meet_and_refine.jpg')}" />
+            <!--/a-->
+        </td>
+        <td>
+            <!--a href="{!$Site.Prefix}/apex/POS_Roadmap"-->
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/propose.jpg')}" />
+            <!--/a-->
+        </td>
+        <td>
+            <!--a href="{!$Site.Prefix}/apex/POS_Roadmap"-->
+            <img alt="" src="{!URLFOR($Resource.pos_images, 'image/apply.jpg')}" />
+            <!--/a-->
+        </td>
+    </tr>
+    <tr><td colspan="4" style="height:20px"></td></tr>
+</table>
+
+</div>
+
+</div>
+
+            </td> <!--End of content--->
+        </tr>
+    </table>
+</div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+   pic1 = new Image();
+   pic1.src = '{!URLFOR($Resource.pos_images, 'image/1.jpg')}';
+   
+   pic2 = new Image();
+   pic2.src = '{!URLFOR($Resource.pos_images, 'image/1_(hover).jpg')}';
+
+   pic3 = new Image();
+   pic3.src = '{!URLFOR($Resource.pos_images, 'image/2.jpg')}';
+   
+   pic4 = new Image();
+   pic4.src = '{!URLFOR($Resource.pos_images, 'image/2_(hover).jpg')}';
+
+   pic5 = new Image();
+   pic5.src = '{!URLFOR($Resource.pos_images, 'image/3.jpg')}';
+   
+   pic6 = new Image();
+   pic6.src = '{!URLFOR($Resource.pos_images, 'image/3_(hover).jpg')}';
+
+   pic7 = new Image();
+   pic7.src = '{!URLFOR($Resource.pos_images, 'image/4.jpg')}';
+   
+   pic8 = new Image();
+   pic8.src = '{!URLFOR($Resource.pos_images, 'image/4_(hover).jpg')}';
+
+   pic9 = new Image();
+   pic9.src = '{!URLFOR($Resource.pos_images, 'image/5.jpg')}';
+   
+   pic10 = new Image();
+   pic10.src = '{!URLFOR($Resource.pos_images, 'image/5_(hover).jpg')}';
+
+   pic11 = new Image();
+   pic11.src = '{!URLFOR($Resource.pos_images, 'image/6.jpg')}';
+   
+   pic12 = new Image();
+   pic12.src = '{!URLFOR($Resource.pos_images, 'image/6_(hover).jpg')}';
+
+   pic13 = new Image();
+   pic13.src = '{!URLFOR($Resource.pos_images, 'image/7.jpg')}';
+   
+   pic14 = new Image();
+   pic14.src = '{!URLFOR($Resource.pos_images, 'image/7_(hover).jpg')}';
+
+   pic15 = new Image();
+   pic15.src = '{!URLFOR($Resource.pos_images, 'image/8.jpg')}';
+   
+   pic16 = new Image();
+   pic16.src = '{!URLFOR($Resource.pos_images, 'image/8_(hover).jpg')}';
+
+</script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

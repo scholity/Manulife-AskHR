@@ -1,0 +1,138 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_TabbedControl" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script type="text/javascript" language="javascript">
+
+        var rowCount = 0;
+
+        function initTabTable(){
+
+            var tabInfo = '{!jsnTabList}'
+            if (tabInfo != '') {
+                tabInfo = JSON.parse('{!jsnTabList}');
+            } else {
+                tabInfo = {};
+            }
+
+
+            if (!$.isEmptyObject(tabInfo)) {
+                for (i = 0; i < tabInfo.length; i++) {
+                    console.log(tabInfo[i]);
+                    addRow(tabInfo[i]);
+                }
+            } else {
+                addRow();
+            }
+
+
+            if({!disableAll}){
+                $('.remove').remove();
+            } else {
+                $('#addRowButton').click(addRow);
+            }
+
+        }
+
+        function addRow(label){
+
+            if(rowCount != 7){
+                if (typeof label !== 'string'){
+                    label = '';
+                }
+
+                var row = $('<tr></tr>');
+                var label = $('<td width="95%"><input class="fullWidth tableInputs tabLabel" style="padding:0;margin:0;" type="text" value="' + label + '"></input></td>');
+                var removeButton = $('<td width="5%"><a class="removeButton"><img class="remove" src="{!URLFOR($Resource.cms__CmsImages, 'btn_remove.png')}"/></a></td>');
+
+                row.append(label);
+                row.append(removeButton);
+                $('#tabTable').append(row);
+                $('.removeButton').unbind();
+                $('.removeButton').click(removeRow);
+                rowCount++;
+
+                if(rowCount == 7){
+                    $('#addRowButton').addClass('ocms-disabled');
+                    $('#addRowButton').attr('disabled','disabled');
+                }
+            }
+        }
+
+        function removeRow(){
+
+            if($('#tabTable tbody tr').length -1 > 0){
+                $(this).parent().parent().remove();
+                rowCount--;
+                $('#addRowButton').removeAttr('disabled');
+                $('#addRowButton').removeClass('ocms-disabled');
+            } else {
+                $(this).parent().parent().find('.tabLabel').val('');
+                rowCount = 0;
+            }
+
+        }
+
+        $(document).ready(function(){
+
+            initTabTable();
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+                var tabList = [];
+
+                $('#tabTable tbody tr').each(function(){
+                    var label = $(this).find('.tabLabel').val();
+                    if (label != null && label != undefined && label != ''){
+                        tabList.push(label);
+                    }
+                });
+
+                tabList = JSON.stringify(tabList);
+
+                attributes.push({"name": "jsnTabList", "value": tabList, "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td class="fullWidth">
+                        <label class="ocmsLabel" for="">Tabs</label>
+                        <apex:outputText escape="false" rendered="{!disableAll}">
+                            <table id="tabTable" style="border:1px dashed #cdcdcd;" class="disabled fullWidth">
+                                <thead>
+                                    <tr>
+                                        <th width="100%">
+                                            Label
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                        </apex:outputText>
+                        <apex:outputText escape="false" rendered="{!!disableAll}">
+                            <table id="tabTable" style="border:1px solid #000;" class="fullWidth">
+                                <thead>
+                                    <tr>
+                                        <th width="100%" colspan="2">
+                                            Label
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                </tbody>
+                            </table>
+                            <br/>
+                            <button id="addRowButton" type="button" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only" role="button" aria-disabled="false"><span class="ui-button-text">Add a new row</span></button>
+                        </apex:outputText>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

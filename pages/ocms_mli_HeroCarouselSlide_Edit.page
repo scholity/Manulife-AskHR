@@ -1,0 +1,160 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_HeroCarouselSlide" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <script type="text/javascript" language="javascript">
+
+        $(document).ready(function(){
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+                
+                attributes.push({"name":"strMobileImage", "value": $('#strMobileImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strTabletImage", "value": $('#strTabletImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strDesktopImage", "value": $('#strDesktopImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strTitle", "value": $('#strTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strSubTitle", "value": $('#strSubTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strPlayVideo", "value": $('#strPlayVideo').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessibleDescription", "value": $('#strAccessibleDescription').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessiblePlayAction", "value": $('#strAccessiblePlayAction').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessiblePlayVideo", "value": $('#strAccessiblePlayVideo').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessibleOverlayClose", "value": $('#strAccessibleOverlayClose').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strOverlayTitle", "value": $('#strOverlayTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strVideoURL", "value": $('#strVideoURL').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessibleViewArticle", "value": $('#strAccessibleViewArticle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strAccessibleArticleName", "value": $('#strAccessibleArticleName').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink", "value": $('#strLink').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+        
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strMobileImage">Mobile Image</label>
+                        <input type="hidden" name="strMobileImage" id="strMobileImage" value="{!strMobileImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strMobileImage" cPassThroughId="strMobileImage" cImage="{!strMobileImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">
+                            Normal: W600 X H400 pixel (72ppi)<br/>
+                            Retina: W1200 X H800 pixel (144ppi)<br/>
+                            Investor Relation Template<br/>
+                            Normal: W300 X H200 pixel (72ppi)<br/>
+                            Retina: W600 X H400 pixel (144ppi)<br/>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strTabletImage">Tablet Image</label>
+                        <input type="hidden" name="strTabletImage" id="strTabletImage" value="{!strTabletImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strTabletImage" cPassThroughId="strTabletImage" cImage="{!strTabletImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">
+                            Normal: W1102 X H735 pixel (72ppi)<br/>
+                            Retina: W2204 X H1470 pixel (144ppi)<br/>
+                            Investor Relation Template<br/>
+                            Normal: W768 X H735 pixel (72ppi)<br/>
+                            Retina: W1536 X H1470 pixel (144ppi)<br/>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strDesktopImage">Desktop Image</label>
+                        <input type="hidden" name="strDesktopImage" id="strDesktopImage" value="{!strDesktopImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strDesktopImage" cPassThroughId="strDesktopImage" cImage="{!strDesktopImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">
+                            Normal: W2000 X H1334 pixel (72ppi)<br/>
+                            Retina: W4000 X H2668 pixel (144ppi)<br/>
+                            Investor Relation Template<br/>
+                            Normal: W2000 X H700 pixel (72ppi)<br/>
+                            Retina: W4000 X H1400 pixel (144ppi)<br/>
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strTitle">Title</label>
+                        <input class="ocmsTextInputLrg" id="strTitle" name="strTitle" type="text" value="{!strTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strSubTitle">Subtitle</label>
+                        <input class="ocmsTextInputLrg" id="strSubTitle" name="strSubTitle" type="text" value="{!strSubTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink">Link</label>
+                        <input type="hidden" name="strLink" id="strLink" value="{!strLink}" />
+                        <cms:PageSelector cPassThroughId="strLink" value="{!strLink}"  dialogId="strLinkDialog1" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strPlayVideo">Play video button</label>
+                        <input class="ocmsTextInputLrg" id="strPlayVideo" name="strPlayVideo" type="text" value="{!strPlayVideo}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strOverlayTitle">Video Overlay Title</label>
+                        <input class="ocmsTextInputLrg" id="strOverlayTitle" name="strOverlayTitle" type="text" value="{!strOverlayTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strVideoURL">Video URL</label>
+                        <input class="ocmsTextInputLrg" id="strVideoURL" name="strVideoURL" type="text" value="{!strVideoURL}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessibleDescription">Action for play video button</label>
+                        <input class="ocmsTextInputLrg" id="strAccessibleDescription" name="strAccessibleDescription" type="text" value="{!strAccessibleDescription}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessiblePlayAction">Reiterate subtitle</label>
+                        <input class="ocmsTextInputLrg" id="strAccessiblePlayAction" name="strAccessiblePlayAction" type="text" value="{!strAccessiblePlayAction}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessiblePlayVideo">Describe play button action</label>
+                        <input class="ocmsTextInputLrg" id="strAccessiblePlayVideo" name="strAccessiblePlayVideo" type="text" value="{!strAccessiblePlayVideo}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessibleOverlayClose">Overlay close button action</label>
+                        <input class="ocmsTextInputLrg" id="strAccessibleOverlayClose" name="strAccessibleOverlayClose" type="text" value="{!strAccessibleOverlayClose}"></input>
+                    </td>
+                </tr>
+                <tr>
+                	<td>
+                		<span>Along with the Link field (defined above), the following two fields are used to show the Hero Carousel skiplink.  The skiplink will not be rendered unless all three fields (the link, the Article Name and the View Article label) have been supplied values</span>
+                	</td>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessibleViewArticle">View article Label visible to users when skiplink is rendered and element has focus.</label>
+                        <input class="ocmsTextInputLrg" id="strAccessibleViewArticle" name="strAccessibleViewArticle" type="text" value="{!strAccessibleViewArticle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strAccessibleArticleName">Article name</label>
+                        <input class="ocmsTextInputLrg" id="strAccessibleArticleName" name="strAccessibleArticleName" type="text" value="{!strAccessibleArticleName}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

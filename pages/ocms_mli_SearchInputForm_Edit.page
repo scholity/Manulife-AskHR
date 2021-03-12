@@ -1,0 +1,125 @@
+<!--
+OrchestraCMS Edit Page
+######################
+
+Auhtor: Daniel Sokolowski
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_Search" showHeader="false" sidebar="false"
+    cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <style>
+        /* ... */
+    </style>
+
+    <script>
+        // we must attach editor save after dom ready as `ce` will not be available before that
+        $(document).ready(function initContentEditor() {
+            ce.content_editor('registerSaveFunction', function() {
+                return $('#idContentLayoutEditor').serializeArray();
+            });
+        });
+
+
+        /*
+        If you are storing non simple values `serializeArray()` might not work and you would have to use below approach
+        ```
+        ce.content_editor('registerSaveFunction', function(){
+            var attributes = new Array();
+
+            attributes.push({"name":"sQueryTermInputPlaceholder", "value": $('#sQueryTermInputPlaceholder').val(), "type": "Text", "simple": true});
+            attributes.push({"name":"sIconSearchLabel", "value": $('#sIconSearchLabel').val(), "type": "Text", "simple": true});
+            attributes.push({"name":"sQueryTermInputPlaceholder", "value": $('#sQueryTermInputPlaceholder').val(), "type": "Text", "simple": true});
+            attributes.push({"name":"sButtonSubmitLabel", "value": $('#sButtonSubmitLabel').val(), "type": "Text", "simple": true});
+
+            return attributes;
+        });
+        ```
+        */
+
+        // Debuging script reference for Chrome Developer Tools
+        //# sourceURL=ocms_mli_SearchInputForm_Edit#inlinedScript1
+    </script>
+
+    <apex:outputPanel >
+        <!--  even though we never do a POST wrapping our inputs in a `form` allows us to use jQuery's `.serializeArray` -->
+        <!-- see `ocms.contenteditor.css` for available classes -->
+        <form id='idContentLayoutEditor'>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <!-- superseded by OMCS7.x adding a language heading with it's own `sContentLayoutLabel`
+                <tr>
+                    <td colspan="2">
+                        <h2>{!content.cms__Name__c}</h2>
+                        <h3>{!sContentLayoutLabel}</h3> <apex:outputText rendered="{!disableAll}">
+                            <p class="ui-state-info">This is published content. To change its value, create a new revision or version.</p>
+                        </apex:outputText>
+                    </td>
+                </tr> -->
+
+
+                <tr>
+                    <td>
+                        <div class="ocmsHint">
+                            <p>
+                                {!sContentLayoutDescription} <a
+                                    onclick="$(this).parentsUntil('td').siblings('.ocmsInstructions').slideToggle()">[?]</a>
+                            </p>
+                            <div style="display: none" class="ocmsInstructions">
+                                <p>
+                                    <strong>IMPORTANT: </strong> If the Search Term entered into this form successfully returns results, the Search Term is saved
+                                    and will appear as an autocomplete/spelling correction option. 
+                                    <br/><br/>
+                                    The saved Search Term is stored in a list which is updated once every 24 hours.
+                                    <br/><br/>
+                                    Successful Search Terms will not appear in the autocomplete suggestion list until this update occurs. 
+                                </p>
+                            </div>
+                        </div>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label class="ocmsLabel ocmsRequiredLabel" for="sQueryTermInputPlaceholder">Query Term Input Placeholder</label> <input
+                        required="required" id="sQueryTermInputPlaceholder" class="ocmsTextInputLrg" name="sQueryTermInputPlaceholder"
+                        type="text" value="{!sQueryTermInputPlaceholder}"></input></td>
+                </tr>
+
+                <tr>
+                    <td><label class="ocmsLabel ocmsRequiredLabel" for="sSearchResultsPageSelectorValue">Results Page</label> <input
+                            type="hidden" name="sSearchResultsPageSelectorValue" id="sSearchResultsPageSelectorValue" value="{!sSearchResultsPageSelectorValue}" />
+                        <cms:PageSelector cPassThroughId="sSearchResultsPageSelectorValue" value="{!sSearchResultsPageSelectorValue}"
+                            dialogId="sSearchResultsPageSelectorValueDialog" disabled="{!disableAll}"
+                            sname="{!content.cms__Site_Name__c}" /></td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accTitle">Label</label>
+                        <input id="accTitle" class="ocmsTextInputLrg" name="accTitle" type="text" value="{!accTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>Accessibility Texts</strong>
+
+                    <p>These values are hidden from the site visitor and are leveraged in accessible enabled browsers.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel" for="sQueryTermInputLabel">Search Input Label</label> <input
+                        id="sQueryTermInputLabel" class="ocmsTextInputLrg" name="sQueryTermInputLabel" type="text"
+                        value="{!sQueryTermInputLabel}"></input></td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel" for="sIconSearchLabel">Icon Search Label</label> <input
+                        id="sIconSearchLabel" class="ocmsTextInputLrg" name="sIconSearchLabel" type="text"
+                        value="{!sIconSearchLabel}"></input></td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel" for="sButtonSubmitLabel">Submit Button Label</label> <input
+                        id="sButtonSubmitLabel" class="ocmsTextInputLrg" name="sButtonSubmitLabel" type="text"
+                        value="{!sButtonSubmitLabel}"></input></td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

@@ -1,0 +1,73 @@
+<apex:page standardController="Task" extensions="ASKHR_TaskEditController" showHeader="false" sidebar="false" docType="html-5.0">
+<br/><br/>
+<apex:pageMessages ></apex:pageMessages>
+<br/><br/><br/>
+
+<apex:form enctype="multipart/form-data">
+    <apex:pageBlock title="Task Edit" mode="edit">
+        <apex:pageBlockButtons >
+            <apex:commandButton action="{!doSave}" value="Save" />
+            <apex:commandButton action="{!doSaveAndNew}" value="Save & New Task"/>
+            <apex:commandButton action="{!cancel}" value="Cancel"/>
+        </apex:pageBlockButtons>
+
+        <apex:pageBlockSection title="Task Information" columns="2">
+           <apex:inputField value="{!Task.OwnerId}" id="assignedTo" />
+           <apex:inputField value="{!Task.WhatId}" id="relatedTo"/>
+           <apex:inputField value="{!Task.Subject}" id="subject"/>
+           <br/>
+           <apex:inputField value="{!Task.ActivityDate}" id="dueDate"/>  
+           <br />
+           <apex:inputTextarea value="{!Task.Description}" id="description" cols="70" rows="8"/>        
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Additional Information" columns="2">
+           <apex:inputField value="{!Task.Status}" id="status"/>
+           <apex:outputField value="{!user.Phone}" id="phone"/>
+           <apex:inputField value="{!Task.Priority}" id="priority"/>        
+           <apex:outputField value="{!user.Email}" id="email"/>     
+        </apex:pageBlockSection>
+        
+        <apex:pageBlockSection title="Reminder" columns="1">         
+         <apex:inputField value="{!Task.ReminderDateTime}" id="reminderDate" label="Reminder">
+              <apex:inputCheckbox value="{!Task.IsReminderSet}" id="reminder" label="" /> 
+         </apex:inputField>                   
+        </apex:pageBlockSection>     
+    </apex:pageBlock>
+
+    <br/><br/>
+    
+   <apex:pageBlock title="Attachment" mode="edit">
+       <apex:pageBlockSection columns="1"> 
+            <apex:pageBlockSectionItem >
+              <apex:outputLabel value="File" for="fileUpload"/>
+              <apex:inputFile id="fileUpload" value="{!attachment.Body}" fileName="{!attachment.Name}" fileSize="{!attachment.BodyLength}" />
+            </apex:pageBlockSectionItem>
+            <br />
+            <apex:pageBlockSectionItem >
+              <apex:outputLabel value="" for="uploadBtn"/> 
+              <apex:commandButton id="uploadBtn" value="Attach File" action="{!processUpload}" />
+            </apex:pageBlockSectionItem>
+            <br />  
+           
+            <apex:pageBlockTable value="{!attachmentlist}" var="attach" width="100%">
+                <apex:column headerValue="Action" rendered="{!display}">
+                <apex:commandLink value="Remove" action="{!processRemove}"/>
+                </apex:column>
+                <apex:column headerValue="File Name" rendered="{!display}">
+                <apex:outputText value="{!attach.Name}" />
+                </apex:column>
+                <apex:column headerValue="Size" rendered="{!display}">
+                <apex:outputText value="{!attach.BodyLength}" />
+                </apex:column>
+                <apex:column headerValue="Last Modified" rendered="{!display}">
+                <apex:outputText value="{!attach.LastModifiedDate}" />
+                </apex:column>
+                <apex:inputHidden value="{!rowCounter}" id="rowCounter"/>
+            </apex:pageBlockTable>
+           
+       </apex:pageBlockSection>            
+    </apex:pageBlock>
+</apex:form>
+
+</apex:page>

@@ -1,0 +1,131 @@
+<apex:component >
+
+  <apex:attribute name="src" type="string" description="This is the selected option on the left panel" required="true" default="s1"/>
+
+        <table width="100%" height="100%" style="border:none!important" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                <a href="{!$Site.Prefix}/apex/POS_About_POS"
+                onmouseover="document.getElementById('s1').src=GetPic('s1', 'over');"
+                onmouseout="document.getElementById('s1').src=GetPic('s1', 'out');"  
+                >
+                <img style="display:block" alt="" id="s1" />
+                </a>                
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                <a href="{!$Site.Prefix}/apex/POS_Roadmap?src=menu"
+                onmouseover="document.getElementById('s2').src=GetPic('s2', 'over');"
+                onmouseout="document.getElementById('s2').src=GetPic('s2', 'out');"                
+                >
+                <img style="display:block" alt="" id="s2" />
+                </a>                
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                <a href="#" onclick="window.open('http://bcove.me/1prelnwn', 'newwindow', 'height=405px,width=720px');return false;"
+                onmouseover="document.getElementById('s3').src=GetPic('s3', 'over');"
+                onmouseout="document.getElementById('s3').src=GetPic('s3', 'out');"            
+                >
+                <img style="display:block" alt="" id="s3" />
+                </a>                
+                </td>
+            </tr>
+                        
+        </table>
+
+<script type="text/javascript">
+   pic17 = new Image();
+   pic17.src = '{!URLFOR($Resource.pos_images, 'image/about_pos.jpg')}';
+   
+   pic18 = new Image();
+   pic18.src = '{!URLFOR($Resource.pos_images, 'image/about_pos_(highlight).jpg')}';
+
+
+   pic19 = new Image();
+   pic19.src = '{!URLFOR($Resource.pos_images2, 'image/pos_roadmap.jpg')}';
+   
+   pic20 = new Image();
+   pic20.src = '{!URLFOR($Resource.pos_images2, 'image/pos_roadmap_(highlight).jpg')}';
+
+   pic21 = new Image();
+   pic21.src = '{!URLFOR($Resource.pos_images, 'image/video_pos.jpg')}';
+   
+   pic22 = new Image();
+   pic22.src = '{!URLFOR($Resource.pos_images, 'image/video_pos_(highlight).jpg')}';
+</script>
+
+<script type="text/javascript">
+   window.onload = new function() {
+       document.getElementById('s1').src=GetImageURL('s1');
+       document.getElementById('s2').src=GetImageURL('s2');
+       document.getElementById('s3').src=GetImageURL('s3');
+   }
+
+   function GetPic(sid, event) {
+     var img = '';
+     var action = event;
+     
+     if (sid == '{!src}') {
+       action = 'over';
+     }
+
+     if (sid == 's1') {
+       if (action == 'out') {
+         img = pic17.src;
+       }
+       if (action == 'over') {
+         img = pic18.src;
+       }
+     }
+     if (sid == 's2') {
+       if (action == 'out') {
+         img = pic19.src;
+       }
+       if (action == 'over') {
+         img = pic20.src;
+       }
+     }
+     if (sid == 's3') {
+       if (action == 'out') {
+         img = pic21.src;
+       }
+       if (action == 'over') {
+         img = pic22.src;
+       }
+     }
+     
+     return img;
+   }
+
+   function GetImageURL(sid) {
+     var img = '';
+     
+     if (sid == 's1') {
+       img = pic17.src;
+       if (sid == '{!src}') {
+         img = pic18.src;
+       }
+     }
+     if (sid == 's2') {
+       img = pic19.src;
+       if (sid == '{!src}') {
+         img = pic20.src;
+       }
+     }
+     if (sid == 's3') {
+       img = pic21.src;
+       if (sid == '{!src}') {
+         img = pic22.src;
+       }
+     }
+     
+     return img;
+   }
+</script>
+
+</apex:component>

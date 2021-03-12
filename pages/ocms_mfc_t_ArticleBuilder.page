@@ -1,0 +1,108 @@
+<!-- ocms_mfc_t_ArticleBuilder -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mfc_FavIcon, 'img/favicon.ico')}" type="image/x-icon"/>
+            <apex:include pageName="ocms_mfc_i_headSpace"/>
+        </apex:define><!-- header -->
+
+        <apex:define name="body">
+            <div class="pg pgArticleBuilder">
+
+                <apex:include pageName="ocms_mfc_i_headerAndSideNav"/>
+
+                <div class="global-layer-wrap main-global-layer">
+                    <div class="global-align-center">
+                        <div class="global-drawer-slider">
+
+                            <apex:include pageName="ocms_mfc_i_globalNavTools"/>
+
+                            <div class="content-layer main-layer sticky-footer-fix">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>TextBlock</strong> ❧ critical alerts section
+                                    </div>
+
+                                </apex:outputText>
+                                <div class='critical-alerts'>
+                                    <cms:Panel panelName="criticalAlerts" panelController="{!controller}"
+                                               panelWidth="550px" panelHeight="30px"/>
+                                </div>
+
+                                <main class="content-wrap main-article">
+                                    <apex:include pageName="ocms_mfc_i_breadcrumb"/>
+
+                                    <!-- TEMPLATE CONTENT -->
+                                    <article class="article-content location-page">
+                                        <!-- class location-page should _probably_ be removed as it is misleading: K2 styles may have to change -->
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint">
+                                                <strong>”Build your own” article content templates ❧ many
+                                                    varieties</strong><br/>
+                                                <div class="ocmsInstructions expandy">
+                                                    ❧ typical content order:<br/>
+                                                    <ul>
+                                                        <li>start with a wide banner image (900 px x 100 px)</li>
+                                                        <li>Contextual Navigation (Class Styled-menu of links to related
+                                                            page; remember to set active menu item/page)
+                                                        </li>
+                                                        <li>Content Title</li>
+                                                        <li>Author and Last Updated Date</li>
+                                                        <li>…</li>
+                                                    </ul>
+                                                    ❧ <i>not</i> MFC Article - that content template goes on a Generic
+                                                    page template<br/>
+                                                </div>
+                                            </div>
+                                        </apex:outputText>
+                                        <cms:Panel panelName="mainArticle" panelController="{!controller}"
+                                                   panelWidth="350px" panelHeight="400px"
+                                        /><!--panelContentLayouts="TextBlock, CustomHtml, Image" /-->
+
+                                        <div class="listing-container related-articles">
+                                            <div class="inner">
+                                                <div class="listing-wrapper">
+                                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                                        <div class="ocmsHint">
+                                                            <strong>Related
+                                                                Articles<span>(optional)</span></strong><br/>
+                                                            ❧ Add related article tiles here
+                                                        </div>
+                                                    </apex:outputText>
+                                                    <cms:Panel panelName="relatedArticles"
+                                                               panelController="{!controller}" panelWidth="350px"
+                                                               panelHeight="60px" panelContentLayouts="Tile"/>
+                                                    <!--panelContentLayouts="Bookmark Bar, CustomHtml" /-->
+                                                </div>
+                                                <div class="clear"></div>
+                                            </div>
+                                        </div>
+
+                                        <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                            <div class="ocmsHint">
+                                                <strong>Bookmark bar, Bookmark Control </strong><br/>
+                                            </div>
+                                        </apex:outputText>
+                                        <cms:Panel panelName="postArticle" panelController="{!controller}"
+                                                   panelWidth="350px"
+                                                   panelHeight="60px" panelLimit="2"
+                                                   panelContentLayouts="BookmarkBar, BookmarkControl"/>
+
+                                    </article>
+                                    <!-- TEMPLATE CONTENT -->
+                                </main>
+
+                                <apex:include pageName="ocms_mfc_i_pageFooter"/>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .global-layer-wrap.main-global-layer -->
+                <a id="back-to-top">
+                    <span class="i18n" id="uiLabelBackToTop">Back to top</span>
+                </a>
+            </div><!-- .pg.pgArticleBuilder -->
+            <!--script type="text/javascript">_satellite.pageBottom();</script-->
+        </apex:define><!-- body -->
+    </apex:composition>
+</apex:page>
+<!-- ocms_mfc_t_ArticleBuilder -->

@@ -1,0 +1,612 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#navigation li.bt7 a,
+#navigation li.bt7 a:hover,
+#navigation li.bt7 a.on{
+width:145px;
+background-position:-815px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+
+}
+
+.fonttitle{
+font-family:Calibri; font-size:24px;color:#00693c;font-weight:bold;
+    }
+    
+.fontbody{
+font-family:Calibri; font-size:16px;color:black;    
+}
+
+.tableborder{
+border-right-color:white;
+border-right-style:solid;
+border-right-width:medium;
+    }
+    
+.deliveryborder{
+border-right-color:#C1DBEA;
+border-right-style:solid;
+border-right-width:medium;
+
+border-left-color:#C1DBEA;
+border-left-style:solid;
+border-left-width:medium;
+
+border-top-color:#C1DBEA;
+border-top-style:solid;
+border-top-width:medium;    
+}
+
+
+/*position and hide the menu initially - leave room for menu items to expand...*/
+
+/*en/disabling...*/
+/*
+#enableDisable {position:absolute; top:145px; left:0; width:100%; text-align:center; color:#ffffff;}
+*/
+
+
+</style>
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+<div id="contentrolltout">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr><td colspan="2" height="20px"></td></tr>
+    <tr>
+        <td  width="10%" valign="top" align="center"> <!--Left Navigation-->
+        
+        <div id="page3">
+            <c:POS_Rollout_Left_Panel src="s1" />    
+
+        </div>
+        
+        </td>
+        <td class="x" align="center" valign="top" width="90%"> <!--Content-->
+            <table style="padding-left:20px" width="100%" cellpadding="0" cellspacing="0" border="0" align="center">
+                <tr><td style="height:50px"></td></tr>
+                <tr>
+                    <td class="fonttitle"> Delivery model for initial releases</td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px;text-align:justify">
+                        The program uses a 'hybrid delivery model' for the design and development 
+                        of the solution. This will involve utilizing an Agile approach (involving a series of 'Sprints') 
+                        to deliver the 'front-end' functionalities, and a more traditional Waterfall approach for the backend functionalities, to integrate with service-oriented-architecture (SOA).
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/delivery_model_diagram.png')}" /></td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/plan_and_analyze_tab.png')}" /></td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px;text-align:justify">
+                        The regional eBusiness team will work with each country to determine a 
+                        solution plan based on the deliverables provided by the regional team (e.g.  BRD), and then developing the deliverables listed below.
+                        </div>                  
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td class="tableborder" style="padding-left:10px;background-color:#DEDED4;height:50px" width="60%">
+                                    <table  width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/task_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">TASKS:</span>
+                                            </td>                                           
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="40%" style="padding-left:10px;background-color:#DEDED4;height:50px">
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/deliverables_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">DELIVERABLES:</span>
+                                            </td>
+                                        </tr>
+                                    </table>                                
+                                </td>
+                            </tr>
+                            <tr>
+                                <td valign="top" class="tableborder" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table style="padding:20px!important" align="center" width="100%" cellpadding="0" cellspacing="5" border="0">
+                                        
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Define an overall solution plan which provides the direction and scope of the project, including business scope, high level integration analysis, resource profile for country delivery team and high level delivery schedule.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Define the high-level requirements, with priorities and acceptance criteria.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Create the high-level solution design, confirm infrastructure and technical implementation standards.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Baseline solution requirements and Sprint scope.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td valign="top" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table align="center" style="padding:20px!important" width="100%"  border="0" cellspacing="5" cellpadding="0" >
+                                        
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>Solution plan</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>User stories / Solution breakdown structure</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>High-level solution design</td>
+                                        </tr>
+                                        <tr>
+                                        <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                        <td>Work estimates/Delivery plan</td>
+                                        </tr>
+                                        <tr>
+                                        <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                        <td>Test approach</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr><td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/design_tab.png')}" /></td></tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px;text-align:justify">
+                        By adopting an <i>Agile</i> approach, we are ensuring that time and 
+                        resources are being maximized while continuously producing results via a series of 'Sprints'. This also avoids spending a considerable portion of the budget on results that may need revisiting.
+                        </div>                  
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td class="tableborder" style="padding-left:10px;background-color:#F8CEA8;height:50px" width="60%">
+                                    <table  width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/task_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">TASKS:</span>
+                                            </td>                                           
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="40%" style="padding-left:10px;background-color:#E0B58B;height:50px">
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/deliverables_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">DELIVERABLES:</span>
+                                            </td>
+                                        </tr>
+                                    </table>                                
+                                </td>
+                            </tr>
+                            <tr>
+                                <td valign="top" class="tableborder" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table align="center" width="100%" style="padding:20px!important" cellpadding="0" cellspacing="5" border="0">
+                                        
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Design: Elaborate detailed requirements and design through User Stories, Functional Specifications and Technical Specifications.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Build: Develop a functional solution at the end of each Sprint which meets the business needs iteratively.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Test: Prepare test cases and scripts to perform incremental testing at the end of each Sprint, and allow end users to complete controlled usability testing.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Review: Solution demo at regular checkpoints and collect feedback from business users. This will allow end users to provide real time feedback, before getting too far into the development lifecycle.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td valign="top" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table align="center" width="100%" style="padding:20px!important" border="0" cellspacing="5" cellpadding="0" >
+                                        
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>User Stories based on the Requirements confirmed in the Plan and Analyze phase.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>Detailed solution design, including Functional Specification Document (FSD), Interface Mapping Specification (IMS), Software Architecture Specification and Data Dictionary. The FSD, IMS and SAS will be delivered by Finantix, whereas the Data Dictionary will be a Manulife Country deliverable.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr><td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/delivery_tab.png')}" /></td></tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody" style="font-weight:bold">
+                        <div align="center" class="deliveryborder" style="padding:5px;width:150px">END-TO-END TESTING</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td class="tableborder" style="padding-left:10px;background-color:#C1DBEA;height:50px" width="60%">
+                                    <table  width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/task_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">TASKS:</span>
+                                            </td>                                           
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="40%" style="padding-left:10px;background-color:#B9CFDC;height:50px">
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/deliverables_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">DELIVERABLES:</span>
+                                            </td>
+                                        </tr>
+                                    </table>                                
+                                </td>
+                            </tr>
+                            <tr>
+                                <td valign="top" class="tableborder" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table align="center" width="100%" style="padding:20px!important" cellpadding="0" cellspacing="5" border="0">
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Perform SIT (System Integration Test), performance testing and other non-functional tests</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Perform End-to-end User Acceptance Testing and signoff.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td valign="top" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table align="center" width="100%" style="padding:20px!important" border="0" cellspacing="5" cellpadding="0" >
+                                        
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Test plan, test cases /scripts and test results</td>
+                                        </tr>
+                                        <tr>    
+                                            <td colspan="2">
+                                                <table align="center" style="padding-left:20px!important" width="100%" cellspacing="0" cellpadding="0" border="0">
+                                                    <tr>
+                                                        <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                                        <td valign="top" width="95%">SIT, UAT</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                                        <td valign="top" width="95%">Non-functional tests such as performance and security testing</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                                        <td valign="top" width="95%">Regression and OAT</td>
+                                                    </tr>
+
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>Test acceptance report</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody" style="font-weight:bold">
+                        <div align="center" class="deliveryborder" style="padding:5px;width:150px">DEPLOYMENT</div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px">
+                        <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                            <tr>
+                                <td class="tableborder" style="padding-left:10px;background-color:#C1DBEA;height:50px" width="60%">
+                                    <table  width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/task_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">TASKS:</span>
+                                            </td>                                           
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td width="40%" style="padding-left:10px;background-color:#B9CFDC;height:50px">
+                                    <table width="100%" cellpadding="0" cellspacing="0" border="0">
+                                        <tr>
+                                            <td width="10%">
+                                                <img alt="" src="{!URLFOR($Resource.pos_images, 'image/deliverables_icon.png')}" />
+                                            </td>
+                                            <td width="90%">
+                                                <span style="font-weight:bold">DELIVERABLES:</span>
+                                            </td>
+                                        </tr>
+                                    </table>                                
+                                </td>
+                            </tr>
+                            <tr>
+                                <td valign="top" class="tableborder" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table align="center" width="100%" style="padding:20px!important" cellpadding="0" cellspacing="5" border="0">
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Prepare and deploy solution into production environment for technical go-live</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Business go-live with end users</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">BAU transition for support and maintenance</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                                <td valign="top" style="background-color:#F3F3F3;font-size:14px!important">
+                                    <table align="center" width="100%" style="padding:20px!important" border="0" cellspacing="5" cellpadding="0" >
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>Deployment strategy including channels, number of agents and number of overall business releases</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>Deployment and migration plan for both technical and business go-live.</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td>Handover documents.</td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            
+                        </table>
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:30px"></td></tr>
+                <tr><td class="fonttitle">Accelerated delivery model</td></tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px;text-align:justify">
+                        We are currently looking at ways to accelerate the model for future releases and countries. Stay tuned!
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:30px"></td></tr>
+                <tr><td class="fonttitle">Indicative timeline and roadmap</td></tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px;text-align:justify">
+                        The diagram shows what timeframe you can expect when rolling out the program in your country.
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr><td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/timeline_and_roadmap_diagram_1.png')}" /></td></tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px;text-align:justify">
+                            The following high level roadmap shows how each of the releases could be planned. 
+                            This roadmap and timeline is required per release, so would be multiplied by 
+                            three if a country chooses to take Meet &amp; Refine, Propose + Product Engine and Apply + Automatic Underwriting at the same time. 
+                        </div>
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <img alt="" src="{!URLFOR($Resource.pos_images, 'image/timeline_and_roadmap_diagram_2.png')}" />
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr><td class="fonttitle">Indicative Resources</td></tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                    <div style="width:770px;text-align:justify">
+                    Below is the recommended country organization structure:
+                    </div>
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr><td><img alt="" src="{!URLFOR($Resource.pos_images, 'image/indicative_resources_diagram.png')}" /></td></tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                    <div style="width:770px;text-align:justify">
+                    The suggested order of priority for appointing country resources is as following:
+                    </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fontbody">
+                        <table align="center" width="90%" cellpadding="0" cellspacing="3" border="0">
+                                        <tr><td colspan="2" style="height:5px"></td></tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Country Lead</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Release Lead </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Business Lead</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">IT Application Lead </td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Infrastructure Lead</td>
+                                        </tr>
+                        </table>    
+                    </td>
+                </tr>
+                <tr><td style="height:20px"></td></tr>
+                <tr>
+                    <td class="fontbody">
+                        <div style="width:770px;text-align:justify">
+                        Given the Agile delivery model, SME knowledge from these key departments will also be required to ensure the analyze, 
+                        design and delivery phases are effective, therefore the following resources will also need to be considered:
+                        </div>                  
+                    </td>
+                </tr>
+                <tr>
+                    <td class="fontbody">
+                        <table align="center" width="90%" cellpadding="0" cellspacing="3" border="0">
+                                        <tr><td colspan="2" style="height:5px"></td></tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Agency / Distribution</td>
+                                        </tr>
+
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Product</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Actuarial / Pricing</td>
+                                        </tr>
+                                        <tr>
+                                            <td valign="top" width="5%"><span style="color:#00693c;font-size:10px!important">&#9632;</span></td>
+                                            <td valign="top" width="95%">Compliance</td>
+                                        </tr>
+                        </table>    
+                    </td>
+                </tr>
+                <tr><td colspan="2" style="height:30px"></td></tr>
+                <tr>
+                    <td valign="top">
+                    <div align="right" style="width:770px!important;float:right;padding-right:50px">
+                    <a href="{!$Site.Prefix}/apex/POS_Questionnaire"
+                    onmouseover="document.getElementById('r3').src=pic15.src;"
+                    onmouseout="document.getElementById('r3').src=pic14.src;">
+                    <img align="right" src="{!URLFOR($Resource.pos_images, 'image/to-questionnaire-button.png')}" alt="" title="Questionaire" id="r3" /></a>
+                    </div>
+                    </td>
+                </tr>
+            </table>
+        </td> <!--End of Content-->
+    </tr>
+    <tr><td colspan="2" align="center" style="height:20px" ></td></tr>
+</table>
+<div style="height:20px"></div>
+
+</div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+   pic14 = new Image();
+   pic14.src = '{!URLFOR($Resource.pos_images, 'image/to-questionnaire-button.png')}';
+   pic15 = new Image();
+   pic15.src = '{!URLFOR($Resource.pos_images, 'image/to-questionnaire-button-(hover).png')}';
+    
+</script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

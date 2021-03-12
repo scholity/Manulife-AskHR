@@ -1,0 +1,222 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_CareersMap" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+	<apex:stylesheet value="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"/>
+	<script type="text/javascript" language="javascript">
+		$(document).ready(function() {
+			ce.content_editor('registerSaveFunction', function () {
+				return [
+					{type: 'Text', simple: true, name: 'legendText', value: $('#legendText').val()},
+					{type: 'Text', simple: true, name: 'canadaText', value: $('#canadaText').val()},
+					{type: 'Text', simple: true, name: 'unitedStatesText', value: $('#unitedStatesText').val()},
+					{type: 'Text', simple: true, name: 'japanText', value: $('#japanText').val()},
+					{type: 'Text', simple: true, name: 'taiwanText', value: $('#taiwanText').val()},
+					{type: 'Text', simple: true, name: 'philippinesText', value: $('#philippinesText').val()},
+					{type: 'Text', simple: true, name: 'indonesiaText', value: $('#indonesiaText').val()},
+					{type: 'Text', simple: true, name: 'singaporeText', value: $('#singaporeText').val()},
+					{type: 'Text', simple: true, name: 'malaysiaText', value: $('#malaysiaText').val()},
+					{type: 'Text', simple: true, name: 'cambodiaText', value: $('#cambodiaText').val()},
+					{type: 'Text', simple: true, name: 'thailandText', value: $('#thailandText').val()},
+					{type: 'Text', simple: true, name: 'vietnamText', value: $('#vietnamText').val()},
+					{type: 'Text', simple: true, name: 'hongKongText', value: $('#hongKongText').val()},
+					{type: 'Text', simple: true, name: 'chinaText', value: $('#chinaText').val()},
+
+					{type: 'Text', simple: true, name: 'canadaLink', value: $('#canadaLink').val()},
+					{type: 'Text', simple: true, name: 'unitedStatesLink', value: $('#unitedStatesLink').val()},
+					{type: 'Text', simple: true, name: 'japanLink', value: $('#japanLink').val()},
+					{type: 'Text', simple: true, name: 'taiwanLink', value: $('#taiwanLink').val()},
+					{type: 'Text', simple: true, name: 'philippinesLink', value: $('#philippinesLink').val()},
+					{type: 'Text', simple: true, name: 'indonesiaLink', value: $('#indonesiaLink').val()},
+					{type: 'Text', simple: true, name: 'singaporeLink', value: $('#singaporeLink').val()},
+					{type: 'Text', simple: true, name: 'malaysiaLink', value: $('#malaysiaLink').val()},
+					{type: 'Text', simple: true, name: 'cambodiaLink', value: $('#cambodiaLink').val()},
+					{type: 'Text', simple: true, name: 'thailandLink', value: $('#thailandLink').val()},
+					{type: 'Text', simple: true, name: 'vietnamLink', value: $('#vietnamLink').val()},
+					{type: 'Text', simple: true, name: 'hongKongLink', value: $('#hongKongLink').val()},
+					{type: 'Text', simple: true, name: 'chinaLink', value: $('#chinaLink').val()},
+				];
+			});
+		});
+	</script>
+<apex:outputPanel layout="block">
+		<form>
+			<table class="ocmsContentEditor ocmsContentEditorNested">
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="legendText">"Indicates Your Location" Text</label>
+						<input class="ocmsTextInputMed" type="text" name="legendText" id="legendText" value="{!legendText}"/>
+					</td>
+				</tr>
+				 <tr>
+					<td>
+						<label class="ocmsLabel" for="canadaLink">Canada Link</label>
+                        <input type="hidden" name="canadaLink" id="canadaLink" value="{!canadaLink}" />
+                        <cms:PageSelector cPassThroughId="canadaLink" value="{!canadaLink}" dialogId="dlgcanadaLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="canadaLink">Canada Text</label>
+						<input class="ocmsTextInputMed" type="text" name="canadaText" id="canadaText" value="{!canadaText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="unitedStatesLink">United States Link</label>
+                        <input type="hidden" name="unitedStatesLink" id="unitedStatesLink" value="{!unitedStatesLink}" />
+                        <cms:PageSelector cPassThroughId="unitedStatesLink" value="{!unitedStatesLink}" dialogId="dlgunitedStatesLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="unitedStatesLink">United States Text</label>
+						<input class="ocmsTextInputMed" type="text" name="unitedStatesText" id="unitedStatesText" value="{!unitedStatesText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="japanLink">Japan Link</label>
+						<input type="hidden" name="japanLink" id="japanLink" value="{!japanLink}" />
+                        <cms:PageSelector cPassThroughId="japanLink" value="{!japanLink}" dialogId="dlgjapanLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="japanLink">Japan Text</label>
+						<input class="ocmsTextInputMed" type="text" name="japanText" id="japanText" value="{!japanText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="taiwanLink">Taiwan Link</label>
+						<input type="hidden" name="taiwanLink" id="taiwanLink" value="{!taiwanLink}" />
+                        <cms:PageSelector cPassThroughId="taiwanLink" value="{!taiwanLink}" dialogId="dlgtaiwanLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="taiwanLink">Taiwan Text</label>
+						<input class="ocmsTextInputMed" type="text" name="taiwanText" id="taiwanText" value="{!taiwanText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="philippinesLink">Philippines Link</label>
+						<input type="hidden" name="philippinesLink" id="philippinesLink" value="{!philippinesLink}" />
+                        <cms:PageSelector cPassThroughId="philippinesLink" value="{!philippinesLink}" dialogId="dlgphilippinesLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="philippinesLink">Philippines Text</label>
+						<input class="ocmsTextInputMed" type="text" name="philippinesText" id="philippinesText" value="{!philippinesText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="indonesiaLink">Indonesia Link</label>
+						<input type="hidden" name="indonesiaLink" id="indonesiaLink" value="{!indonesiaLink}" />
+                        <cms:PageSelector cPassThroughId="indonesiaLink" value="{!indonesiaLink}" dialogId="dlgindonesiaLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="indonesiaLink">Indonesia Text</label>
+						<input class="ocmsTextInputMed" type="text" name="indonesiaText" id="indonesiaText" value="{!indonesiaText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="singaporeLink">Singapore Link</label>
+						<input type="hidden" name="singaporeLink" id="singaporeLink" value="{!singaporeLink}" />
+                        <cms:PageSelector cPassThroughId="singaporeLink" value="{!singaporeLink}" dialogId="dlgsingaporeLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="singaporeLink">Singapore Text</label>
+						<input class="ocmsTextInputMed" type="text" name="singaporeText" id="singaporeText" value="{!singaporeText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="malaysiaLink">Malaysia Link</label>
+						<input type="hidden" name="malaysiaLink" id="malaysiaLink" value="{!malaysiaLink}" />
+                        <cms:PageSelector cPassThroughId="malaysiaLink" value="{!malaysiaLink}" dialogId="dlgmalaysiaLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="malaysiaLink">Malaysia Text</label>
+						<input class="ocmsTextInputMed" type="text" name="malaysiaText" id="malaysiaText" value="{!malaysiaText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="cambodiaLink">Cambodia Link</label>
+						<input type="hidden" name="cambodiaLink" id="cambodiaLink" value="{!cambodiaLink}" />
+                        <cms:PageSelector cPassThroughId="cambodiaLink" value="{!cambodiaLink}" dialogId="dlgcambodiaLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="cambodiaLink">Cambodia Text</label>
+						<input class="ocmsTextInputMed" type="text" name="cambodiaText" id="cambodiaText" value="{!cambodiaText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="thailandLink">Thailand Link</label>
+						<input type="hidden" name="thailandLink" id="thailandLink" value="{!thailandLink}" />
+                        <cms:PageSelector cPassThroughId="thailandLink" value="{!thailandLink}" dialogId="dlgthailandLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="thailandLink">Thailand Text</label>
+						<input class="ocmsTextInputMed" type="text" name="thailandText" id="thailandText" value="{!thailandText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="vietnamLink">Vietnam Link</label>
+						<input type="hidden" name="vietnamLink" id="vietnamLink" value="{!vietnamLink}" />
+                        <cms:PageSelector cPassThroughId="vietnamLink" value="{!vietnamLink}" dialogId="dlgvietnamLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="vietnamLink">Vietnam Text</label>
+						<input class="ocmsTextInputMed" type="text" name="vietnamText" id="vietnamText" value="{!vietnamText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="hongKongLink">Hong Kong Link</label>
+						<input type="hidden" name="hongKongLink" id="hongKongLink" value="{!hongKongLink}" />
+                        <cms:PageSelector cPassThroughId="hongKongLink" value="{!hongKongLink}" dialogId="dlghongKongLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="hongKongLink">Hong Kong Text</label>
+						<input class="ocmsTextInputMed" type="text" name="hongKongText" id="hongKongText" value="{!hongKongText}"/>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="chinaLink">China Link</label>
+						<input type="hidden" name="chinaLink" id="chinaLink" value="{!chinaLink}" />
+                        <cms:PageSelector cPassThroughId="chinaLink" value="{!chinaLink}" dialogId="dlgchinaLink" sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<label class="ocmsLabel" for="chinaLink">China Text</label>
+						<input class="ocmsTextInputMed" type="text" name="chinaLink" id="chinaLink" value="{!chinaLink}"/>
+					</td>
+				</tr>
+			</table>
+		</form>
+	</apex:outputPanel>
+	
+    <script src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+</apex:page>

@@ -1,0 +1,56 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_BrandHubWidget" showHeader="false"
+           sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+          rel="stylesheet" type="text/css" class="psContentEditorCSS"/>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function () {
+            ce.content_editor('registerSaveFunction', function () {
+                var attributes = new Array();
+                attributes.push({"name": "title", "value": $('#title').val(), "type": "Text", "simple": true});
+                attributes.push({"name": "hubImage", "value": $('#hubImage').val(), "type": "Text", "simple": true});
+                attributes.push({"name": "hubLink", "value": $('#hubLink').val(), "type": "Text", "simple": true});
+                attributes.push({
+                    "name": "hubHoverText",
+                    "value": $('#hubHoverText').val(),
+                    "type": "Text",
+                    "simple": true
+                });
+                return attributes;
+            });
+        });
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="title">BrandJub Title</label>
+						<textarea class="ocmsTextInputLrg" id="title" name="title"><apex:outputText value="{!title}"/></textarea>
+                        <p class="ocmsHelpText">Title for BrandHub widget, usually just BrandHub</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="hubImage">BrandHub Image</label>
+                        <input type="hidden" name="hubImage" id="hubImage" value="{!hubImage}"/>
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="hubImage"
+                                           cImage="{!hubImage}" type="Image" disabled="{!disableAll}"
+                                           DialogId="imageInput2"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="hubLink">BrandHub Link</label>
+						<textarea class="ocmsTextInputLrg" id="hubLink" name="hubLink"><apex:outputText value="{!hubLink}"/></textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="hubHoverText">BrandHub Hover Text</label>
+						<textarea class="ocmsTextInputLrg" id="hubHoverText" name="hubHoverText"><apex:outputText value="{!hubHoverText}"/></textarea>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

@@ -1,0 +1,22 @@
+<apex:page controller="cms.GenerateContent" extensions="ocms_mfc_BookmarkContentServiceLayout" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+<html><head></head><body>{:Start:}
+	<div id="{!cli.id}" class="bookmarks bookmarks-currentPage bookmarks-loading">
+		<a href="#" class="bookmarks-currentPage-save"></a>
+		<a href="#" class="bookmarks-currentPage-delete"></a>
+		<div class="bookmarks-loader"></div>
+	</div>
+	<script>
+		LazyLoad.css('{!URLFOR($Resource.ocms_mfc_Bookmark, 'css/styles.css')}');
+		LazyLoad.js('{!URLFOR($Resource.ocms_mfc_Bookmark, 'js/main.js')}', function() {
+			window['{!cli.id}-ctrl'] = new ocmsIntranetBookmarks.CurrentPage($('#{!cli.id}'));
+
+			// Set up the bookmark text based on stored content. 
+			// This way we don't have to ajax it in on every toggled state
+			$(document).ready(function() {
+				$(".bookmarks-currentPage-save").text("{!AddBookmarkName}");
+				$(".bookmarks-currentPage-delete").text("{!RemoveBookmarkName}");
+			});
+		});
+	</script> 
+{:Stop:}</body></html>
+</apex:page>

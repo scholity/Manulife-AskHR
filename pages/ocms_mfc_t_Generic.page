@@ -1,0 +1,77 @@
+<!-- ocms_mfc_t_Generic -->
+<apex:page controller="cms.CoreController" extensions="ocms_mfc_PageHelper" showHeader="false" sidebar="false" standardStylesheets="false" cache="false">
+    <apex:composition template="{!page_template_reference}">
+        <apex:define name="header">
+            <link rel="shortcut icon" href="{!URLFOR($Resource.ocms_mfc_FavIcon, 'img/favicon.ico')}" type="image/x-icon"/>
+            <apex:include pageName="ocms_mfc_i_headSpace"/>
+        </apex:define><!-- header -->
+
+        <apex:define name="body">
+            <div class="pg pgGeneric" id="page-generic-template">
+
+                <apex:include pageName="ocms_mfc_i_headerAndSideNav"/>
+
+                <div class="global-layer-wrap main-global-layer">
+                    <div class="global-align-center">
+                        <div class="global-drawer-slider">
+
+                            <apex:include pageName="ocms_mfc_i_globalNavTools"/>
+
+                            <div class="content-layer main-layer sticky-footer-fix">
+                                <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                    <div class="ocmsHint">
+                                        <strong>TextBlock</strong> ❧ critical alerts section
+                                    </div>
+
+                                </apex:outputText>
+                                <div class='critical-alerts'>
+                                    <cms:Panel panelName="criticalAlerts" panelController="{!controller}"
+                                               panelWidth="550px" panelHeight="30px"/>
+                                </div>
+
+                                <article class="content-wrap main-article">
+                                    <apex:include pageName="ocms_mfc_i_breadcrumb"/>
+
+                                    <!-- TEMPLATE CONTENT -->
+
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Main content section</strong><br/>
+                                            <!--div class="ocmsInstructions expandy">
+                                                ❧ it is yet to be determined exactly what content templates can be added to the main container on this “Generic” page template<br />
+                                            </div-->
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelName="mainArticle" panelController="{!controller}"
+                                               panelWidth="350px"
+                                               panelHeight="160px"/>
+                                    <!--panelContentLayouts="TextBlock, CustomHtml, Image" /-->
+
+                                    <!-- TEMPLATE CONTENT -->
+
+                                    <!-- BOOKMARK CONTENT-->
+                                    <apex:outputText rendered="{!api.page_mode == 'edit'}">
+                                        <div class="ocmsHint">
+                                            <strong>Bookmark bar, Bookmark Control </strong><br/>
+                                        </div>
+                                    </apex:outputText>
+                                    <cms:Panel panelName="postArticle" panelController="{!controller}"
+                                               panelWidth="350px"
+                                               panelHeight="60px" panelLimit="2"
+                                               panelContentLayouts="BookmarkBar, BookmarkControl"/>
+                                </article>
+
+                                <apex:include pageName="ocms_mfc_i_pageFooter"/>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- .global-layer-wrap.main-global-layer -->
+                <a id="back-to-top">
+                    <span class="i18n" id="uiLabelBackToTop">Back to top</span>
+                </a>
+            </div><!-- .pg.pgGeneric#page-generic-template -->
+            <!--script type="text/javascript">_satellite.pageBottom();</script-->
+        </apex:define><!-- body -->
+    </apex:composition>
+</apex:page>
+<!-- ocms_mfc_t_Generic -->

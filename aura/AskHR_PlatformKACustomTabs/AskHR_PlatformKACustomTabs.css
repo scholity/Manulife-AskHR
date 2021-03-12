@@ -1,0 +1,16 @@
+.THIS {
+}
+
+.THIS .whiteIcon svg {
+    fill: coral;
+}
+
+
+.THIS .fieldLabelBackground {
+    background-color:#FAFAFA;
+}
+
+.THIS .slds-tabs_default__nav .slds-is-active a {
+    color:black;
+    font-weight:bold;
+}

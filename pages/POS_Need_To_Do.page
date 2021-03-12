@@ -1,0 +1,107 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'jquery-1.11.3.min.js')}"/>
+  <apex:includeScript value="{!URLFOR($Resource.pos_scripts, 'highlight.js')}"/>
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+<style type="text/css">
+
+#navigation li.bt7 a,
+#navigation li.bt7 a:hover,
+#navigation li.bt7 a.on{
+width:145px;
+background-position:-815px -90px;
+background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+
+}
+
+</style>
+
+<div style="float:right;padding-right:15px;padding-top:10px">
+    <table cellspacing="5">
+        <tr>
+            <td valign="middle"><input id="SeaFie" type="text" name="keys" /></td>
+            <td valign="middle">
+                <input id="searchbt" title="Search" value="SEARCH" type="image" src="{!URLFOR($Resource.pos_images, 'image/search_icon.png')}" />
+            </td>
+        </tr>
+    </table>
+</div>
+
+ <div id="ManagingChange" style="height:100%" >
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <tr><td colspan="2" height="20px"></td></tr>        
+    <tr>
+        <td  width="10%" valign="top" align="center"> <!--Left Navigation-->
+        
+    <div id="page3">
+        <div style="height:20px"/> 
+            <c:POS_Rollout_Left_Panel src="s3" />    
+    </div>
+        </td>
+            <td valign="top" width="90%"><!--content-->
+                <div id="happening" style="height:100%" align="center">
+<div style="height:50px"></div>
+  
+<img align="middle" width="800px" src="{!URLFOR($Resource.pos_images, 'image/what-you-need-to-do-to-make-it-happen-title.png')}" alt="" />
+<div style="height:10px"></div>
+
+<div align="center" class="imgLiquidFill imgLiquid imgLiquid_bgSize imgLiquid_ready" style="width: 800px; height: 700px; background-image: url({!URLFOR($Resource.pos_images, 'image/table.png')});
+background-size: contain; background-position: 50% 50%; background-repeat: no-repeat;">
+<img alt="" src="{!URLFOR($Resource.pos_images, 'image/table.png')}" style="display: none;" /></div>
+
+<div style="height:10px"></div>
+
+<table border="0" cellpadding="0" cellspacing="0" width="100%" align="center">
+ <tr>
+
+  <td valign="top" align="center">
+  <a href="{!$Site.Prefix}/apex/POS_Managing_Change"
+      onmouseover="document.getElementById('r3').src=pic16.src;"
+      onmouseout="document.getElementById('r3').src=pic15.src;">
+
+  <img align="middle" src="{!URLFOR($Resource.pos_images, 'image/back-button.png')}" alt="" title="Change Management" id="r3" /></a>
+  </td>
+ </tr>
+</table>
+
+</div>
+            </td>   <!--End of Content-->   
+    </tr>
+</table>
+<div style="height:20px"></div>
+
+ </div>
+
+<script language="javascript" type="text/javascript">
+
+  $(document).ready(function(){
+  document.getElementById('SeaFie').style.height = '25px';
+
+        $('#SeaFie').on('keyup', function(){
+            console.log($(this).val());
+                $('.x').unhighlight();
+                $('.x').highlight($(this).val());
+
+        }); 
+       
+       
+        $('#searchbt').click(function(){
+                $('.x').unhighlight();
+                $('.x').highlight($('#SeaFie').val());
+
+        });  
+         
+    });
+
+   pic15 = new Image();
+   pic15.src = '{!URLFOR($Resource.pos_images, 'image/back-button.png')}';
+   pic16 = new Image();
+   pic16.src = '{!URLFOR($Resource.pos_images, 'image/back-button-(hover).png')}';
+ </script>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

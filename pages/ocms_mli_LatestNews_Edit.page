@@ -1,0 +1,217 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_LatestNews" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+    <apex:outputPanel layout="block">
+        <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+        <script type="text/javascript" language="javascript">
+
+            $(document).ready(function() {
+
+                CKEDITOR.replace('sPresentationDetail', {
+                        customConfig: '/apex/c__ocms_mli_CKEConfig'
+                });
+
+                ce.content_editor('registerSaveFunction', function() {
+                    return [
+                        {type: 'text', name: 'sLoaderTitle', value: $('#sLoaderTitle').val()},
+                        {type: 'text', name: 'sLoaderIcon', value: $('#sLoaderIcon').val()},
+                        {type: 'text', name: 'sLoaderIconAlt', value: $('#sLoaderIconAlt').val()},
+
+                        {type: 'text', name: 'sTaxonomyContentLayout', value: $('#sTaxonomyContentLayout').val()},
+                        {type: 'text', name: 'iQueryLimit', value: $('#iQueryLimit').val()},
+                        {type: 'text', name: 'sTagPaths', value: $('#sTagPaths').val()},
+                        {type: 'text', name: 'strWidth', value: $('#strWidth').val()},
+
+                        {type: 'cms.Link', name: 'sLoaderExternalLink', value: $('#sLoaderExternalLink').val()},
+                        {type: 'text', name: 'sLoaderExternalLinkLabel', value: $('#sLoaderExternalLinkLabel').val()},
+                        {type: 'text', name: 'sLoaderExternalLinkAccessible', value: $('#sLoaderExternalLinkAccessible').val()},
+
+                        {type: 'text', name: 'sEventsLabel', value: $('#sEventsLabel').val()},
+                        {type: 'text', name: 'sPresentationLabel', value: $('#sPresentationLabel').val()},
+                        {type: 'text', name: 'sPresentationDetail', value: CKEDITOR.instances.sPresentationDetail.getData()},
+                        {type: 'text', name: 'sNoArticles', value: $('#sNoArticles').val()}
+                    ];
+                });
+
+                if (!{!disableAll}) {
+					initializeTagPathSelectors();
+				}
+
+                $('#iQueryLimit').keypress(function(e)
+                   {
+                     var key_codes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 0, 8];
+
+                     if (!($.inArray(e.which, key_codes) >= 0)) {
+                       e.preventDefault();
+                     }
+                   });
+                });
+
+
+        </script>
+
+ 		<table class="ocmsContentEditor ocmsContentEditorNested">
+            <tbody>
+                <tr>
+                    <td>
+                        <strong>Loader Header Values</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLoaderTitle">Loader Title</label>
+                        <input class="ocmsTextInputLrg" id="sLoaderTitle" name="sLoaderTitle" type="text" value="{!sLoaderTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLoaderIcon">Loader Icon</label>
+                        <input type="hidden" name="sLoaderIcon" id="sLoaderIcon" value="{!sLoaderIcon}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sLoaderIcon" cPassThroughId="sLoaderIcon" cImage="{!sLoaderIcon}" type="Image" disabled="{!disableAll}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLoaderIconAlt">Loader Icon Alt Text</label>
+                        <input class="ocmsTextInputLrg" id="sLoaderIconAlt" name="sLoaderIconAlt" type="text" value="{!sLoaderIconAlt}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <strong>Loader Taxonomy Values</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel" for="sTagPaths" title=""> Taxonomy Category:
+	                    <br/>
+	                    <br/>
+	                    Default Taxonomy Category will point to the Investor Relations taxonomy node</label>
+	                    <div class="taxSelect">
+	                    	<input type="text" id="sTagPaths" name="sTagPaths" value="{!sTagPaths}"></input>
+                    	</div>
+	                    <br />
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="bPassTagAsFilter" title="">Pass Feeds Tag as Filter</label>
+
+                        <apex:outputText rendered="{!bPassTagAsFilter == true}">
+                            <input data-lang=" " id="bPassTagAsFilterYes" class="ocmsLanguageNeutral" type="radio" name="bPassTagAsFilter" value="true" checked="checked" />Yes
+                            <input data-lang=" " id="bPassTagAsFilterNo" class="ocmsLanguageNeutral" type="radio" name="bPassTagAsFilter" value="false" />No
+                        </apex:outputText>
+                        <apex:outputText rendered="{!bPassTagAsFilter == false}">
+                            <input data-lang=" " id="bPassTagAsFilterYes" class="ocmsLanguageNeutral" type="radio" name="bPassTagAsFilter" value="true" />Yes
+                            <input data-lang=" " id="bPassTagAsFilterNo" class="ocmsLanguageNeutral" type="radio" name="bPassTagAsFilter" value="false"
+                                checked="checked" />No
+                        </apex:outputText>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label class="ocmsLabel" for="sTaxonomyContentLayout" title=""> Taxonomy Layout</label>
+
+                        <p>
+
+                            <select name="sTaxonomyContentLayout" id="sTaxonomyContentLayout">
+                                <option value="MLIArticleListableSummary">Article Summary List</option>
+                                <option value="MLIArticleListableDetail">Article Detail List</option>
+                                <option value="MLIArticleListableEventsAndPresentations">Events and Presentations Summary List</option>
+                            </select>
+
+                            <br />
+                            <!-- <span>Current value: "{!sTaxonomyContentLayout}"</span> -->
+                        </p>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><label class="ocmsLabel" for="iQueryLimit" title=""> Number of Articles to Display
+                    <br/>
+                    <br/> This value must be an integer greater than 0
+                    </label>
+                    <br/>
+                    <input type="text" id="iQueryLimit" name="iQueryLimit" value="{!iQueryLimit}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <strong>Loader External Link Values</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLoaderExternalLink">Loader External Link</label>
+                        <input type="hidden" name="sLoaderExternalLink" id="sLoaderExternalLink" value="{!sLoaderExternalLinkAsData}" />
+                        <cms:PageSelector cPassThroughId="sLoaderExternalLink" value="{!sLoaderExternalLinkAsData}"  dialogId="sLoaderExternalLinkDialog" disabled="{!layout_disabled}" sname="{!content.cms__Site_Name__c}" token="{!token}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLoaderExternalLinkLabel">Loader External Link Label</label>
+                        <input class="ocmsTextInputLrg" id="sLoaderExternalLinkLabel" name="sLoaderExternalLinkLabel" type="text" value="{!sLoaderExternalLinkLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLoaderExternalLinkAccessible">Loader External Link Accessibility Text</label>
+                        <input class="ocmsTextInputLrg" id="sLoaderExternalLinkAccessible" name="sLoaderExternalLinkAccessible" type="text" value="{!sLoaderExternalLinkAccessible}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <strong>Upcoming Events and Presentations Labels</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sEventsLabel">Upcoming Events Label</label>
+                        <input class="ocmsTextInputLrg" id="sEventsLabel" name="sEventsLabel" type="text" value="{!sEventsLabel}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sPresentationLabel">Past Presentations Label</label>
+                        <input class="ocmsTextInputLrg" id="sPresentationLabel" name="sPresentationLabel" type="text" value="{!sPresentationLabel}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sPresentationDetail">Past Presentations Body</label>
+                        <textarea  id="sPresentationDetail" name="sPresentationDetail">
+                            <apex:outputText value="{!sPresentationDetail}" />
+                        </textarea>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sNoArticles">Message for no articles/news/events to display</label>
+                        <input class="ocmsTextInputLrg" id="sNoArticles" name="sNoArticles" type="text" value="{!sNoArticles}"></input>
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+        <script type="text/javascript" language="javascript">
+            //Initialize picklist values here - populate each picklist with values from their last save
+
+            var sTaxonomyContentLayout =  "{!sTaxonomyContentLayout}";
+            $('select#sTaxonomyContentLayout').val(sTaxonomyContentLayout);
+        </script>
+    </apex:outputPanel>
+
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/tagPathSelector.js')}"></script>
+
+</apex:page>

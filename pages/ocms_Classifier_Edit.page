@@ -1,0 +1,232 @@
+<!-- ocms_Classifier_Edit.page -->
+<!--
+    This is the OrchestraCMS content editor page for "Classifier" custom content
+
+    2015-Mar-12-29 Bill Lucas
+        - modified for Manulife and OrchestraCMS Winter '15 compatibility; classifier definitions read from
+          VF text/javascript page /apex/ocms_ps_ClassifierDefinitions that makes calls to addClassifier()
+
+    2015-Jan-29 Bill Lucas
+        - original
+
+-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_Classifier"
+    showHeader="false" sidebar="false" cache="false" standardStylesheets="false" title="OrchestraCMS content editor">
+
+	<link href="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"
+		rel="stylesheet" type="text/css" class="psContentEditorCSS" />
+    <!--script src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script-->
+
+    <apex:outputPanel layout="block">
+
+        <script id="ocms_classifier_Edit">
+			if (!(debug && debug.debug && $.isFunction(debug.debug))) {
+				var debug = console;
+			}
+
+            function addClassifier(label, classNames, targetSelector) {
+                aClassifiers.push({label: label, classNames: classNames, targetSelector: targetSelector});
+            }
+
+            var aClassifiers = [],
+                //
+                //  set bAllowCustom to true to let the content author manually enter a class name and selector
+                //  manually, as well as choosing from the pre-defined classifiers specified by calls to `lassifier()
+                //
+                bAllowCustom = false,
+
+                //
+                //  set bIncludeExampleMarkup to true to display example markup that will have the specified class added 
+                //
+                bShowExample = false;
+
+                //
+                //  optionally pre-define solution-specific labels, class names, and optional jQuery CSS selectors
+                //	*** now deferred to reading from VisualForce page /apex/ocms_ClassifierDefinitions ***
+	            // addClassifier('Board of Directors', 'boardOfDirectors');
+	            // addClassifier('Building Assets', 'buildingAssets');
+	            // addClassifier('Document List', 'myList docs');
+	            // addClassifier('Vehicle List', 'myList vehicles');
+	            // addClassifier('Unicorns Forever', 'unicorns', '.pg');
+	            // addClassifier('You’ll be sorry', 'ugly', 'div');
+        </script>
+
+        <script src="{!URLFOR('/apex/ocms_ClassifierDefinitions')}"></script>
+
+        <script id="ocms_classifier_Edit-2">
+            $(document).ready(function initContentEditor () {
+            	function buildPredefinedClassificationDropDown() {
+                    $('#predefinedClassification').fadeIn();
+                    $classifierLabel = $('#classifierLabel');
+                    if (bAllowCustom) {
+                        $classifierLabel
+                            .append($('<option value="Custom">Custom</option>'))
+                            .append($('<option value="2" disabled>-</option>'));
+                    }
+
+                    $(aClassifiers).each(function(nIt, cls) {
+                        $classifierLabel.append($('<option value="' + cls.label + '" data-index="' + nIt + '">' + cls.label + '</option>'))
+                    });
+
+                    var savedValue = '{!classifierLabel}' || '0';   // option.metaNone has value 0 and text "Choose…"
+                    
+                    debug.info('classifierLabel saved value', savedValue);
+                    $classifierLabel.val(savedValue).trigger('change', 'init');
+
+                    if ($classifierLabel.val() !== savedValue) {
+                        debug.warn('could not initialize classifier drop-down list to "' + savedValue + '"');
+                    }
+                }	// buildPredefinedClassificationDropDown
+
+
+                var $classifierLabel;
+
+                $('.ocmsLabel').dblclick(function() {
+                	$('.psContentEditorCSS').attr('disabled', $('.psContentEditorCSS').attr('disabled') ? false : true);
+                });
+
+                // set up change handler for classifier drop down even when disabled because buildPredefinedClassificationDropDown() 
+                // calls it directing as part of initialization
+                // 
+                // select#classifierLabel
+                //  - not always visible (only when pre-defined Classifiers have been established [preferred!])
+                //  - the initial item is Choose… and is removed when any an valid option is chosen
+                //  - the item "Custom" has a value of -1
+                //  - pre-defined Classifiers have values 0..n, corresponding to their position within aClassifiers[]
+                $('#classifierLabel').change(function(evt, evtContext) {
+
+                    // new rules!
+                    // option   .text       .val    .attr('class')
+                    //          Choose…     Choose… metaNone
+                    //          Custom      Custom
+                    //          -           2       disabled
+                    //          Blah        Blah                data-index=0
+                    //          Burford     Burford             data-index=1
+                    //          Watermelon  Watermelon          data-index=2
+
+                    var val = this.value;
+                    // debug.debug('Select change: ' + val);
+                    if (val !== 'Choose…') {    // should it ever?
+                        $('#classifierLabel option.metaNone').remove();
+
+                        if (val === 'Custom') {
+                            // start with empty values when switching to Custom (not when initializing on page load), and fade in edit controls
+                            if (evtContext !== 'init') {
+                                $('#classNames, #targetSelector').val('');
+                                $('#exampleMarkup').attr('class', '');
+                            }
+                            $('#manualClassification').fadeIn();
+                        } else {
+                            $('#manualClassification').hide();  // often already hidden, of course
+                            var nChoice = parseInt($('option:selected', this).data('index'), 10);
+                            // debug.debug('nChoice: ' + nChoice);
+                            $('#classNames').val(aClassifiers[nChoice].classNames);
+                            $('#targetSelector').val(aClassifiers[nChoice].targetSelector);
+                            $('#exampleMarkup').attr('class', $('#classNames').val());
+                        }
+                    }
+                });
+
+
+                if (!{!disableAll}) {
+                    $('#classNames').blur(function(evt) {
+                        this.value = this.value.replace(/,/g, ' ').replace(/ +/g, ' ').trim();
+                    });
+
+                    $('#targetSelector').blur(function(evt) {
+                        this.value = this.value.trim();
+                    });
+
+                    $('#classNames').keyup(function() {
+                        $('#exampleMarkup').attr('class', $(this).val());
+                    });
+                    
+                    // aClassifiers.sort(function (a, b) {
+                    //     return (a.label < b.label) ? -1 : ((a.label > b.label) ? 1 : 0)
+                    // });
+                    if (bShowExample) {
+                        $('#exampleMarkup_c').fadeIn();
+                    }
+
+                    ce.content_editor('registerSaveFunction', function() {
+                        $('#classNames, #targetSelector').blur();
+                       
+                    	return [
+                    		{type: 'text', name: 'classifierLabel', 	value: $('#classifierLabel').val(), lang: ''},
+                    		{type: 'text', name: 'classNames',			value: $('#classNames').val(),      lang: ''},
+                    		{type: 'text', name: 'targetSelector',		value: $('#targetSelector').val(),  lang: ''}
+                    	];
+                    });
+                }
+
+                if (aClassifiers.length) {
+                	buildPredefinedClassificationDropDown();
+                } else {
+                    $('#manualClassification').fadeIn();
+                    if ($('#targetSelector').val()) {
+                        $('#advancedTarget').show();
+                    }
+                }
+
+                $('#layoutLabel').dblclick(function() {
+                    $('#manualClassification').toggle();
+                });
+            });
+        </script>
+
+        <style type="text/css">
+            #manualClassification,
+            #predefinedClassification {
+                display: none;
+            }
+
+            #targetSelector {
+                min-width: 40em;
+            }
+
+/*            #classifierLabel {
+                font-size: 1.1em;
+            }
+*/
+            #exampleMarkup_c {
+                display: none;          /* optionally displayed dynamically */
+                margin: 40px 0 0 10px;
+            }
+        </style>
+
+
+        <table class="ocmsContentEditor ocmsContentEditorNested">
+            <tr><td>
+                <p class="intro">
+                    This special content item may be used to “classify” part of a page in a distinctive way so that your web site knows how to handle it or the content items within it.
+                </p>
+			</td></tr>
+
+			<tr><td id="predefinedClassification">
+            	<label class="ocmsLabel" for="classifierLabel">Classification</label>
+                <select id="classifierLabel">
+                    <option value='Choose…' class="metaNone">Choose…</option>
+                </select>
+        	</td></tr>
+
+            <tr id="manualClassification"><td>
+            	<label class="ocmsLabel" for="classNames" title="one or more CSS class names">CSS class name(s)</label>
+                <input type='text' id="classNames" placeholder="enter at least one CSS class name" value="{!classNames}" class="ocmsTextInputLrg" />
+				<br /><!-- in same td since it may be dynamically hidden/shown -->
+				<br />
+				<br />
+                <label class="ocmsLabel" for="targetSelector" title="jQuery CSS selector">jQuery CSS selector</label>
+                <input type='text' id="targetSelector" placeholder="CSS selector, or leave blank for parent container" value="{!targetSelector}" />
+                <p class="ocmsHelpText">(Advanced use only)</p>
+			</td></tr>
+
+            <tr id="exampleMarkup_c"><td id="exampleMarkup">
+                <h3>This is sample markup</h3>
+                <p>This shows what page elements <i>may</i> look like if the current Classifier value was applied to this container.
+                    The actual appearance on the published page may be different than approximated here.
+                </p>
+            </td></tr>
+        </table>
+    </apex:outputPanel>
+</apex:page>
+<!-- ocms_Classifier_Edit.page -->

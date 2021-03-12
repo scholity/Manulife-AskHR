@@ -1,0 +1,96 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_ProductServiceTile" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+
+            try {
+                var $ele;
+                if ($('#sTileTitle').val() == null || $('#sTileTitle').val() == '') {
+                    $ele = $('#sTileTitle');
+                    errorField($ele, languageUsed + 'Product/Service Title must be provided.');
+                    return false;
+                }
+                if ($('#sTileDescription').val() == null || $('#sTileDescription').val() == '') {
+                    $ele = $('#sTileDescription');
+                    errorField($ele, languageUsed + 'Product/Service Description must be provided.');
+                    return false;
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            CKEDITOR.replace('sTileDescription', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sTileImageIcon", "value": $('#sTileImageIcon').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTileImageIconAlt", "value": $('#sTileImageIconAlt').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTileTitle", "value": $('#sTileTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTileDescription", "value": CKEDITOR.instances.sTileDescription.getData(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTileImageIcon">Product/Service Image Icon</label>
+                        <input type="hidden" name="sTileImageIcon" id="sTileImageIcon" value="{!sTileImageIcon}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sTileImageIcon" cPassThroughId="sTileImageIcon" cImage="{!sTileImageIcon}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W82 X H82 pixel (72ppi)<br/>
+                        Retina: W164 X H164 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTileImageIconAlt">Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sTileImageIconAlt" name="sTileImageIconAlt" type="text" value="{!sTileImageIconAlt}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sTileTitle">Product/Service Title</label>
+                        <input class="ocmsTextInputLrg" id="sTileTitle" name="sTileTitle" type="text" value="{!sTileTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sTileDescription">Product/Service Description</label>
+                        <textarea  id="sTileDescription" name="sTileDescription">
+                            <apex:outputText value="{!sTileDescription}" />
+                        </textarea>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

@@ -1,0 +1,673 @@
+<!--
+ - Created by rhyanmitchell on 2017-02-09.
+ -->
+
+<apex:page sidebar="false" standardStylesheets="false" contentType="application/javascript">
+
+        <!--<script>-->
+            (function () {
+                var actualCKEditorOptions = {
+                    // This is what would normally be in an options file. We return it at the end.
+                };
+
+                // Append styles
+                function uStudioStylesAppend() {
+                    $('head').append('<link href="{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'css/uStudio.css')}" rel="stylesheet" type="text/css" class="psContentEditorCSS" />');
+                }
+
+                // Additional init for a single editor - any additional commands/buttons/whatever that need to be added
+                function additionalCKEditorInit(editor) {
+                    console.log(editor);
+                    editor.addCommand('uStudio', {
+                        exec: function (editor) {
+                            uStudioSelector(editor);
+                        }
+                    });
+                    editor.ui.addButton('uStudio', {
+                        label  : 'uStudio',
+                        command: 'uStudio',
+                        toolbar: 'insert',
+                        icon: '{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'img/uStudio-Play-Icon-16x16.png')}'
+                    });
+                }
+
+                /**
+                 * Prepare the uStudio selector dialog
+                 * @param editor    CKEDITOR instance
+                 **/
+                function uStudioSelector(editor) {
+                    var $dialog = $('<div id="uStudioDialog" title="Embedded Video"></div>');
+                    $dialog.dialog({
+                        resizable: true,
+                        width    : 675,
+                        height   : 400,
+                        modal    : true,
+                        close    : function () {
+                            $(this).remove();
+                        },
+                        buttons  : {
+                            "Embed Video": function () {
+                                //var element = document.getElementById('uStudioTest');
+                                //editor.setData(element.outerHTML);
+
+                                // Selected Video
+                                var $video = $('input[name=video]:checked');
+
+                                // ID and URL
+                                var uid = $video.data('uid');
+                                var url = $video.data('url');
+                                var title = $video.data('title');
+
+                                if (isValidEmbed(uid, url)) {
+                                    var embed = '<div class="video-container"><iframe title="Embedded Video: ' + title + '" id="' + uid + '" src="' + url + '" frameborder="0" scrolling="no" allowFullScreen="true" webkitAllowFullScreen="true" mozAllowFullScreen="true"></iframe></div>';
+                                    //editor.setData(embed);
+                                    var element = CKEDITOR.dom.element.createFromHtml(embed, editor.document);
+                                    editor.insertElement(element);
+                                    $(this).dialog('close');
+                                }
+
+                                function isValidEmbed(uid, url) {
+                                    var valid = true;
+                                    var message;
+                                    if (!uid.length) {
+                                        valid = false;
+                                        message += 'Invalid video id.';
+                                    } else if (!url.length || url === 'undefined') {
+                                        valid = false;
+                                        $destination = $('select', '#videoOptions');
+                                        if (!$('option:selected', $destination).index()) {
+                                            $destination.css('color', 'red');
+                                        }
+                                        message += 'Invalid video url.';
+                                    }
+                                    console.log('Embed Valid: ' + valid);
+                                    if (!valid) {
+                                        console.log(message);
+                                    }
+                                    console.log('Embed Valid: ' + valid);
+                                    return valid;
+                                }
+                            },
+                            Cancel       : function () {
+                                $(this).dialog('close');
+                            }
+                        },
+                        position: {
+                            my: 'left top',
+                            at: 'left+10 top',
+                            of: '.' + editor.id
+                        }
+                    });
+
+                    // Add the uStudio logo to the top of the dialog
+                    var $uStudioDialogParent = $('#uStudioDialog').parent();
+                    $('.ui-dialog-titlebar', $uStudioDialogParent).prepend(
+                        '<img src="{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'img/uStudio-16x64-transparent.png')}"/>'
+                    );
+
+                    generateEmbedControls($dialog);
+                    loadEventHandlers();
+                    loadStudioDropDown($dialog);
+
+                }
+
+                /**
+                 *  Generate control for embed selection
+                 *
+                 *  @param $dialog      Dialog jquery object that the uStudio Selector controls and video list will append to
+                 **/
+                function generateEmbedControls($dialog) {
+                    var $table = $('<table class="ocmsContentEditor ocmsContentEditorNested"></table>');
+                    var $controls = $(
+                        '<tr>' +
+                            '<td>' +
+                                '<div id="sourceContainer">' +
+                                    '<div class="studioContainer">' +
+                                        '<label class="ocmsLabel" for="studio" title="Studio">Studio *</label>' +
+                                        '<select id="studio" disabled="disabled"><option>Select Studio</option></select>' +
+                                    '</div>' +
+                                    '<div class="collectionContainer">' +
+                                        '<label class="ocmsLabel" for="collection" title="Collection">Collection</label>' +
+                                        '<select id="collection" disabled="disabled" style="width: 280px;"><option>Select Collection</option></select>' +
+                                    '</div>' +
+                                    '<div class="destinationContainer">' +
+                                        '<label class="ocmsLabel" for="destination" title="Destination">Destination</label>' +
+                                        '<select id="destination" disabled="disabled"><option>Select Destination</option></select>' +
+                                    '</div>' +
+                                '</div>' +
+                                '<div id="sortSearchContainer">' +
+                                    '<div class="displayContainer">' +
+                                        '<label class="ocmsLabel" for="display" title="Display">Display</label>' +
+                                        '<select id="display" class="noBorder">' +
+                                            '<option value="5">5 Videos</option>' +
+                                            '<option value="10">10 Videos</option>' +
+                                            '<option value="15">15 Videos</option>' +
+                                            '<option value="20">20 Videos</option>' +
+                                            '<option value="25">25 Videos</option>' +
+                                        '</select>' +
+                                    '</div>' +
+                                    '<div class="sortContainer">' +
+                                        '<label class="ocmsLabel" for="sort" title="Sort">Sort</label>' +
+                                        '<select id="sort">' +
+                                            '<option value="created">Created Date</option>' +
+                                            '<option value="title">Title</option>' +
+                                        '</select>' +
+                                    '</div>' +
+                                    '<div class="searchContainer">' +
+                                        '<label class="ocmsLabel" for="search" title="Search">Search</label>' +
+                                        '<input id="search" type="text"/><button id="searchButton">Search</button>' +
+                                    '</div>' +
+                                '</div>' +
+                            '</td>' +
+                        '</tr>'
+                    );
+
+                    var $videos = $(
+                        '<tr>' +
+                            '<td>' +
+                                '<div id="videosContainer">' +
+                                    '<div id="videos">Select a Studio and Collection/Destination to search for videos. </div>' +
+                                    '<div class="pageNav"></div>' +
+                                '</div>' +
+                            '</td>' +
+                        '</tr>'
+                    );
+
+                    $dialog.append($table);
+                    $table.append($controls);
+                    $table.append($videos);
+
+                }
+
+                /**
+                 * Event handlers for search, studio, collection, destination selection
+                 **/
+                function loadEventHandlers() {
+
+                    $("#studio").change(function() {
+                        var studio_uid = $('option:selected', this).val();
+                        //$('#collection').prop('disabled', true).html('<option>Select Collection</option>');
+                        //$('#destination').prop('disabled', true).html('<option>Select Destination</option>');
+                        $('#collection').attr('disabled', true).html('<option>Select Collection</option>');
+                        $('#destination').attr('disabled', true).html('<option>Select Destination</option>');
+                        loadCollectionDropDown(studio_uid);
+                        loadDestinationDropDown(studio_uid);
+                    });
+
+                    $("#destination").change(function() {
+                        $('#collection')[0].selectedIndex = 0;
+                        getVideos(0, true);
+                    });
+
+                    $("#collection").change(function() {
+                        $('#destination')[0].selectedIndex = 0;
+                        getVideos(0, true);
+                    });
+
+                    $('#searchButton').click(function() {
+                        getVideos(0, true);
+                    });
+
+                    $('#search').keypress(function(e) {
+                        if(e.which == 13) {
+                            $('#searchButton').click();
+                        }
+                    });
+                }
+
+                /**
+                 * uStudio Service call to get all the studios available
+                 **/
+                function loadStudioDropDown() {
+
+                    var $studio = $('#studio');
+
+                    var params = {
+                        action: 'getStudios'
+                    }
+
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_uStudioService', params, function (textStatus, json, xhr) {
+                        if (json.success) {
+                            var options = '<option>Select Studio</option>';
+                            var studioId;
+                            var studioCount = json.studios.studios.length;
+                            $.each(json.studios.studios, function (index, value) {
+                                studioId = value.uid;
+                                options += '<option value="' + studioId + '">' + value.name + '</option>';
+
+                            });
+                            console.log('Studios: ' + json.studios.studios.length);
+                            $studio.html(options);
+                            $studio.attr('disabled', false);
+
+                            if (studioCount == 1) {
+                                $studio.val(studioId);
+                                $studio.change();
+                            }
+                        }
+                    }, null, true);
+                }
+
+                /**
+                 * uStudio Service call to get all the collections available for the selected studio
+                 *
+                 * @param uid       The studio id
+                 **/
+                function loadCollectionDropDown(uid) {
+
+                    var $collection = $('#collection');
+
+                    var params = {
+                        action: 'getCollections',
+                        uid: uid
+                    }
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_uStudioService', params, function (textStatus, json, xhr) {
+                        if (json.success) {
+                            var options = '<option>Select Collections</option>';
+                            $.each(json.collections.collections, function (index, value) {
+                                options += '<option value="' + value.uid + '">' + value.name + '</option>';
+                            });
+                            $collection.html(options);
+                            //$collection.prop('disabled', false);
+                            $collection.attr('disabled', false);
+
+                        }
+                    }, null, true);
+                }
+
+                /**
+                 * uStudio Service call to get all the destinations available for the selected studio
+                 *
+                 * @param uid       The studio id
+                 **/
+                function loadDestinationDropDown(uid) {
+
+                    var $destination = $('#destination');
+
+                    var params = {
+                        action: 'getDestinations',
+                        uid: uid
+                    }
+
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_uStudioService', params, function (textStatus, json, xhr) {
+                        if (json.success) {
+                            console.log('Studio result: ');
+                            console.log(json);
+                            var options = '<option>Select Destination</option>';
+                            //var defaultDest = 'Dwzk5IW24dXV'; // For Production
+                            var defaultDest = 'DH0tyZLSfVGs'; //For test env
+                            $.each(json.destinations.destinations, function (index, value) {
+                                options += '<option value="' + value.uid + '">' + value.name + '</option>';
+                                if(value.name.indexOf('Default')!=-1)
+                                    defaultDest=value.uid;                                
+                            });
+                            $destination.html(options);
+                            //$destination.prop('disabled', false);
+                            $destination.attr('disabled', false);
+
+                            //defaultDest = json.destination_id;
+
+                            if ($('option[value=' + defaultDest + ']', $destination).length) {
+                                $destination.val(defaultDest);
+                                $destination.change();
+                            } else {
+                                getVideos(0, true);
+                            }
+
+                        }
+                    }, null, true);
+                }
+
+
+                /**
+                 * Get videos based on current index.
+                 * @param index         Video index for the current page.
+                 * @param isNewQuery    New queries will recreate pagination.  Otherwise update the selected page number.
+                 */
+                function getVideos(index, isNewQuery) {
+
+                    var limit = $('option:selected', $('#display')).val();
+                    var studio_uid = $('option:selected', $('#studio')).val();
+                    var collection_uid = $('option:selected', $('#collection')).val();
+                    var destination_uid = $('option:selected', $('#destination')).val();
+                    var sort_order = $('option:selected', $('#sort')).val();
+                    var sort_direction = '';
+                    switch(sort_order) {
+                        case 'created': // Created Date
+                            sort_direction = 'desc';
+                            break;
+                        case 'title': // Title
+                            sort_direction = 'asc';
+                            break;
+                        default:
+                            sort_direction = 'asc';
+                    }
+                    var search_query = $('#search').val();
+
+                    console.log('Studio: ' + studio_uid + ' , Destination: ' + destination_uid);
+
+                    var action = '';
+                    if ($('#collection')[0].selectedIndex &gt; 0) {
+                        action = 'getCollectionVideos';
+                    } else if ($('#destination')[0].selectedIndex &gt; 0) {
+                        action = 'getDestinationVideos';
+                    } else {
+                        action = 'getVideos';
+                    }
+
+                    var params = {
+                        action         : action,
+                        studio_uid     : studio_uid,
+                        collection_uid : collection_uid,
+                        destination_uid: destination_uid,
+                        sort_order     : sort_order,
+                        sort_direction : sort_direction,
+                        search_query   : search_query,
+                        limit          : limit,
+                        index          : index
+                    }
+
+                    /**
+                     * Get a list of videos through an AJAX service request to Salesforce.
+                     *
+                     * Upon successful response, generate the markup for the videos table allowing users to select and
+                     * preview videos from uStudio.
+                     *
+                     * @param String        Service Class       name of the service apex class in Salesforce
+                     * @param JSON Object   Service Parameters  paramaters to pass through the service request
+                     * @param Callback Function                 return function including json response
+                     */
+
+                    $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_uStudioService', params, function (textStatus, json, xhr) {
+                        console.log(json);
+                        if (json.success) {
+                            console.log('Studio result: ');
+                            console.log(json);
+
+                            generateVideosTable(json);
+
+                            // When a video is selected, show more options below it
+                            $('input[name=video]').change(function() {
+                                var video_uid = $(this).data('uid');
+                                var video_url = $(this).data('url');
+                                //var video_studio_uid = $('option:selected', $('#studio')).val();
+
+                                if ($('#videoOptions').length) {
+                                    $('#videoOptions').remove();
+                                    $('#videos .selected').removeClass('selected');
+                                }
+
+                                // Append video details (destination and preview) after the selected video
+                                $(this).closest('tr').addClass('selected').after(
+                                    '<tr id="videoOptions">' +
+                                        '<td colspan="4">' +
+                                            '<div>' +
+                                                '<label class="ocmsLabel" for="vid' + video_uid + '" title="Destination">Destination</label>' +
+                                                '<select id="vid' + video_uid + '" class="noBorder">' +
+                                                    '<option>Select Destination</option>' +
+                                                '</select>' +
+                                            '</div>' +
+                                            '<div>' +
+                                                '<label class="ocmsLabel" for="previewVideo" title="Preview">&nbsp;</label>' +
+                                                '<button id="previewVideo" href="#" class="previewVideo" data-uid="' + video_uid + '" data-url="' + video_url + '">' +
+                                                    '<span>Preview</span>' +
+                                                    '<img src="{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'img/uStudio-Play-Icon-16x16.png')}"/>' +
+                                                '</button>' +
+                                            '</div>' +
+                                        '</td>' +
+                                    '</tr>'
+                                );
+
+                                // Open a preview dialog for a video
+                                $('.previewVideo').click(function (evt) {
+
+                                    evt.preventDefault();// prevent auto-scroll to top
+                                    var uid = $(this).data('uid');
+                                    var url = $(this).data('url');
+
+                                    if (url !== 'undefined') {
+                                        var $embed = $('<div class="video-container"><iframe id="' + uid + '" src="' + url + '" frameborder="0" scrolling="no" allowFullScreen="true" webkitAllowFullScreen="true" mozAllowFullScreen="true"></iframe></div>');
+                                        var $preview = $('<div id="uPreviewDialog"></div>');
+                                        $preview.dialog({
+                                            resizable: true,
+                                            width    : 450,
+                                            height   : 400,
+                                            modal    : true,
+                                            close    : function () {
+                                                $(this).remove();
+                                            },
+                                            //buttons  : {
+                                            //    Close: function () {
+                                            //        $(this).dialog('close');
+                                            //    }
+                                            //},
+                                            position: {
+                                                my: 'center center',
+                                                at: 'center center',
+                                                of: $(this).closest('.ui-dialog')
+                                            }
+                                        });
+                                        $preview.append($embed);
+                                    }
+                                });
+
+                                var params = {
+                                    action         : 'getVideoDestinations',
+                                    studio_uid     : studio_uid,
+                                    video_uid      : video_uid
+                                }
+
+                                $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_uStudioService', params, function (textStatus, json, xhr) {
+                                    console.log(json);
+                                    if (json.success) {
+                                        console.log('Studio result: ');
+                                        console.log(json);
+                                        var options = '<option>Select Destination</option>';
+                                        $.each(json.destinations.destinations, function (index, value) {
+                                            options += '<option value="' + value.uid + '" data-url="' + value.player_embed_url + '">' + value.name + '</option>';
+                                        });
+                                        var defaultDest = json.destination_id;
+                                        var $destinations = $('#vid' + video_uid);
+                                        $destinations.html(options);
+
+                                        // Update the selected video's URL and preview URL based on the selected Destination
+                                        $destinations.change(function() {
+                                            var params = {
+                                                action         : 'getDestinationVideo',
+                                                studio_uid     : studio_uid,
+                                                destination_uid: $('option:selected', $(this)).val(),
+                                                video_uid: video_uid
+                                            }
+
+                                            $.orchestracmsRestProxy.doAjaxServiceRequest('ocms_mfc_uStudioService', params, function (textStatus, json, xhr) {
+                                                console.log(json);
+                                                var url = json.video.player_embed_url;
+                                                if (json.success) {
+                                                    $('tr.selected input[name=video]').data('url', url);
+                                                    //$('tr.selected a.previewVideo').data('url', url).attr('data-url', url);
+                                                    $('tr#videoOptions button.previewVideo').data('url', url).attr('data-url', url);
+                                                }
+                                            }, null, true);
+
+                                            //var dest_url = $('option:selected', $(this)).data('url');
+                                            //var dest_uid = $(this).val();
+                                            //var player_embed_url = dest_url + '/embed/' + dest_uid + '/' + video_uid;
+                                            //$('tr.selected input[name=video]').data('url', player_embed_url);
+                                            //$('tr.selected a.previewVideo').data('url', player_embed_url);
+                                        });
+
+                                        // If filtering on Destination, default the selected video to this Destination
+                                        if ($('#destination')[0].selectedIndex) {
+                                            $destinations.val($('#destination').val());
+                                        } else if ($('option[value=' + defaultDest + ']', $destinations).length) {
+                                            $destinations.val(defaultDest);
+                                            $destinations.change();
+                                        }
+                                    }
+                                }, null, true);
+                            });
+
+                            refreshPagination(json.videos, limit, index, isNewQuery);
+                            console.log('uStudio Calls Successful - init CKEditor');
+
+                        }
+
+                        function generateVideosTable(json) {
+                            var html = '' +
+                                '<table>' +
+                                    '<thead>' +
+                                        '<th class="uSelect"></th>' +
+                                        //'<th class="uPreview"></th>' +
+                                        '<th class="uTitle">Title</th>' +
+                                        '<th class="uDate">Created Date</th>' +
+                                        '<th class="uSubtitles">Subtitles</th>' +
+                                    '</thead>' +
+                                    '<tbody>';
+
+                            $.each(json.videos.videos, function (index, value) {
+                                html += '' +
+                                    '<tr>' +
+                                        '<td class="uSelect">' +
+                                            '<input type="radio" name="video" id="' + value.uid + '" data-uid="' + value.uid + '" data-url="' + value.player_embed_url + '" data-title="' + value.title + '"/>' +
+                                        '</td>' +
+                                        '<td class="uTitle"><label for="' + value.uid + '"  title="' + value.title + '"><span>' + value.title + '</span></label></td>' +
+                                        '<td><label for="' + value.uid + '"  title="' + value.title + '"><span>' + value.created + '</span></label></td>' +
+                                        '<td class="uSubtitles"><label for="' + value.uid + '"  title="' + value.title + '"><span>' + getSubtitleLanguageCodes(value) + '</span></label></td>' +
+                                    '</tr>';
+                            });
+
+                            html += '</tbody>' +
+                                '</table>';
+
+                            $('#videos').html(html);
+
+                        }
+                    }, null, true);
+
+                    // Iterate keys for a video to find available subtitles and return their language codes
+                    function getSubtitleLanguageCodes(video) {
+                        var languageCodes = '';
+                        var substring = '_subtitles';
+                        var offset = -substring.length; // -10 offset
+
+                        $.each(video, function (key, value) {
+                            // If the object key ends with '_subtitles'.
+                            // NOTE: We need to use slice instead of substr because substr doesn't support negative offsets
+                            if (key.slice(offset) === substring) {
+                                // Ensure subtitles aren't empty
+                                if (value.public_url !== undefined &amp;&amp; value.public_url.length) {
+                                    if (languageCodes.length > 0) {
+                                        languageCodes += ', ';
+                                    }
+                                    // Substring from the first index until the underscore
+                                    languageCodes += key.substr(0, key.length + offset);
+                                }
+                            }
+                        });
+                        return languageCodes;
+                    }
+
+                    function refreshPagination(videos, limit, index, isNewQuery) {
+                        var $pageNav = $('.pageNav');
+                        var videoCount = videos.count;
+
+                        if (videoCount > limit) {
+                            //var $nav = $('<div class="page-navigator"></div>');
+                            var pageCount = Math.ceil(videoCount / limit);
+
+                            limit = parseInt(limit);
+                            index = parseInt(index);
+
+                            var pageFirst = 0;
+                            var pageLast = pageCount * limit - limit;
+                            var pagePrev = index - limit &lt; pageFirst ? pageFirst: index - limit; // must use XML character references (less-than)
+                            var pageNext = index + limit &gt; pageLast ? pageLast: index + limit; // must use XML character references (greater-than)
+
+                            if (isNewQuery || !isNewQuery) {
+                                // Clear the nav
+                                console.log('Empty the page navigation.');
+                                $pageNav.empty();
+
+                                if (pageCount > 0) {
+                                    var $prevPages = $(
+                                        '<a href="#" class="page-first">&lt;&lt;</a>' +
+                                        '<a href="#" class="page-prev">&lt;</a>'
+                                    );
+
+                                    var $nextPages = $(
+                                        '<a href="#" class="page-next">&gt;</a>' +
+                                        '<a href="#" class="page-last">&gt;&gt;</a>'
+                                    );
+
+                                    var pageStart = 0;
+                                    var pageEnd = pageCount;
+                                    var pageStartThreshold = limit * 5;
+                                    var pageEndThreshold = limit * (pageCount - 6);
+                                    var page = index / limit + 1;
+
+                                    // Only show 10 pages at a time.
+                                    if (pageCount &gt; 10) {
+                                        if (index &lt; pageStartThreshold) {
+                                            pageEnd = 10;
+                                        } else if (index &gt; pageEndThreshold) {
+                                            pageStart = pageCount - 10;
+                                        } else {
+                                            pageStart = page - 5;
+                                            pageEnd = page + 5;
+                                        }
+                                    }
+
+                                    // All the available pages
+                                    for (var i = pageStart; i &lt; pageEnd; i++) {
+                                        var page = i + 1;
+                                        var page_index = i * limit;
+
+                                        var html = '';
+                                        if (page_index == index) {
+                                            html += '<a href="#" class="page-selector active" data-index="' + page_index + '">' + page + '</a>';
+                                        } else {
+                                            html += '<a href="#" class="page-selector" data-index="' + page_index + '">' + page + '</a>';
+                                        }
+                                        $pageNav.append(html);
+                                    }
+
+                                    // Always show prev page and next page controls
+                                    $pageNav.prepend($prevPages);
+                                    $pageNav.append($nextPages);
+
+                                    $('.page-selector, .page-prev, .page-first, .page-next, .page-last').click(function(evt) {
+                                        evt.preventDefault(); // do not scroll to the top
+                                        // Don't navigate if this click wouldn't change the page
+                                        if ($(this).data('index') != $('.page-selector.active').data('index')) {
+                                            getVideos($(this).data('index'), false);
+                                        }
+                                    });
+                                }
+
+                            } else {
+                                $('.page-selector').removeClass('active');
+                                $('.page-selector[data-index="' + index + '"]').addClass('active');
+                            }
+                            $('.page-first').data('index', pageFirst);
+                            $('.page-prev').data('index', pagePrev);
+                            $('.page-next').data('index', pageNext);
+                            $('.page-last').data('index', pageLast);
+
+                        } else {
+                            $pageNav.empty();
+                        }
+                    }
+                }
+
+                // Use the CKEditor listener for "instanceCreated" to initialize the uStudio button
+                CKEDITOR.on("instanceCreated", function (event) {
+                    console.log('CKEditor Instance Created');
+                    uStudioStylesAppend();
+                    additionalCKEditorInit(event.editor)
+                });
+
+                return actualCKEditorOptions;
+            })()
+        <!--</script>-->
+
+</apex:page>

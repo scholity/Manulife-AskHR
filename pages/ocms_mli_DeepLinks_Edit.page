@@ -1,0 +1,147 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_DeepLinks" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function(){
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"strLink1Image", "value": $('#strLink1Image').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink1Text", "value": $('#strLink1Text').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"strLink1Link", "value": $('#strLink1Link').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink2Image", "value": $('#strLink2Image').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink2Text", "value": $('#strLink2Text').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"strLink2Link", "value": $('#strLink2Link').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink3Image", "value": $('#strLink3Image').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink3Text", "value": $('#strLink3Text').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"strLink3Link", "value": $('#strLink3Link').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink4Image", "value": $('#strLink4Image').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strLink4Text", "value": $('#strLink4Text').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"strLink4Link", "value": $('#strLink4Link').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"accPage", "value": $('#accPage').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"accOf", "value": $('#accOf').val(), "type": "Text", "simple": true});
+                attributes.push({"name":"accSelected", "value": $('#accSelected').val(), "type": "Text", "simple": true});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink1Image">Link 1 image</label>
+                        <input type="hidden" name="strLink1Image" id="strLink1Image" value="{!strLink1Image}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strLink1Image" cPassThroughId="strLink1Image" cImage="{!strLink1Image}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W339 X H191 pixel (72ppi)<br/>
+                        Retina: W678 X H382 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink1Text">Link 1 Button Text</label>
+                        <input class="ocmsTextInputLrg" id="strLink1Text" type="text" value="{!strLink1Text}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink1Link">Link 1 link</label>
+                        <input type="hidden" name="strLink1Link" id="strLink1Link" value="{!strLink1Link}" />
+                        <cms:PageSelector cPassThroughId="strLink1Link" value="{!strLink1Link}"  dialogId="strLinkDialog1" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink2Image">Link 2 image</label>
+                        <input type="hidden" name="strLink2Image" id="strLink2Image" value="{!strLink2Image}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strLink2Image" cPassThroughId="strLink2Image" cImage="{!strLink2Image}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W339 X H191 pixel (72ppi)<br/>
+                        Retina: W678 X H382 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink2Text">Link 2 Button Text</label>
+                        <input class="ocmsTextInputLrg" id="strLink2Text" type="text" value="{!strLink2Text}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink2Link">Link 2 link</label>
+                        <input type="hidden" name="strLink2Link" id="strLink2Link" value="{!strLink2Link}" />
+                        <cms:PageSelector cPassThroughId="strLink2Link" value="{!strLink2Link}"  dialogId="strLinkDialog2" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink3Image">Link 3 image</label>
+                        <input type="hidden" name="strLink3Image" id="strLink3Image" value="{!strLink3Image}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strLink3Image" cPassThroughId="strLink3Image" cImage="{!strLink3Image}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W339 X H191 pixel (72ppi)<br/>
+                        Retina: W678 X H382 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink3Text">Link 3 Button Text</label>
+                        <input class="ocmsTextInputLrg" id="strLink3Text" type="text" value="{!strLink3Text}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink3Link">Link 3 link</label>
+                        <input type="hidden" name="strLink3Link" id="strLink3Link" value="{!strLink3Link}" />
+                        <cms:PageSelector cPassThroughId="strLink3Link" value="{!strLink3Link}"  dialogId="strLinkDialog3" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink4Image">Link 4 image</label>
+                        <input type="hidden" name="strLink4Image" id="strLink4Image" value="{!strLink4Image}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="strLink4Image" cPassThroughId="strLink4Image" cImage="{!strLink4Image}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">Normal: W339 X H191 pixel (72ppi)<br/>
+                        Retina: W678 X H382 pixel (144ppi)</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink4Text">Link 4 Button Text</label>
+                        <input class="ocmsTextInputLrg" id="strLink4Text" type="text" value="{!strLink4Text}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="strLink4Link">Link 4 link</label>
+                        <input type="hidden" name="strLink4Link" id="strLink4Link" value="{!strLink4Link}" />
+                        <cms:PageSelector cPassThroughId="strLink4Link" value="{!strLink4Link}"  dialogId="strLinkDialog4" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Accessibility</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accPage">Page</label>
+                        <input class="ocmsTextInputLrg" id="accPage" type="text" value="{!accPage}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accOf">Of</label>
+                        <input class="ocmsTextInputLrg" id="accOf" type="text" value="{!accOf}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="accSelected">Selected</label>
+                        <input class="ocmsTextInputLrg" id="accSelected" type="text" value="{!accSelected}" />
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

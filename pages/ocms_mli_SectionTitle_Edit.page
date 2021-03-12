@@ -1,0 +1,46 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_SectionTitle" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script type="text/javascript" language="javascript">
+
+        $(document).ready(function(){
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sTitleImageIcon", "value": $('#sTitleImageIcon').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTitleImageAlt", "value": $('#sTitleImageAlt').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTitleText", "value": $('#sTitleText').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTitleImageIcon">Section Title Image Icon</label>
+                        <input type="hidden" name="sTitleImageIcon" id="sTitleImageIcon" value="{!sTitleImageIcon}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sTitleImageIcon" cPassThroughId="sTitleImageIcon" cImage="{!sTitleImageIcon}" type="Image" disabled="{!disableAll}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTitleImageAlt">Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sTitleImageAlt" name="sTitleImageAlt" type="text" value="{!sTitleImageAlt}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTitleText">Section Title</label>
+                        <input class="ocmsTextInputLrg" id="sTitleText" name="sTitleText" type="text" value="{!sTitleText}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

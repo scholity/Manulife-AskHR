@@ -1,0 +1,38 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" contentType="text/javascript">
+
+/**
+ * ocms_ClassifierDefinitions.page
+ *
+ * This VisualForce page, served as text/javascript, is used to add definitions for the Classifier content type
+ * based on the current site.
+ *
+ * The JavaScript function addClassifier is provied within the Classifer_Edit page.
+ * 
+ */
+
+// not strictly necessary to include as a self-invoking function, but helps keep things tidy
+(function _addClassifierDefinitions() {
+
+	var siteName = $(document).data('cms').site_name;
+	// context, namespace, csrf_token, site_name only at this time
+	if (debug.log) {
+		debug.log('\tocms_ClassifierDefinitions – Site name: ', siteName);
+	}
+
+	if (siteName === 'AskHR_Employee_Community') {
+		bAllowCustom = false;
+
+	    addClassifier('Data Entry Form - Submit an Event', 'event-detail', '.article-content');		//'submitEventForm_c');
+	    addClassifier('Data Entry Form - Fraud Report',    'fraudReportForm_c');
+	    addClassifier('Data Entry Form - Submit a Story',  'submitAStoryForm_c');
+	} else if (siteName === 'Manulife') {
+	    addClassifier('Manulife Rocks', 'mli');
+	} else {
+		if (debug.warn) {
+			debug.warn('Unexpected site name seen within ocms_ClassifierDefinitions.page: ' + siteName);
+		}
+	}
+
+	return undefined;
+})();
+</apex:page>

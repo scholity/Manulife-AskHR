@@ -1,0 +1,175 @@
+<apex:page standardstylesheets="false" extensions="ASKHR_CaseCommunicationExt" applyhtmltag="false" applybodytag="false" doctype="html-5.0" showheader="false" sidebar="false" standardcontroller="Case">
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <head>
+        
+        <apex:stylesheet value="{!URLFOR($Resource.SLDS_0122,'assets/styles/salesforce-lightning-design-system-vf.css')}" />
+        <apex:includescript value="/support/console/33.0/integration.js" />
+        <apex:includescript value="https://code.jquery.com/jquery-1.12.1.min.js" />
+    </head>
+    <apex:remoteobjects >
+        <apex:remoteobjectmodel jsshorthand="articleFeedback" name="ASKHR_ArticleFeedback__c" fields="CreatedDate,Article_Feedback_User_Name__c,Comment__c,Case__c,Case_Owner__c,Case_Contact_Name__c,Case_Contact_Email__c">
+        </apex:remoteobjectmodel>
+    </apex:remoteobjects>
+    <body>
+        <div id="comment-feed" class="slds">
+            <div class="slds-grid slds-grid--vertical">
+                <div class="slds-p-around--medium">
+                    <div class="slds-feed">
+                        <ul id="commentList" class="slds-feed__list">
+                            <!--<li class="slds-comment__overflow">
+                          <button class="slds-button slds-button--neutral">3 more comments</button>
+                        </li>-->
+                        </ul>
+                        <div class="slds-form-element">
+                            <div class="slds-form-element__control" style="{!IF(Case.OwnerIsUser__c,'','display:none')}">
+                                <textarea id="comment-input" class="slds-textarea" placeholder="Write a comment" data-autoresize="" rows="2"></textarea>
+                                <button id="comment-submit-btn" class="slds-button slds-button--brand slds-float--right" type="button" onclick="insertNewComment()">Submit</button>
+                                <div class="slds-spinner--small slds-float--right slds-m-right--small" id="comment-loading" style="display:none">
+                                    <apex:image value="{!URLFOR($Resource.SLDS_0122,'/assets/images/spinners/slds_spinner.gif')}" />
+                                </div>
+                            </div>
+                            <div class="slds-tile slds-m-around--small" style="{!IF(Case.OwnerIsUser__c,'display:none','display:block')}">
+                                <p>Please assign the case owner to an analyst to enable this section</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+            j$ = jQuery.noConflict();
+            var comment = new SObjectModel.articleFeedback();
+            var outputDiv = document.getElementById("commentList");
+            var hideComment = true;
+            j$('#comment-submit-btn').attr('disabled', true);
+            j$('#comment-input').keyup(function() {
+                if(j$(this).val() != '') {
+                    j$('#comment-submit-btn').attr('disabled' , false);
+                }else{
+                    j$('#comment-submit-btn').attr('disabled' , true);
+                }
+            });
+
+            function insertNewComment(){
+                document.getElementById("comment-loading").style.display="block";
+                j$('#comment-submit-btn').attr('disabled', true);
+
+                var caseContactName = getContactName();
+                var commentDetails = document.getElementById("comment-input").value;
+                var newCommentFields = {
+                        Case__c : '{!Case.Id}',
+                        Case_Contact_Email__c : '{!Case.SuppliedEmail}',
+                        Case_Owner__c : '{!Case.OwnerId}',
+                        Case_Contact_Name__c : caseContactName,
+                        Article_Feedback_User__c : '{!$User.Id}',
+                        Comment__c  : commentDetails,
+                        RecordTypeId : '{!mCommentRecordTypeId}'
+                };
+                comment.create(newCommentFields, function(error, results){
+                    document.getElementById("comment-loading").style.display="none";
+                    if(error){
+                        console.log(error.message);
+                    }else{
+                        updateOutputDiv();
+                        document.getElementById("comment-input").value = '';
+                        //console.log(JSON.stringify(results));
+                    }
+                });
+            }
+
+            function updateOutputDiv(){
+                var query = {
+                    where: {
+                        Case__c: {eq: '{!Case.Id}'}
+                    },
+                     orderby: [ {CreatedDate: 'ASC'}]
+
+                };
+                comment.retrieve(query,
+                                  function(error, records){
+                                    if(error){
+                                        console.log(error.message);
+                                    }else{
+                                        var html='';
+
+                                        for(i = 0; i < records.length; i++){
+
+                                            if(records.length - 3 > i && hideComment){
+                                               html = '<li class="slds-comment__overflow slds-m-top--small">' +
+                                                        '<button class="slds-button slds-button--neutral" onClick="toggleMoreComment()">' + (i+1) + ' more comments</button>' +
+                                                      '</li>';
+                                            }else{
+                                                html +=     '<li class="slds-feed__item">' +
+                                                    '   <div class="slds-media slds-comment slds-hint-parent">' +
+                                                    '      <div class="slds-media__body">'+
+                                                    '      <div class="slds-grid slds-grid--align-spread slds-has-flexi-truncate">' +
+                                                    '           <p class="slds-truncate"><a id="' + records[i].get("Article_Feedback_User_Name__c") + '">' + records[i].get("Article_Feedback_User_Name__c") +  '</a> -'+
+                                                    '               <span class="slds-text-body--small">' + normalizeDateExtended(records[i].get('CreatedDate')) + '</span>' +
+                                                    '           </p>' +
+                                                    '       </div>' +
+                                                    '       <div class="slds-comment__content slds-text-longform">' +
+                                                    '       <p>' + records[i].get("Comment__c") + '</p>' +
+                                                    '       </div>' +
+                                                    '       </div>' +
+                                                    '   </div>' +
+                                                    '</li>';
+                                            }
+                                        }
+                                        //console.log(html);
+                                        outputDiv.innerHTML = html;
+                                        //resizeFrame();
+                                    }
+                                  }
+              );
+            }
+        function normalizeDateExtended(mydate){
+            mydate = new Date(mydate);
+            data = new Date(mydate -  mydate.getTimezoneOffset() * 60000);
+            var d = mydate.getDate();
+            var m = mydate.getMonth()+1;
+            var y = mydate.getFullYear();
+            return '' + (d<=9?'0'+d:d)+'/'+ (m<=9?'0'+m:m) +'/' + y + ' ' + mydate.getHours() + ':' + mydate.getMinutes();
+        }
+
+        function toggleMoreComment(){
+            hideComment = !hideComment;
+            updateOutputDiv();
+        }
+
+        function resizeFrame() {
+           // if(!sforce.console.isInConsole()){
+                var frame = j$("iframe[title='ASKHR_CaseCommunicationList']", parent.document);
+                var nHeight = j$("#comment-feed").height();//document.body.scrollHeight; //use the returned height of sControl frame
+
+                //frame.style.height = nHeight+"px"; //set the frame height to correspond to the content
+                j$("iframe[title='ASKHR_CaseCommunicationList']", parent.document).css("height", nHeight);
+           // }
+        }
+
+        updateOutputDiv();
+
+        j$.each(j$('#comment-input'), function() {
+        var offset = this.offsetHeight - this.clientHeight;
+
+       var resizeTextarea = function(el) {
+            j$(el).css('height', 'auto').css('height', el.scrollHeight + offset);
+        };
+        j$(this).on('keyup input', function() { resizeTextarea(this); }).removeAttr('data-autoresize');
+        });
+
+        function getContactName(){
+            var str = "{!Case.Sender_Email_Address__c}";
+
+            if(~str.indexOf("(")){
+                var nameFromEmail = str.substring(0, str.indexOf("("));
+                return nameFromEmail;
+            }else{
+                var nameFromCaseContact = "{!Case.Contact.FirstName}";
+                return nameFromCaseContact;
+            }
+        }
+
+    </script>
+</html>
+</apex:page>

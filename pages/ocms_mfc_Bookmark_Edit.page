@@ -1,0 +1,45 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_BookmarkContentServiceLayout" showHeader="false" sidebar="false" cache="false" standardStylesheets="false">
+<apex:outputPanel layout="block">
+	<!-- Need to manually add styling  -->
+	<!-- <style>@import url('{!URLFOR($Resource.ocms_core, 'css/ocms-content-template.css')}');</style> -->
+	<script type="text/javascript" language="javascript">
+    	//  Implement this function for the Save button in the editor
+		//  Saves the content attributes
+		$(document).ready(function() {
+			ce.content_editor('registerSaveFunction', function() {
+				var attributes = new Array();
+				attributes.push({"name":"AddBookmarkName", "value":$('#AddBookmarkName').val(), "type":"Text"});
+				attributes.push({"name":"RemoveBookmarkName", "value":$('#RemoveBookmarkName').val(), "type":"Text"});
+			    
+				return attributes;                       
+			});
+		});
+	</script>
+
+	<table class="ocmsContentEditor ocmsContentEditorNested">
+		<tr>
+			<td>
+				<label class="ocmsLabel" for="addBookmarkName">Add Bookmark button text</label>
+				<apex:outputText escape="false" rendered="{!disableAll}" >
+			        <input type="text" value="{!AddBookmarkName}" name="AddBookmarkName" id="AddBookmarkName" size="60" disabled="disabled" />
+				</apex:outputText>
+			    <apex:outputText escape="false" rendered="{!!disableAll}" >
+			        <input type="text" value="{!AddBookmarkName}" name="AddBookmarkName" id="AddBookmarkName" size="60" />
+			    </apex:outputText>
+			</td>
+		</tr>
+
+		<tr>
+			<td>
+				<label class="ocmsLabel" for="RemoveBookmarkName">Remove Bookmark button text</label>
+				 <apex:outputText escape="false" rendered="{!disableAll}" >
+			        <input type="text" value="{!RemoveBookmarkName}" name="RemoveBookmarkName" id="RemoveBookmarkName" size="60" disabled="disabled" />
+				</apex:outputText>
+			    <apex:outputText escape="false" rendered="{!!disableAll}" >
+			        <input type="text" value="{!RemoveBookmarkName}" name="RemoveBookmarkName" id="RemoveBookmarkName" size="60" />
+			    </apex:outputText>
+			</td>
+		</tr>
+	</table>
+  </apex:outputPanel>	
+</apex:page>

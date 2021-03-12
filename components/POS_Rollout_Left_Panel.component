@@ -1,0 +1,157 @@
+<apex:component >
+
+  <apex:attribute name="src" type="string" description="This is the selected option on the left panel" required="true" default="s1"/>
+
+        <table width="100%" height="100%" style="border:none!important" border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td>
+                <a href="{!$Site.Prefix}/apex/POS_Rollout"
+                onmouseover="document.getElementById('s1').src=GetPic('s1', 'over');"
+                onmouseout="document.getElementById('s1').src=GetPic('s1', 'out');"  
+                >
+                <img style="display:block" alt="" title="How to Roll it Out" id="s1" />
+                </a>                
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                <a href="{!$Site.Prefix}/apex/POS_Spotlight"
+                onmouseover="document.getElementById('s2').src=GetPic('s2', 'over');"
+                onmouseout="document.getElementById('s2').src=GetPic('s2', 'out');"                
+                >
+                <img style="display:block" alt="" title="Spotlight" id="s2" />
+                </a>                
+                </td>
+            </tr>
+            
+            <tr>
+                <td>
+                <a href="{!$Site.Prefix}/apex/POS_Managing_Change"
+                onmouseover="document.getElementById('s3').src=GetPic('s3', 'over');"
+                onmouseout="document.getElementById('s3').src=GetPic('s3', 'out');"            
+                >
+                <img style="display:block" alt="" title="Managing the change" id="s3" />
+                </a>                
+                </td>
+            </tr>
+                        
+            <tr>
+                <td>
+                <a href="{!$Site.Prefix}/apex/POS_Resources"
+                onmouseover="document.getElementById('s4').src=GetPic('s4', 'over');"
+                onmouseout="document.getElementById('s4').src=GetPic('s4', 'out');"        
+                >
+                <img style="display:block"  title="Resources" alt="Icon" id="s4" />
+                </a>                
+                </td>
+            </tr>
+        </table>
+
+<script type="text/javascript">
+   pic1 = new Image();
+   pic1.src = '{!URLFOR($Resource.pos_images, 'image/How_to_Roll_it_out.jpg')}';
+   pic2 = new Image();
+   pic2.src = '{!URLFOR($Resource.pos_images, 'image/How_to_Roll_it_out_(highlight).jpg')}';
+
+   pic3 = new Image();
+   pic3.src = '{!URLFOR($Resource.pos_images, 'image/Spotlight.jpg')}';
+   pic4 = new Image();
+   pic4.src = '{!URLFOR($Resource.pos_images, 'image/Spotlight_(highlight).jpg')}';
+
+   pic5 = new Image();
+   pic5.src = '{!URLFOR($Resource.pos_images, 'image/Managing_the_Change.jpg')}';
+   pic6 = new Image();
+   pic6.src = '{!URLFOR($Resource.pos_images, 'image/Managing_the_Change_(highlight).jpg')}';
+
+   pic7 = new Image();
+   pic7.src = '{!URLFOR($Resource.pos_images, 'image/Resources.jpg')}';
+   pic8 = new Image();
+   pic8.src = '{!URLFOR($Resource.pos_images, 'image/Resources_(highlight).jpg')}';
+</script>
+
+<script type="text/javascript">
+   window.onload = new function() {
+       document.getElementById('s1').src=GetImageURL('s1');
+       document.getElementById('s2').src=GetImageURL('s2');
+       document.getElementById('s3').src=GetImageURL('s3');
+       document.getElementById('s4').src=GetImageURL('s4');
+   }
+
+   function GetPic(sid, event) {
+     var img = '';
+     var action = event;
+     
+     if (sid == '{!src}') {
+       action = 'over';
+     }
+
+     if (sid == 's1') {
+       if (action == 'out') {
+         img = pic1.src;
+       }
+       if (action == 'over') {
+         img = pic2.src;
+       }
+     }
+     if (sid == 's2') {
+       if (action == 'out') {
+         img = pic3.src;
+       }
+       if (action == 'over') {
+         img = pic4.src;
+       }
+     }
+     if (sid == 's3') {
+       if (action == 'out') {
+         img = pic5.src;
+       }
+       if (action == 'over') {
+         img = pic6.src;
+       }
+     }
+     if (sid == 's4') {
+       if (action == 'out') {
+         img = pic7.src;
+       }
+       if (action == 'over') {
+         img = pic8.src;
+       }
+     }
+     
+     return img;
+   }
+
+   function GetImageURL(sid) {
+     var img = '';
+     
+     if (sid == 's1') {
+       img = pic1.src;
+       if (sid == '{!src}') {
+         img = pic2.src;
+       }
+     }
+     if (sid == 's2') {
+       img = pic3.src;
+       if (sid == '{!src}') {
+         img = pic4.src;
+       }
+     }
+     if (sid == 's3') {
+       img = pic5.src;
+       if (sid == '{!src}') {
+         img = pic6.src;
+       }
+     }
+     if (sid == 's4') {
+       img = pic7.src;
+       if (sid == '{!src}') {
+         img = pic8.src;
+       }
+     }
+     
+     return img;
+   }
+</script>
+
+</apex:component>

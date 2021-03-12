@@ -1,0 +1,176 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_Accordion" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if ($('#sAccordianLinkTitle').val() == null || $('#sAccordianLinkTitle').val() == '') {
+                    $ele = $('#sAccordianLinkTitle');
+                    errorField($ele, languageUsed + 'Title of article must be provided.');
+                    return false;
+                }
+                if (CKEDITOR.instances.sAccordianDetail.getData() == null || CKEDITOR.instances.sAccordianDetail.getData() == '') {
+                    $ele = $('#sAccordianDetail');
+                    errorField($ele, languageUsed + 'Body (Article content) must be provided.');
+                    return false;
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            CKEDITOR.replace('sAccordianDetail', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            var textMax = 1000;
+            var textLength;
+            var textRemaining;
+
+            /* *****
+               * Initialize the remaining character count in the summary text boxes
+               * Character limit is set to 1000
+             * *****/
+            textLength = $('#sAccordianSummary').val().length;
+            textRemaining = textMax - textLength;
+            $('#charSummaryCount').html(textRemaining + ' characters remaining');
+
+            /* *****
+               * Update the character count as characters are entered
+             * *****/
+            $('#sAccordianSummary').keyup(function() {
+                textLength = $('#sAccordianSummary').val().length;
+                textRemaining = textMax - textLength;
+                $('#charSummaryCount').html(textRemaining + ' characters remaining');
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sAccordionImage", "value": $('#sAccordionImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAccordianImageAlt", "value": $('#sAccordianImageAlt').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sShowContent", "value":$('#sShowContent:checked').length != 0, "type":"Text"});
+                attributes.push({"name":"sFirstAccordion", "value":$('#sFirstAccordion:checked').length != 0, "type":"Text"});
+                attributes.push({"name":"sAccordianLinkTitle", "value": $('#sAccordianLinkTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAccordianSummary", "value": $('#sAccordianSummary').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAccordianDetail", "value": CKEDITOR.instances.sAccordianDetail.getData(), "type": "Text", "simple": false});
+                attributes.push({"name":"sCallToActionText", "value": $('#sCallToActionText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAccordionDestLink", "value": $('#sAccordionDestLink').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+
+            if('{!sShowContent}' == 'true') {
+                $('#sShowContent').attr('checked','checked');
+            }
+
+            if('{!sFirstAccordion}' == 'true') {
+                $('#sFirstAccordion').attr('checked','checked');
+            }
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form class="accordionForm">
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccordionImage">Article Image</label>
+                        <input type="hidden" name="sAccordionImage" id="sAccordionImage" value="{!sAccordionImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sAccordionImage" cPassThroughId="sAccordionImage" cImage="{!sAccordionImage}" type="Image" disabled="{!disableAll}" />
+                        <p class="ocmsHelpText">
+                            Normal: W208 X H145 pixel (72ppi)<br/>
+                            Retina: W416 X H290 pixel (144ppi)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccordianImageAlt">Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sAccordianImageAlt" name="sAccordianImageAlt" type="text" value="{!sAccordianImageAlt}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+                <tr class="ocmsCheckForm">
+                    <td>
+                        <ul>
+                            <li>
+                                <label><input type="checkbox" id="sShowContent" name="sShowContent" />Show Content</label>
+                                <p class="ocmsHelpText">Check if this Accordion needs to be rendered expanded by default.</p>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr class="ocmsCheckForm">
+                    <td>
+                        <ul>
+                            <li>
+                                <label><input type="checkbox" id="sFirstAccordion" name="sFirstAccordion" />First Accordion</label>
+                                <p class="ocmsHelpText">Check if this Accordion added first in the list<br/>
+                                (Note: it will only add a class name to identify the first accordion)</p>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sAccordianLinkTitle">Title of article</label>
+                        <input class="ocmsTextInputLrg" id="sAccordianLinkTitle" name="sAccordianLinkTitle" type="text" value="{!sAccordianLinkTitle}" required="required"></input>
+                        <p class="ocmsHelpText">It will also be the link associated with article/opens the article body</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccordianSummary">Short description of article</label>
+                        <textarea  id="sAccordianSummary" name="sAccordianSummary" style="width: 600px; height: 150px;" maxlength="1000"><apex:outputText value="{!sAccordianSummary}" /></textarea>
+                        <p class="ocmsHelpText">
+                            (<span id="charSummaryCount"></span>)
+                        </p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sAccordianDetail">Body (Article content)</label>
+                        <textarea  id="sAccordianDetail" name="sAccordianDetail" required="required">
+                            <apex:outputText value="{!sAccordianDetail}" />
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sCallToActionText">'Call to action' button label</label>
+                        <input class="ocmsTextInputLrg" id="sCallToActionText" name="sCallToActionText" type="text" value="{!sCallToActionText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccordionDestLink">'Call to action' button link</label>
+                        <input type="hidden" name="sAccordionDestLink" id="sAccordionDestLink" value="{!sAccordionDestLink}" />
+                        <cms:PageSelector cPassThroughId="sAccordionDestLink" value="{!sAccordionDestLink}"  dialogId="sAccordionDestLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

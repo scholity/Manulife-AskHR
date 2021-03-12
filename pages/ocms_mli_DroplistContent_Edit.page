@@ -1,0 +1,87 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_DroplistContent" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if ($('#sDroplistText').val() == null || $('#sDroplistText').val() == '') {
+                    $ele = $('#sDroplistText');
+                    errorField($ele, languageUsed + 'Content box must be provided.');
+                    return false;
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            CKEDITOR.replace('sDroplistText', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sDroplistText", "value": CKEDITOR.instances.sDroplistText.getData(), "type": "Text", "simple": false});
+                attributes.push({"name":"sDroplistAccessible", "value": $('#sDroplistAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLinkText", "value": $('#sLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLink", "value": $('#sLink').val(), "type": "cms.Link", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sDroplistText">Content box</label>
+                        <textarea  id="sDroplistText" name="sDroplistText">
+                            <apex:outputText value="{!sDroplistText}" />
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sDroplistAccessible">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sDroplistAccessible" name="sDroplistAccessible" type="text" value="{!sDroplistAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLinkText">Learn More Link Label</label>
+                        <input class="ocmsTextInputLrg" id="sLinkText" name="sLinkText" type="text" value="{!sLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLink">Learn More Link</label>
+                        <input type="hidden" name="sLink" id="sLink" value="{!sLink}" />
+                        <cms:PageSelector cPassThroughId="sLink" value="{!sLink}"  dialogId="sLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

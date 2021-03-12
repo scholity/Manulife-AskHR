@@ -1,0 +1,38 @@
+<apex:page standardStylesheets="false" showHeader="false" sidebar="false" >
+
+  <apex:composition template="POS_Template">
+    <apex:define name="body">
+
+    <style type="text/css">
+    
+    #Contacts {
+    min-height:658px;
+    background-image:url('{!URLFOR($Resource.pos_images, 'image/contact_us.jpg')}'); 
+    height:658px!important;
+    background-repeat: no-repeat;
+    background-position:center;
+    width: 100%;
+     
+    }
+    
+    #navigation li.bt6 a,
+    #navigation li.bt6 a:hover,
+    #navigation li.bt6 a.on{
+    width:145px;
+    background-position:-670px -90px;
+    background-image: url('{!URLFOR($Resource.pos_css, 'images/menu_1.gif')}');
+    }
+    
+    #email-address {
+    padding-left: 318.8px;
+    }
+    
+    </style>
+    
+     <div id="Contacts" style="height:100%" >
+     </div>
+
+    </apex:define>
+  </apex:composition>
+
+</apex:page>

@@ -1,0 +1,283 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_FollowUs" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        var cmsData = $(document).data('cms') || {};
+
+        function validateAttributes() {
+            var languageUsed = (cmsData.languageInUse.LanguageName != undefined) ? (cmsData.languageInUse.LanguageName + ' - ') : '';
+            try {
+                var $ele;
+                if ($('#sFollowLabel').val() == null || $('#sFollowLabel').val() == '') {
+                    $ele = $('#sFollowLabel');
+                    errorField($ele, languageUsed + 'Follow Label must be provided.');
+                    return false;
+                }
+                if ($('#sFBLabel').val() != null && $('#sFBLabel').val() != '') {
+                    if ($('#sFBFollowLink').val() == null || $('#sFBFollowLink').val() == '') {
+                        $ele = $('#sFBFollowLink');
+                        errorField($ele, languageUsed + 'Facebook Follow Link must be provided as Facebook Label is added.');
+                        return false;
+                    }
+                }
+                if ($('#sTwitterLabel').val() != null && $('#sTwitterLabel').val() != '') {
+                    if ($('#sTwitterFollowLink').val() == null || $('#sTwitterFollowLink').val() == '') {
+                        $ele = $('#sTwitterFollowLink');
+                        errorField($ele, languageUsed + 'Twitter Follow Link must be provided as Twitter Label is added.');
+                        return false;
+                    }
+                }
+                if ($('#sInstagramLabel').val() != null && $('#sInstagramLabel').val() != '') {
+                    if ($('#sInstagramFollowLink').val() == null || $('#sInstagramFollowLink').val() == '') {
+                        $ele = $('#sInstagramFollowLink');
+                        errorField($ele, languageUsed + 'Instagram Follow Link must be provided as Instagram Label is added.');
+                        return false;
+                    }
+                }
+                if ($('#sLinkedInLabel').val() != null && $('#sLinkedInLabel').val() != '') {
+                    if ($('#sLinkedInFollowLink').val() == null || $('#sLinkedInFollowLink').val() == '') {
+                        $ele = $('#sLinkedInFollowLink');
+                        errorField($ele, languageUsed + 'LinkedIn Follow Link must be provided as LinkedIn Label is added.');
+                        return false;
+                    }
+                }
+                if ($('#sYoutubeLabel').val() != null && $('#sYoutubeLabel').val() != '') {
+                    if ($('#sYoutubeFollowLink').val() == null || $('#sYoutubeFollowLink').val() == '') {
+                        $ele = $('#sYoutubeFollowLink');
+                        errorField($ele, languageUsed + 'Youtube Follow Link must be provided as Youtube Label is added.');
+                        return false;
+                    }
+                }
+                if ($('#sRssLabel').val() != null && $('#sRssLabel').val() != '') {
+                    if ($('#sRssFollowLink').val() == null || $('#sRssFollowLink').val() == '') {
+                        $ele = $('#sRssFollowLink');
+                        errorField($ele, languageUsed + 'RSS Follow Link must be provided as RSS Label is added.');
+                        return false;
+                    }
+                }
+                if ($('#sOtherSocialLabel').val() != null && $('#sOtherSocialLabel').val() != '') {
+                    if ($('#sOtherSocialLink').val() == null || $('#sOtherSocialLink').val() == '') {
+                        $ele = $('#sOtherSocialLink');
+                        errorField($ele, languageUsed + 'Other Social Programs Link must be provided as Other Social Programs Label is added.');
+                        return false;
+                    }
+                }
+            } catch(e) {
+                $('<div></div>').ocmsShowErrorPopup({
+                    message: 'Unable to save content.',
+                    width: 300
+                });
+                return false;
+            }
+            return true;
+        }
+
+        $(document).ready(function(){
+
+            /* *****
+               * enforcing mandatory fields to be filled before save
+             * *****/
+            ce.content_editor('registerBindings', {
+                'Save'    : validateAttributes,
+                'Publish' : validateAttributes
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sFollowLabel", "value": $('#sFollowLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFollowAccessible", "value": $('#sFollowAccessible').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAccessibleText", "value": $('#sAccessibleText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLinkTitle", "value": $('#sLinkTitle').val(), "type": "Text", "simple": false});
+
+                attributes.push({"name":"sFBLabel", "value": $('#sFBLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFBFollowLink", "value": $('#sFBFollowLink').val(), "type": "cms.Link", "simple": false});
+
+                attributes.push({"name":"sTwitterLabel", "value": $('#sTwitterLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sTwitterFollowLink", "value": $('#sTwitterFollowLink').val(), "type": "cms.Link", "simple": false});
+
+                attributes.push({"name":"sInstagramLabel", "value": $('#sInstagramLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sInstagramFollowLink", "value": $('#sInstagramFollowLink').val(), "type": "cms.Link", "simple": false});
+
+                attributes.push({"name":"sLinkedInLabel", "value": $('#sLinkedInLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sLinkedInFollowLink", "value": $('#sLinkedInFollowLink').val(), "type": "cms.Link", "simple": false});
+
+                attributes.push({"name":"sYoutubeLabel", "value": $('#sYoutubeLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sYoutubeFollowLink", "value": $('#sYoutubeFollowLink').val(), "type": "cms.Link", "simple": false});
+
+                attributes.push({"name":"sRssLabel", "value": $('#sRssLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sRssFollowLink", "value": $('#sRssFollowLink').val(), "type": "cms.Link", "simple": false});
+
+                attributes.push({"name":"sOtherSocialLabel", "value": $('#sOtherSocialLabel').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sOtherSocialLink", "value": $('#sOtherSocialLink').val(), "type": "cms.Link", "simple": false});
+                attributes.push({"name":"sAccessibleOther", "value": $('#sAccessibleOther').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>
+                        <label class="ocmsLabel ocmsRequiredLabel" for="sFollowLabel">Follow Label</label>
+                        <input class="ocmsTextInputLrg" id="sFollowLabel" name="sFollowLabel" type="text" value="{!sFollowLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFollowAccessible">Follow Accessible Text (mobile only)</label>
+                        <input class="ocmsTextInputLrg" id="sFollowAccessible" name="sFollowAccessible" type="text" value="{!sFollowAccessible}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccessibleText">Social Links Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sAccessibleText" name="sAccessibleText" type="text" value="{!sAccessibleText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLinkTitle">Link Title</label>
+                        <input class="ocmsTextInputLrg" id="sLinkTitle" name="sLinkTitle" type="text" value="{!sLinkTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Facebook</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFBLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sFBLabel" name="sFBLabel" type="text" value="{!sFBLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFBFollowLink">Follow Link</label>
+                        <input type="hidden" name="sFBFollowLink" id="sFBFollowLink" value="{!sFBFollowLink}" />
+                        <cms:PageSelector cPassThroughId="sFBFollowLink" value="{!sFBFollowLink}"  dialogId="sFBFollowLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Twitter</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTwitterLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sTwitterLabel" name="sTwitterLabel" type="text" value="{!sTwitterLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTwitterFollowLink">Follow Link</label>
+                        <input type="hidden" name="sTwitterFollowLink" id="sTwitterFollowLink" value="{!sTwitterFollowLink}" />
+                        <cms:PageSelector cPassThroughId="sTwitterFollowLink" value="{!sTwitterFollowLink}"  dialogId="sTwitterFollowLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Instagram</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sInstagramLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sInstagramLabel" name="sInstagramLabel" type="text" value="{!sInstagramLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sInstagramFollowLink">Follow Link</label>
+                        <input type="hidden" name="sInstagramFollowLink" id="sInstagramFollowLink" value="{!sInstagramFollowLink}" />
+                        <cms:PageSelector cPassThroughId="sInstagramFollowLink" value="{!sInstagramFollowLink}"  dialogId="sInstagramFollowLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>LinkedIn</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLinkedInLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sLinkedInLabel" name="sLinkedInLabel" type="text" value="{!sLinkedInLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sLinkedInFollowLink">Follow Link</label>
+                        <input type="hidden" name="sLinkedInFollowLink" id="sLinkedInFollowLink" value="{!sLinkedInFollowLink}" />
+                        <cms:PageSelector cPassThroughId="sLinkedInFollowLink" value="{!sLinkedInFollowLink}"  dialogId="sLinkedInFollowLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Youtube</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sYoutubeLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sYoutubeLabel" name="sYoutubeLabel" type="text" value="{!sYoutubeLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sYoutubeFollowLink">Follow Link</label>
+                        <input type="hidden" name="sYoutubeFollowLink" id="sYoutubeFollowLink" value="{!sYoutubeFollowLink}" />
+                        <cms:PageSelector cPassThroughId="sYoutubeFollowLink" value="{!sYoutubeFollowLink}"  dialogId="sYoutubeFollowLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>RSS</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sRssLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sRssLabel" name="sRssLabel" type="text" value="{!sRssLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sRssFollowLink">Follow Link</label>
+                        <input type="hidden" name="sRssFollowLink" id="sRssFollowLink" value="{!sRssFollowLink}" />
+                        <cms:PageSelector cPassThroughId="sRssFollowLink" value="{!sRssFollowLink}"  dialogId="sRssFollowLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <strong>Other Social Programs</strong>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sOtherSocialLabel">Label</label>
+                        <input class="ocmsTextInputLrg" id="sOtherSocialLabel" name="sOtherSocialLabel" type="text" value="{!sOtherSocialLabel}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sOtherSocialLink">Link</label>
+                        <input type="hidden" name="sOtherSocialLink" id="sOtherSocialLink" value="{!sOtherSocialLink}" />
+                        <cms:PageSelector cPassThroughId="sOtherSocialLink" value="{!sOtherSocialLink}"  dialogId="sOtherSocialLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccessibleOther">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sAccessibleOther" name="sAccessibleOther" type="text" value="{!sAccessibleOther}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+</apex:page>

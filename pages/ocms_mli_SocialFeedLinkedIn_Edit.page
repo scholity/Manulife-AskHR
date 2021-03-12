@@ -1,0 +1,143 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_SocialFeedLinkedIn" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <script src="{!URLFOR($Resource.ocms_mli_pageSupport, 'js/ps-mli-edit-content.js')}"></script>
+    <script type="text/javascript" language="javascript">
+        $(document).ready(function(){
+
+            CKEDITOR.replace('sFeedAreaMessage', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            CKEDITOR.replace('sFeedAreaSupplierText', {
+                   customConfig: '/apex/c__ocms_mli_CKEConfig'
+            });
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"sTabCheck", "value":$('#sTabCheck:checked').length != 0, "type":"Text"});
+                attributes.push({"name":"sFeedAreaTabId", "value": $('#sFeedAreaTabId').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaTitle", "value": $('#sFeedAreaTitle').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sAccessibleText", "value": $('#sAccessibleText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaImage", "value": $('#sFeedAreaImage').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaImageAltText", "value": $('#sFeedAreaImageAltText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaMessage", "value": CKEDITOR.instances.sFeedAreaMessage.getData(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaSignInLinkText", "value": $('#sFeedAreaSignInLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaSignInLink", "value": $('#sFeedAreaSignInLink').val(), "type": "cms.Link", "simple": false});
+                attributes.push({"name":"sFeedAreaFollowLinkText", "value": $('#sFeedAreaFollowLinkText').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"sFeedAreaFollowLink", "value": $('#sFeedAreaFollowLink').val(), "type": "cms.Link", "simple": false});
+                attributes.push({"name":"sFeedAreaSupplierText", "value": CKEDITOR.instances.sFeedAreaSupplierText.getData(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+
+            if('{!sTabCheck}' == 'true') {
+                $('#sTabCheck').attr('checked','checked');
+            }
+        });
+
+    </script>
+    <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr class="ocmsCheckForm">
+                    <td>
+                        <ul>
+                            <li>
+                                <label><input type="checkbox" id="sTabCheck" name="sTabCheck" />Separate or Tabbed Section</label>
+                                <p class="ocmsHelpText">Check if this content will be used for the social feed tabbed section.</p>
+                            </li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td><label class="ocmsLabel" for="sFeedAreaTabId" title="">Feed Area Tab Sequence</label>
+                        <select name="sFeedAreaTabId" id="sFeedAreaTabId">
+                            <option value="None">Please select tabId.</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                        </select>
+                        <p class="ocmsHelpText">The selection should match the sequence of social feed tabbed menu.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaTitle">Feed Area Title</label>
+                        <input class="ocmsTextInputLrg" id="sFeedAreaTitle" name="sFeedAreaTitle" type="text" value="{!sFeedAreaTitle}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sAccessibleText">Accessible Text</label>
+                        <input class="ocmsTextInputLrg" id="sAccessibleText" name="sAccessibleText" type="text" value="{!sAccessibleText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaImage">Feed Area Image</label>
+                        <input type="hidden" name="sFeedAreaImage" id="sFeedAreaImage" value="{!sFeedAreaImage}" />
+                        <cms:ImageSelector sname="{!content.cms__Site_Name__c}" DialogID="sFeedAreaImage" cPassThroughId="sFeedAreaImage" cImage="{!sFeedAreaImage}" type="Image" disabled="{!disableAll}" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaImageAltText">Feed Area Image Alternative Text</label>
+                        <input class="ocmsTextInputLrg" id="sFeedAreaImageAltText" name="sFeedAreaImageAltText" type="text" value="{!sFeedAreaImageAltText}"></input>
+                        <p class="ocmsHelpText">Words that describe the image that will be read by screen-reading software.</p>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaMessage">Feed Area Message</label>
+                        <textarea  id="sFeedAreaMessage" name="sFeedAreaMessage">
+                            <apex:outputText value="{!sFeedAreaMessage}" />
+                        </textarea>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaSignInLinkText">Feed Area SignIn Link Text</label>
+                        <input class="ocmsTextInputLrg" id="sFeedAreaSignInLinkText" name="sFeedAreaSignInLinkText" type="text" value="{!sFeedAreaSignInLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaSignInLink">Feed Area SignIn Link</label>
+                        <input type="hidden" name="sFeedAreaSignInLink" id="sFeedAreaSignInLink" value="{!sFeedAreaSignInLink}" />
+                        <cms:PageSelector cPassThroughId="sFeedAreaSignInLink" value="{!sFeedAreaSignInLink}"  dialogId="sFeedAreaSignInLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaFollowLinkText">Feed Area Follow Us Link Text</label>
+                        <input class="ocmsTextInputLrg" id="sFeedAreaFollowLinkText" name="sFeedAreaFollowLinkText" type="text" value="{!sFeedAreaFollowLinkText}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaFollowLink">Feed Area Follow Us Link</label>
+                        <input type="hidden" name="sFeedAreaFollowLink" id="sFeedAreaFollowLink" value="{!sFeedAreaFollowLink}" />
+                        <cms:PageSelector cPassThroughId="sFeedAreaFollowLink" value="{!sFeedAreaFollowLink}"  dialogId="sFeedAreaFollowLinkDialog" disabled="{!disableAll}" sname="{!content.cms__Site_Name__c}"/>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sFeedAreaSupplierText">Feed Area Supplier Text</label>
+                        <textarea  id="sFeedAreaSupplierText" name="sFeedAreaSupplierText">
+                            <apex:outputText value="{!sFeedAreaSupplierText}" />
+                        </textarea>
+                    </td>
+                </tr>
+            </table>
+            <script>
+                // Initialize picklist values here - populate picklist with values from their last save
+                var sFeedAreaTabId =  "{!sFeedAreaTabId}";
+                $('select#sFeedAreaTabId').val(sFeedAreaTabId);
+            </script>
+        </form>
+    </apex:outputPanel>
+</apex:page>

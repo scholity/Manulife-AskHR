@@ -1,0 +1,55 @@
+<!-->
+Use the cms.CreateContentController class to create an editor, create an extension class/controller
+to store your custom content attributes, and provide customized editor and controller functionality
+</!-->
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_Table" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+	<apex:outputPanel layout="block">
+        <link rel="stylesheet" type="text/css" href="{!URLFOR($Resource.ocms_mli_pageSupport, 'css/ps-mli-edit-content.css')}" />
+        <script type="text/javascript" language="javascript">
+			$(document).ready(function() {
+
+                CKEDITOR.replace('sTableDetail', {
+                        customConfig: '/apex/c__ocms_mli_CKEConfig'
+                });
+
+                ce.content_editor('registerSaveFunction', function() {
+                    return [
+                        {type: 'string', name: 'sMobileInstructionText', value: $('#sMobileInstructionText').val()},
+                        {type: 'string', name: 'sTableDetail', value: CKEDITOR.instances.sTableDetail.getData()},
+                        {type: 'string', name: 'sNoteText', value: $('#sNoteText').val()}
+                    ];
+                });
+            });
+        </script>
+
+        <table class="ocmsContentEditor ocmsContentEditorNested">
+            <tbody>
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sMobileInstructionText">Mobile Instruction Text</label>
+                        <input class="ocmsTextInputLrg" id="sMobileInstructionText" name="sMobileInstructionText" type="text" value="{!sMobileInstructionText}"></input>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sTableDetail">Table Body</label>
+                        <textarea  id="sTableDetail" name="sTableDetail">
+                            <apex:outputText value="{!sTableDetail}" />
+                        </textarea>
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>
+                        <label class="ocmsLabel" for="sNoteText">Note Text</label>
+                        <input class="ocmsTextInputLrg" id="sNoteText" name="sNoteText" type="text" value="{!sNoteText}"></input>
+                    </td>
+                </tr>
+			</tbody>
+		</table>
+	</apex:outputPanel>
+
+</apex:page>

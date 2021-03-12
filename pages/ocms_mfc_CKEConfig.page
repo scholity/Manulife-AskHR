@@ -1,0 +1,101 @@
+<apex:page showHeader="false" sidebar="false" standardStylesheets="false" contentType="text/javascript">
+
+    /**
+    *
+    *  The content editor page will reference this like so, for a textarea with the id of 'richText'
+    *      CKEDITOR.replace('richText', {
+    *         customConfig: '/apex/c__ocms_mfc_CKEConfig',
+    *      });
+    *
+    */
+
+    CKEDITOR.editorConfig = function(config) {
+
+    // Define changes to default configuration here. For example:
+    // config.language = 'fr';
+    // config.uiColor = '#AADC6E';
+    CKEDITOR.config.toolbar = 'Custom';
+
+    CKEDITOR.config.toolbar_Custom =
+    [
+    { name: 'document',     items : [ 'Source','-', 'Templates'] },
+    { name: 'clipboard',    items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
+    { name: 'editing',      items : [ 'Find','Replace','-','SelectAll','-','SpellChecker', 'Scayt' ] },
+
+    '/',
+    { name: 'basicstyles',  items : [ 'Bold','Italic','Underline','Strike','Subscript','Superscript','-','RemoveFormat' ] },
+    { name: 'paragraph',    items : [ 'NumberedList','BulletedList','-','Outdent','Indent','-','Blockquote','-','JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock','-','BidiLtr','BidiRtl' ] },
+    { name: 'links',        items : [ 'Link','Unlink','Anchor' ] },
+    { name: 'insert',       items : [ 'OrchestraCMSImage','orchestracmsimage','OrchestraCMSFlash','Table','HorizontalRule', 'SpecialChar','PageBreak','uStudio' ] },
+    { name: 'taxonomylink', items : [ 'taxonomylink'] },
+    '/',
+    <!--{ name: 'styles',       items : [ 'Styles','Format','Font','FontSize' ] },
+    { name: 'colors',       items : [ 'TextColor','BGColor' ] }, -->
+    { name: 'styles',       items : [ 'Format' ] },
+    { name: 'tools',        items : [ 'Maximize', 'ShowBlocks'] }
+    <!-- { name: 'MFC Buttons', items : [ 'ReportButton' ] } -->
+    ];
+
+    //Adding new pluggins here
+    <!-- CKEDITOR.plugins.add( 'reportbutton', {
+        icons: "{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'icons/reportbutton')}",
+        init: function( editor ) {
+
+            editor.addCommand( 'reportbutton', {
+                exec: function( editor ) {
+                    var now = new Date();
+                    editor.insertHtml('<div class="global-flag ckeContentBorder"><a href="#"></a></div>');
+                }
+            });
+
+            editor.ui.addButton( 'ReportButton', {
+                label: 'Report Button',
+                title: 'Report Button',
+                command: 'reportbutton',
+                toolbar: 'insert'
+            });
+        }
+    }); -->
+
+    // -- autogrow: dynamically resizes CKEditor window to fit content
+    CKEDITOR.plugins.addExternal('autogrow',  "{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'autogrow/')}");
+
+    // -- magicline: help set insertion point outside of block structures
+    CKEDITOR.plugins.addExternal('magicline', "{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'magicline/')}");
+    CKEDITOR.config.magicline_color = '#363';
+    CKEDITOR.config.magicline_everywhere = true;
+    CKEDITOR.config.contentsCss = ["{!URLFOR($Resource.ocms_mfc_CKEditorExtras, 'css/editorExtras.css')}", "{!URLFOR($Resource.ocms_mfc_siteFiles, 'css/style.css')}"];
+    CKEDITOR.config.bodyClass = 'article-content';
+    CKEDITOR.config.allowedContent = true;
+    CKEDITOR.config.width = 850;
+    //CKEDITOR.config.resize_minWidth = 650;
+    //CKEDITOR.config.resize_maxWidth = 1250;
+
+
+    // use the instanceReady() function to dynamically add a script element to the current page that will
+    // add one or more template sets, each with one or more CKEditor content templates
+    CKEDITOR.on('instanceReady', function(evt) {
+    var setsScript = document.createElement('script');
+    setsScript.className = 'ocms_mfc_CKETemplateSets';
+    setsScript.type = 'text/javascript';
+    setsScript.src = '{!URLFOR("/apex/ocms_mfc_CKETemplateSets")}';
+    document.getElementsByTagName('HEAD').item(0).appendChild(setsScript);
+    });
+
+    // bad things happen if named plugins are not present!
+    // no space in this comma separated list
+    //config.extraPlugins = 'templates,autogrow,magicline,reportbutton';
+    config.extraPlugins = 'templates,autogrow,magicline';
+    //added by Bridgeline Support for case 75429
+    config.removePlugins = 'image,image2';
+
+    // specify which template sets defined above by /apex/ocms_mfc_CKETemplateSets.page will be used when
+    // this CKEConfig page has been referenced by the content editor page
+    // no space in this comma separated list!
+    config.templates = 'MFC-Articles';
+
+    // insert content template at insertion point; don’t replace the whole darn editor text
+    config.templates_replaceContent = false;
+    };
+
+</apex:page>

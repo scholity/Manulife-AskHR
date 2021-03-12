@@ -1,0 +1,5 @@
+<apex:component access="global" controller="ASKHR_CaseUpdatedVFController">
+    <apex:attribute name="caseId" access="global" description="Attribute for Case Id" type="Id" required="required" assignTo="{!mCaseId}" />
+    <apex:attribute name="inputLabel" access="global" description="Attribute for input from Custom Label" type="String" required="required" assignTo="{!mInput}" />
+    <apex:outputText value="{!mOutput}"></apex:outputText>
+</apex:component>

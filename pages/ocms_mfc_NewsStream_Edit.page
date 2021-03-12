@@ -1,0 +1,260 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mfc_NewsStream" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+  <apex:stylesheet value="{!URLFOR($Resource.ocms_mfc_siteFiles, 'lib/css/ps.contentEditor.css')}"/>
+  <script type="text/javascript" language="javascript">
+    $(document).ready(function () {
+      $('#initialLayoutAsList').attr('checked', '{!initialLayoutAsList}' === 'true' || '{!initialLayoutAsList}' === 'checked');
+      $('#isListedCEOTile').attr('checked', '{!isListedCEOTile}' === 'checked');
+
+      ce.content_editor('registerSaveFunction', function () {
+        return [
+          {type: 'Text', simple: true, name: 'myNewsText', value: $('#myNewsText').val()},
+          {type: 'Text', simple: true, name: 'allText', value: $('#allText').val()},
+          {type: 'Text', simple: true, name: 'iconTooltipChangeLayout', value: $('#iconTooltipChangeLayout').val()},
+          {type: 'Text', simple: true, name: 'iconTooltipPreferences', value: $('#iconTooltipPreferences').val()},
+          {type: 'Text', simple: true, name: 'filterText', value: $('#filterText').val()},
+          {type: 'Text', simple: true, name: 'loadAmount', value: $('#loadAmount').val()},
+          {type: 'Text', simple: true, name: 'carouselNewsLimit', value: $('#carouselNewsLimit').val()},
+          {type: 'Text', simple: true, name: 'carouselPriorityLimit', value: $('#carouselPriorityLimit').val()},
+          {type: 'Text', simple: true, name: 'showFeatured', value: $('#showFeatured').is(':checked')},
+          {type: 'Text', simple: true, name: 'imageLink', value: $('#imageLink').val()},
+          {type: 'text', simple: true, name: 'image', value: $('#image').val()},
+          {type: 'Text', simple: true, name: 'imageText', value: $('#imageText').val()},
+          {type: 'text', simple: true, name: 'listViewImage', value: $('#listViewImage').val()},
+          {type: 'Text', simple: true, name: 'initialLayoutAsList', value: $('#initialLayoutAsList').attr('checked')},
+          {type: 'Text', simple: true, name: 'isListedCEOTile', value: $('#isListedCEOTile').attr('checked')},
+          {type: 'Text', simple: true, name: 'ceoCategoryLabel', value: $('#ceoCategoryLabel').val()},
+          {type: 'Text', simple: true, name: 'listedCEOTileColor', value: $('#listedCEOTileColor').val()},
+          {type: 'Text', simple: true, name: 'listedCEOTileFontColor', value: $('#listedCEOTileFontColor').val()},
+          {type: 'Text', simple: true, name: 'newFromLabel', value: $('#newFromLabel').val()},
+          {type: 'Text', simple: true, name: 'leaderName1', value: $('#leaderName1').val()},
+          {type: 'Text', simple: true, name: 'leaderName2', value: $('#leaderName2').val()},
+          {type: 'Text', simple: true, name: 'leaderName3', value: $('#leaderName3').val()},
+          {type: 'Text', simple: true, name: 'leaderTitle1', value: $('#leaderTitle1').val()},
+          {type: 'Text', simple: true, name: 'leaderTitle2', value: $('#leaderTitle2').val()},
+          {type: 'Text', simple: true, name: 'leaderTitle3', value: $('#leaderTitle3').val()},
+          {type: 'Text', simple: true, name: 'leaderLink1', value: $('#leaderLink1').val()},
+          {type: 'Text', simple: true, name: 'leaderLink2', value: $('#leaderLink2').val()},
+          {type: 'Text', simple: true, name: 'leaderLink3', value: $('#leaderLink3').val()},
+          {type: 'Text', simple: true, name: 'viewAllLeaderMsgLabel', value: $('#viewAllLeaderMsgLabel').val()},
+          {type: 'Text', simple: true, name: 'viewAllLeaderMsgLabelLink', value: $('#viewAllLeaderMsgLabelLink').val()}
+        ];
+      });
+
+      $('#carouselNewsLimit, #carouselPriorityLimit').acceptChars('digits length 1');
+    });
+  </script>
+  <apex:outputPanel layout="block">
+    <form>
+      <table class="ocmsContentEditor ocmsContentEditorNested">
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="loadAmount">Amount of news loaded per page</label>
+            <input class="ocmsTextInputSml" type="text" name="loadAmount" id="loadAmount" value="{!loadAmount}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label><input type="checkbox" id="initialLayoutAsList" name="initialLayoutAsList"/> Initially Show as
+              List</label><br/>
+          </td>
+        </tr>
+        <tr class="ocmsEditorSubtitle">
+          <td>News Stream filter labels</td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="myNewsText">“My News”</label>
+            <input class="ocmsTextInputMed" type="text" name="myNewsText" id="myNewsText" value="{!myNewsText}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="allText">“All”</label>
+            <input class="ocmsTextInputMed" type="text" name="allText" id="allText" value="{!allText}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="iconTooltipChangeLayout">“Tooltip for ChangeLayout icon”</label>
+            <input class="ocmsTextInputMed" type="text" name="iconTooltipChangeLayout" id="iconTooltipChangeLayout"
+                   value="{!iconTooltipChangeLayout}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="iconTooltipPreferences">“Tooltip for Preferences icon”</label>
+            <input class="ocmsTextInputMed" type="text" name="iconTooltipPreferences" id="iconTooltipPreferences"
+                   value="{!iconTooltipPreferences}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="filterText">"Mobile Filter"</label>
+            <input class="ocmsTextInputMed" type="text" name="filterText" id="filterText" value="{!filterText}"/>
+          </td>
+        </tr>
+        <tr class="ocmsEditorSubtitle">
+          <td>Carousel Item Limits</td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="carouselNewsLimit">News items limit</label>
+            <input class="ocmsTextInputSml" type="text" name="carouselNewsLimit" id="carouselNewsLimit"
+                   value="{!carouselNewsLimit}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="carouselPriorityLimit">Carousel CEO and Executive Leadership Message
+              limit</label>
+            <input class="ocmsTextInputSml" type="text" name="carouselPriorityLimit" id="carouselPriorityLimit"
+                   value="{!carouselPriorityLimit}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="image" title="First Image">Featured tile image (grid view)</label>
+            <input type="hidden" name="image" id="image" value="{!image}"/>
+            <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="image" cImage="{!image}"
+                               type="Image" disabled="{!disableAll}" DialogId="imageInput1"/>
+            <p class='ocmsHelpText'>Images should be 199 px wide by 315 px tall.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="listViewImage" title="First List View Image">Featured tile image (list
+              view)</label>
+            <input type="hidden" name="listViewImage" id="listViewImage" value="{!listViewImage}"/>
+            <cms:ImageSelector sname="{!content.cms__Site_Name__c}" cPassThroughId="listViewImage"
+                               cImage="{!listViewImage}" type="Image" disabled="{!disableAll}" DialogId="imageInput2"/>
+            <p class='ocmsHelpText'>Images should be 199 px wide by 146 px tall.</p>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="imageText">Featured tile title</label>
+            <input class="ocmsTextInputLrg" type="text" name="imageText" id="imageText" value="{!imageText}"/>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="imageLink">Image Link</label>
+            <cms:PageSelector cPassThroughId="imageLink" value="{!imageLink}" dialogId="linkTarget"
+                              sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+            <input type="hidden" id="imageLink" name="imageLink" value="{!imageLink}"/>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label><input type="checkbox" id="isListedCEOTile" name="isListedCEOTile"/> Render listed CEO tile </label><br/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="ceoCategoryLabel">CEO Category Label</label>
+            <input class="ocmsTextInputLrg" type="text" name="ceoCategoryLabel" id="ceoCategoryLabel" value="{!ceoCategoryLabel}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="listedCEOTileColor">Listed CEO Tile Color (Optional)</label>
+            <input class="ocmsTextInputLrg" type="text" name="listedCEOTileColor" id="listedCEOTileColor" value="{!listedCEOTileColor}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="listedCEOTileFontColor">Listed CEO Tile Font Color (Optional)</label>
+            <input class="ocmsTextInputLrg" type="text" name="listedCEOTileFontColor" id="listedCEOTileFontColor" value="{!listedCEOTileFontColor}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="newFromLabel">New From Label</label>
+            <input class="ocmsTextInputLrg" type="text" name="newFromLabel" id="newFromLabel" value="{!newFromLabel}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderName1">Leader Name 1</label>
+            <input class="ocmsTextInputLrg" type="text" name="leaderName1" id="leaderName1" value="{!leaderName1}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderTitle1">Leader Title 1</label>
+            <input class="ocmsTextInputLrg" type="text" name="leaderTitle1" id="leaderTitle1" value="{!leaderTitle1}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderLink1">Leader Link 1</label>
+            <input type="hidden" id="leaderLink1" name="leaderLink1" value="{!leaderLink1}"/>
+            <cms:PageSelector cPassThroughId="leaderLink1" value="{!leaderLink1}" dialogId="leaderLink1Dlg"
+                              sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderName2">Leader Name 2</label>
+            <input class="ocmsTextInputLrg" type="text" name="leaderName2" id="leaderName2" value="{!leaderName2}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderTitle2">Leader Title 2</label>
+            <input class="ocmsTextInputLrg" type="text" name="leaderTitle2" id="leaderTitle2" value="{!leaderTitle2}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderLink2">Leader Link 2</label>
+            <input type="hidden" id="leaderLink2" name="leaderLink2" value="{!leaderLink2}"/>
+            <cms:PageSelector cPassThroughId="leaderLink2" value="{!leaderLink2}" dialogId="leaderLink2Dlg"
+                              sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderName3">Leader Name 3</label>
+            <input class="ocmsTextInputLrg" type="text" name="leaderName3" id="leaderName3" value="{!leaderName3}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderTitle3">Leader Title 3</label>
+            <input class="ocmsTextInputLrg" type="text" name="leaderTitle3" id="leaderTitle3" value="{!leaderTitle3}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="leaderLink3">Leader Link 3</label>
+            <input type="hidden" id="leaderLink3" name="leaderLink3" value="{!leaderLink3}"/>
+            <cms:PageSelector cPassThroughId="leaderLink3" value="{!leaderLink3}" dialogId="leaderLink3Dlg"
+                              sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+          </td>
+        </tr>
+
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="viewAllLeaderMsgLabel">View All Leadership Message Label</label>
+            <input class="ocmsTextInputLrg" type="text" name="viewAllLeaderMsgLabel" id="viewAllLeaderMsgLabel" value="{!viewAllLeaderMsgLabel}"/>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <label class="ocmsLabel" for="viewAllLeaderMsgLabelLink">view All Leadership Message Label Link</label>
+            <input type="hidden" id="viewAllLeaderMsgLabelLink" name="viewAllLeaderMsgLabelLink" value="{!viewAllLeaderMsgLabelLink}"/>
+            <cms:PageSelector cPassThroughId="viewAllLeaderMsgLabelLink" value="{!viewAllLeaderMsgLabelLink}" dialogId="viewAllLeaderMsgLabelLinkDlg"
+                              sname="{!content.cms__Site_Name__c}" disabled="{!disableAll}" token="{!token}"/>
+          </td>
+        </tr>
+      </table>
+    </form>
+  </apex:outputPanel>
+
+  <script src="{!URLFOR($Resource.ocms_mfc_PageSupport, 'lib/ocms-helper/js/ocms-extensions.js')}"></script>
+</apex:page>

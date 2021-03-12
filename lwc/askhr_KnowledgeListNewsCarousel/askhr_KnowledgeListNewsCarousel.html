@@ -1,0 +1,22 @@
+<template>
+    <!-- Show the Carousel only if there is data -->
+    <template if:true={showCarousel}>
+        
+        <div class="slds-text-align_center">
+            <div style="width:350px;">
+                <lightning-carousel scroll-duration={scrollDuration}>
+                    <!-- Add a carousel element for each news knowledge article -->
+                    <template for:each={listKnowledgeNewsArticles} for:item="knowledgeNewsArticle">
+                        <lightning-carousel-image key={knowledgeNewsArticle.record.Id}
+                                src={knowledgeNewsArticle.url}
+                                header={knowledgeNewsArticle.record.Title}
+                                description={knowledgeNewsArticle.record.Summary}
+                                alternative-text={knowledgeNewsArticle.record.Title}
+                                href={knowledgeNewsArticle.articlUrl}>
+                            </lightning-carousel-image>
+                    </template>
+                </lightning-carousel>
+            </div>
+        </div>
+    </template>
+</template>

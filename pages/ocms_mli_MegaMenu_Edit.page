@@ -1,0 +1,53 @@
+<apex:page controller="cms.CreateContentController" extensions="ocms_mli_MegaMenu" showHeader="false" sidebar="false" cache="false" title="Orchestra CMS" standardStylesheets="false">
+
+    <script type="text/javascript" language="javascript">
+
+        $(document).ready(function(){
+
+            ce.content_editor('registerSaveFunction', function(){
+
+                var attributes = new Array();
+
+                attributes.push({"name":"strCloseButton", "value": $('#strCloseButton').val(), "type": "Text", "simple": false});
+                //attributes.push({"name":"strSkipLink", "value": $('#strSkipLink').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strDataMsgOpen", "value": $('#strDataMsgOpen').val(), "type": "Text", "simple": false});
+                attributes.push({"name":"strDataMsgClose", "value": $('#strDataMsgClose').val(), "type": "Text", "simple": false});
+
+                return attributes;
+            });
+        });
+
+    </script>
+    <apex:outputPanel >
+        <form>
+            <table class="ocmsContentEditor ocmsContentEditorNested">
+                <tr>
+                    <td>             
+                        <label class="ocmsLabel" for="strCloseButton">Close button</label>
+                        <input class="ocmsTextInputLrg" id="strCloseButton" name="strCloseButton" type="text" value="{!strCloseButton}"></input>
+                    </td>
+                </tr>
+                
+                <!-- <tr> remove as per STI 7198
+                    <td>             
+                        <label class="ocmsLabel" for="strSkipLink">Skip link verbage</label>
+                        <input class="ocmsTextInputLrg" id="strSkipLink" name="strSkipLink" type="text" value="{!strSkipLink}"></input>
+                    </td>
+                </tr> -->
+                <tr>
+                    <td>             
+                        <label class="ocmsLabel" for="strDataMsgOpen">Open Message</label>
+                        <input class="ocmsTextInputLrg" id="strDataMsgOpen" name="strDataMsgOpen" type="text" value="{!strDataMsgOpen}"></input>
+                    </td>
+                </tr>
+                <tr>
+                    <td>             
+                        <label class="ocmsLabel" for="strDataMsgClose">Close Message</label>
+                        <input class="ocmsTextInputLrg" id="strDataMsgClose" name="strDataMsgClose" type="text" value="{!strDataMsgClose}"></input>
+                    </td>
+                </tr>
+            </table>
+        </form>
+    </apex:outputPanel>
+    
+</apex:page>

@@ -1,0 +1,38 @@
+<apex:page controller="cms.GenerateContent" extensions="ocms_mli_Article" showHeader="false" sidebar="false" standardStylesheets="false">
+    {:Start:}
+        
+
+
+        <script>
+
+            // Extract any data needed from the controller class and append it to the MLI object
+            // Check first to make sure MLI isn't undefined, if it is, define it as an empty object.
+
+            if(typeof window.MLI === 'undefined'){
+                window.MLI = {};
+            }
+
+            if(typeof window.MLI.content === 'undefined'){
+                window.MLI.content = {};
+            }
+
+        </script>
+
+        <!-- Once the data has been appended we can make use of the custom content's javascript files. -->
+        <!-- Depending on Heath Wallace's implementation, this may be superfluous -->
+
+        <apex:outputText rendered="{!api.page_mode != 'production'}">
+            <p>preview mode</p>
+            <script src="{!URLFOR($Resource.ocms_mli_countryLocator, 'js/countryLocator.js')}"></script>
+            <div class='test'>
+            Testing Testing 123
+            </div>
+        </apex:outputText>
+        <apex:outputText rendered="{!api.page_mode == 'production'}">
+            <p>production mode</p>
+            <script src="{!URLFOR($Resource.ocms_mli_countryLocator, 'js/countryLocator.min.js')}"></script>
+        </apex:outputText>
+
+
+    {:Stop:}
+</apex:page>

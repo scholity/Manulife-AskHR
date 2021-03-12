@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ApexPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>34.0</apiVersion>
+    <availableInTouch>false</availableInTouch>
+    <confirmationTokenRequired>false</confirmationTokenRequired>
+    <description>Manulife.com Student Connect</description>
+    <label>ocms_mli_t_student_connect</label>
+    <packageVersions>
+        <majorNumber>7</majorNumber>
+        <minorNumber>89</minorNumber>
+        <namespace>cms</namespace>
+    </packageVersions>
+</ApexPage>
